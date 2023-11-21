@@ -434,3 +434,21 @@
     color: red;
     font-size: 14px;
 }
+.login-infos-wrapper {
+  padding-top: 30px;
+}
+.login-infos-wrapper .info-item {
+    display: flex;
+    margin-bottom: 10px;
+}
+.login-infos-wrapper .label {
+    width: 100px;
+    text-align: right;
+    margin-right: 10px;
+}
+.info-item-btn {
+  padding-top: 20px;
+}
+.conf-btn {
+  margin-right: 10px;
+}

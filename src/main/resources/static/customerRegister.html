@@ -7,7 +7,7 @@
     <title>お客様の情報登録ページ</title>
     <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
     <!-- vue と elementUIの依存css -->
-    <link rel="stylesheet" href="./css/element-ui-min.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     
     <link href="./css/common.css" rel="stylesheet" />
     
@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/@element-plus/icons-vue"></script>
 
 </head>
 <body >
@@ -58,6 +59,9 @@
                         パスワード<span class="required">（必須）</span>
                     </label>
                     <el-input placeholder="例：danldkad&%$$&" v-model="customerInfo.password"></el-input>
+                    <div class="desc">
+                        (8-12桁、数字とアルファベット両方とも1桁以上)
+                    </div>
                 </div>
                 <div class="form-item">
                     <label class="label" for="">
@@ -69,10 +73,10 @@
                     <label class="label" for="">
                         性&nbsp;&nbsp;別<span class="required">（必須）</span>
                     </label>
-                    <el-radio-group v-model="radio">
-                        <el-radio :label="male">男性</el-radio>
-                        <el-radio :label="female">女性</el-radio>
-                        <el-radio :label="other">指定しない</el-radio>
+                    <el-radio-group v-model="customerInfo.gender">
+                        <el-radio :label="0">男性</el-radio>
+                        <el-radio :label="1">女性</el-radio>
+                        <el-radio :label="2">指定しない</el-radio>
                     </el-radio-group>
                 </div>
                 <div class="form-item">
@@ -121,6 +125,7 @@
             return {
                 // html の中の　v-model　属性と同じ値
                 customerInfo: {
+                    gender: 0
 				},
                 caseInfo: {}
             };
