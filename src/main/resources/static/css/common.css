@@ -400,8 +400,16 @@
     margin-bottom: 14px;
 }
 
-.login-form-container .form-item label {
-    width: 100px;
+.login-form-container .caption {
+    font-weight: bold;
+    font-size: 20px;
+    color: #999;
+}
+
+.login-form-container .form-item .label {
+    width: 180px;
+    text-align: right;
+    margin-right: 10px;
 }
 
 .login-form {
@@ -413,6 +421,14 @@
 .login-form-container .form-item .desc {
     font-size: 12px;
     margin-left: 10px;
+}
+.user-check {
+  text-decoration: underline;
+  cursor: pointer;
+  color: #409eff;
+}
+.login-form-container .btn-form-item {
+    padding-left: 190px;
 }
 .required {
     color: red;
