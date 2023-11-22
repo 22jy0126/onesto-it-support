@@ -30,7 +30,49 @@
 
     <!-- メインの部分 -->
     <main class="common-mian complete-main" id="app">
-        
+        <section class="login-form-container">
+            <div class="caption">
+                ログイン<br>
+                「システム名」はオネストが運営する求人票登録サイトです。<br>
+                あなたのお願い、オネストの社員が実現致します！！<br>
+                会員登録時のメールアドレスでログインいただけます
+            </div>
+        </section>
+
+    <form method="post" action="uw04_01.html">
+		<table>
+			<tr>
+				<th>メールアドレス：</th>
+				<td><input type="text"  name="mail"  value=""></td>
+			</tr>
+			<tr>
+				<th>パスワード　　：</th>
+				<td><input type="password"  name="pw"></td>
+			</tr>
+			<tr>
+				<td colspan="2" class="rt"><input type="submit" value="ログイン"></td>
+			</tr>
+			<tr>
+				<td colspan="2" class="rt"><a href="">パスワードをお忘れの方</a><td>
+			</tr>
+		</table>
+	</form>
+	
+	<hr>
+	
+	<h3>初めての方</h3>
+		<p>はじめてご利用されるお客様は、下記より会員登録をおこなってください。</p>
+		<ul>
+			<li>登録は無料です。</li>
+		</ul>
+		<table>
+			<tr>
+				<td>
+					<button type="button"onclick="location.href='customerRegister.html'">新規会員登録</button>
+				</td>
+			</tr>
+		</table>
+
     </main>
 </body>
 </html>
