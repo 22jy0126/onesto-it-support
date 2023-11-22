@@ -452,3 +452,7 @@
 .conf-btn {
   margin-right: 10px;
 }
+.complete-main .el-icon-success {
+  color: #67C23A;
+  font-size: 30px;
+}
