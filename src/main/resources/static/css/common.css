@@ -452,7 +452,27 @@
 .conf-btn {
   margin-right: 10px;
 }
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .complete-main .el-icon-success {
   color: #67C23A;
-  font-size: 30px;
+  font-size: 80px;
+  padding-top: 30px;
+}
+
+.complete-main  .complete-text .main{
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.complete-main  .complete-text .sub{
+  text-align: center;
+  font-size: 20px;
+  text-decoration: underline;
+  cursor: pointer;
+  color: #409eff;
 }
