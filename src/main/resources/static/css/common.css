@@ -400,8 +400,16 @@
     margin-bottom: 14px;
 }
 
-.login-form-container .form-item label {
-    width: 100px;
+.login-form-container .caption {
+    font-weight: bold;
+    font-size: 20px;
+    color: #999;
+}
+
+.login-form-container .form-item .label {
+    width: 180px;
+    text-align: right;
+    margin-right: 10px;
 }
 
 .login-form {
@@ -414,7 +422,37 @@
     font-size: 12px;
     margin-left: 10px;
 }
+.user-check {
+  text-decoration: underline;
+  cursor: pointer;
+  color: #409eff;
+}
+.login-form-container .btn-form-item {
+    padding-left: 190px;
+}
 .required {
     color: red;
     font-size: 14px;
+}
+.login-infos-wrapper {
+  padding-top: 30px;
+}
+.login-infos-wrapper .info-item {
+    display: flex;
+    margin-bottom: 10px;
+}
+.login-infos-wrapper .label {
+    width: 100px;
+    text-align: right;
+    margin-right: 10px;
+}
+.info-item-btn {
+  padding-top: 20px;
+}
+.conf-btn {
+  margin-right: 10px;
+}
+.complete-main .el-icon-success {
+  color: #67C23A;
+  font-size: 30px;
 }
