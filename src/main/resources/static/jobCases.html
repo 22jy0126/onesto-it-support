@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     
     <link href="./css/common.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/jobCase.css">
     
     <!-- vue と elementUIの依存javascript -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
@@ -29,8 +30,129 @@
     </header>
 
     <!-- メインの部分 -->
-    <main class="common-mian complete-main" id="app">
-        
+    <main class="common-mian job-case-main" id="app">
+        <!-- 求人票検索 -->
+        <section class="job-case-search-container">
+            <div class="common-caption">
+                <i class="el-icon-search icon"></i>
+                お気の入り求人を検索してください
+            </div>
+            <div class="job-case-search">
+                <div class="search-item">
+                    <div class="search-label">
+                        求人名
+                    </div>
+                    <el-input 
+                        clearable
+                        placeholder="求人名を入力して検索"
+                        v-model="searchJobCase.caseName">
+                    </el-input>
+                </div>
+                <div class="search-item">
+                    <div class="search-label">
+                        予定期間
+                    </div>
+                    <el-input-number 
+                        v-model="searchJobCase.maxDays" :min="1" :max="999">
+                    </el-input-number>
+                    <div class="mark">以内</div>
+                </div>
+                <div class="search-item">
+                    <div class="search-label">
+                        報酬
+                    </div>
+                    <el-input-number v-model="searchJobCase.minMoney" :min="0.1" :max="99999">
+                    </el-input-number>
+                    <div class="mark">万円以上</div>
+                </div>
+                <div class="search-item">
+                    <div class="search-label">
+                        必須技術条件
+                    </div>
+                    <el-select 
+                        v-model="searchJobCase.requiredTech" 
+                        multiple 
+                        placeholder="選択してください"
+                        clearable>
+                        <el-option v-for="tech in techs" :key="tech.value" :label="tech.label" :value="tech.value">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div class="search-item">
+                    <div class="search-label">
+                        プラス技術条件
+                    </div>
+                    <el-select 
+                        v-model="searchJobCase.pulsTech" 
+                        multiple 
+                        clearable
+                        placeholder="選択してください">
+                        <el-option v-for="tech in techs" :key="tech.value" :label="tech.label" :value="tech.value">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div class="search-item">
+                    <el-button type="primary">検索</el-button>
+                    <el-button type="info">リセット</el-button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 求人票リスト -->
+        <section>
+            <div class="common-caption">
+                <i class="el-icon-document icon"></i>
+                合計<span class="em">15件</span>の求人案件を見つかりました
+            </div>
+            <div class="job-case-item" v-for="job in jobList">
+                <div class="case-name-line">
+                    <div class="case-name">{{job.caseName}}</div>
+                    <div>
+                        <span>締切:</span>
+                        <span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
+                    </div>
+                </div>
+                <div class="case-sub">
+                    <div class="case-sub-day">
+                        <span class="label">予定期間:&nbsp;&nbsp;&nbsp;</span>
+                        <span>{{job.workDays}}日</span>
+                    </div>
+                    <div class="case-sub-money">
+                        <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
+                        <span>{{job.bonusMoney.toLocaleString()}}万円</span>
+                        <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
+                    </div>
+                    <div class="case-sub-item">
+                        <span class="label">募集人数:&nbsp;&nbsp;&nbsp;</span>
+                        <span>{{job.number}}人</span>
+                    </div>
+                </div>
+                <div class="case-sub">
+                    <span class="label">クライアント氏名:&nbsp;&nbsp;&nbsp;</span>
+                    <span>{{job.customerName}}さん</span>
+                </div>
+                <div class="case-sub">
+                    <span class="label">必須技術条件:&nbsp;&nbsp;&nbsp;</span>
+                    <span>{{job.requiredTech}}</span>
+                </div>
+                <div class="case-sub">
+                    <span class="label">プラス技術条件:&nbsp;&nbsp;&nbsp;</span>
+                    <span>{{job.pulsTech}}</span>
+                </div>
+                <div class="case-sub">
+                    <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
+                    <span>{{job.description}}</span>
+                </div>
+                <div class="go-detail">
+                    詳細>>
+                </div>
+            </div>
+        </section>
+        <!-- ページ -->
+        <section>
+            <el-pagination layout="prev, pager, next" :total="50">
+            </el-pagination>
+        </section>
     </main>
 </body>
 </html>
@@ -40,22 +162,96 @@
        
     let vm;
     vm = new Vue({
-
         // id はapp の属性の中の部分を管理する
         el: "#app",
         data(){
             return {
                 // 求人票のデータ
                 jobList: [{
-                    caseName: "学生管理システムの制作",                                   // 求人プロジェクト名
-                    customerName: "小林　七海",　　　　　                                 // クライアント氏名
-                    requiredTech: "HTML CSS",                                           //　必須技術条件
-                    pulsTech: "Javascript Java",                                        //　プラス技術条件
-                    number: 3,                                                          //　募集人数
-                    workDays: 15,                                                       //　仕事予定期間
-                    bonusMoney: 5000000,                                                //　報酬
+                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                    customerName: "小林　七海",　　　　　       // クライアント氏名
+                    requiredTech: "HTML CSS",               //　必須技術条件
+                    pulsTech: "Javascript Java",            //　プラス技術条件
+                    number: 3,                              //　募集人数
+                    workDays: 15,                           //　仕事予定期間
+                    bonusMoney: 5,                    //　報酬
+                    bonusMoneyNegotiable: true,             //　報酬相談可能
                     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadline: "2024年2月20日"                // 締切時間
+                }, {
+                    caseName: "従業員管理システムの制作",       // 求人プロジェクト名
+                    customerName: "小林　七海",　　　　　      // クライアント氏名
+                    requiredTech: "HTML CSS",               //　必須技術条件
+                    pulsTech: "Javascript Java",            //　プラス技術条件
+                    number: 3,                              //　募集人数
+                    workDays: 15,                           //　仕事予定期間
+                    bonusMoney: 7.5,                    //　報酬
+                    bonusMoneyNegotiable: false,             //　報酬相談可能                                               
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadline: "2099年12月31日"
+                }, {
+                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                    customerName: "小林　七海",　　　　　       // クライアント氏名
+                    requiredTech: "HTML CSS",               //　必須技術条件
+                    pulsTech: "Javascript Java",            //　プラス技術条件
+                    number: 3,                              //　募集人数
+                    workDays: 15,                           //　仕事予定期間
+                    bonusMoney: 5,                    //　報酬
+                    bonusMoneyNegotiable: true,             //　報酬相談可能
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadline: "2024年2月20日"                // 締切時間
+                }, {
+                    caseName: "従業員管理システムの制作",       // 求人プロジェクト名
+                    customerName: "小林　七海",　　　　　      // クライアント氏名
+                    requiredTech: "HTML CSS",               //　必須技術条件
+                    pulsTech: "Javascript Java",            //　プラス技術条件
+                    number: 3,                              //　募集人数
+                    workDays: 15,                           //　仕事予定期間
+                    bonusMoney: 7.5,                    //　報酬
+                    bonusMoneyNegotiable: false,             //　報酬相談可能                                               
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadline: "2099年12月31日"
                 }],
+                // 求人票の検索
+                searchJobCase: {
+                    maxDays: 10,
+                    minMoney: 1,
+                },
+                // 技術選択肢
+                techs: [{
+                    value: "VBA",
+                    label: "VBA",
+                }, {
+                    value: "java",
+                    label: "java",
+                }, {
+                    value: "c++",
+                    label: "c++",
+                }, {
+                    value: "c#",
+                    label: "c#",
+                }, {
+                    value: "php",
+                    label: "php",
+                }, {
+                    value: "python",
+                    label: "python",
+                }, {
+                    value: "html",
+                    label: "html",
+                }, {
+                    value: "css",
+                    label: "css",
+                }, {
+                    value: "javaScript",
+                    label: "javaScript",
+                }, {
+                    value: "android",
+                    label: "android",
+                }, {
+                    value: "ios",
+                    label: "ios",
+                }]
             };
         },
     });
