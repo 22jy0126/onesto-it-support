@@ -388,7 +388,7 @@
     padding-top: 13px;
 }
 .common-mian {
-    padding: 90px 20px 0 20px;
+    padding: 70px 0px 0px 200px;
 }
 .login-form-container {
     font-size: 18px;
@@ -480,3 +480,23 @@
     background-color: #409eff !important;
     border-color: #409eff !important;
 } */
+.el-aside {
+    border-right: 1px solid #eee;
+    background: #f8f8f8;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    bottom: 0;
+}
+
+.el-menu {
+  background-color: #eee;
+  border-right: none;
+}
+.el-menu-item.is-active {
+    color: #000;
+    background-color: #ddd;
+}
+.el-menu-item:hover {
+    background-color: #ddd;
+}
