@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>お客様の情報登録完了ページ</title>
+    <title>求人一覧</title>
     <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
     <!-- vue と elementUIの依存css -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
@@ -19,153 +19,160 @@
 
 </head>
 <body >
-    <!-- ヘッドの部分 各々の画面は同じです -->
-    <header class="common-header">
-        <div class="logo">
-            ブリッジ
-        </div>
-        <div class="login-info">
-            未登録
-        </div>
-    </header>
-
-    <!-- メインの部分 -->
-    <el-container class="common-mian job-case-main" id="app">
-        <!-- サイドメニュー -->
-        <el-aside width="200px">
-            <el-menu 
-                default-active="1"
-                class="el-menu-vertical-demo">
-                <el-menu-item index="1">求人一覧</el-menu-item>
-                <el-menu-item index="2">応募歴史</el-menu-item>
-            </el-menu>
-        </el-aside>
-        
-        <el-container>
-            <el-main>
-                <!-- 求人票検索 -->
-                <section class="job-case-search-container">
-                    <div class="common-caption">
-                        <i class="el-icon-search icon"></i>
-                        お気の入り求人を検索してください
-                    </div>
-                    <div class="job-case-search">
-                        <div class="search-item">
-                            <div class="search-label">
-                                求人名
-                            </div>
-                            <el-input 
-                                clearable
-                                placeholder="求人名を入力して検索"
-                                v-model="searchJobCase.caseName">
-                            </el-input>
-                        </div>
-                        <div class="search-item">
-                            <div class="search-label">
-                                予定期間
-                            </div>
-                            <el-input-number 
-                                v-model="searchJobCase.maxDays" :min="1" :max="999">
-                            </el-input-number>
-                            <div class="mark">以内</div>
-                        </div>
-                        <div class="search-item">
-                            <div class="search-label">
-                                報酬
-                            </div>
-                            <el-input-number v-model="searchJobCase.minMoney" :min="0.1" :max="99999">
-                            </el-input-number>
-                            <div class="mark">万円以上</div>
-                        </div>
-                        <div class="search-item">
-                            <div class="search-label">
-                                必須技術条件
-                            </div>
-                            <el-select 
-                                v-model="searchJobCase.requiredTech" 
-                                multiple 
-                                placeholder="選択してください"
-                                clearable>
-                                <el-option v-for="tech in techs" :key="tech.value" :label="tech.label" :value="tech.value">
-                                </el-option>
-                            </el-select>
-                        </div>
-                        <div class="search-item">
-                            <div class="search-label">
-                                プラス技術条件
-                            </div>
-                            <el-select 
-                                v-model="searchJobCase.pulsTech" 
-                                multiple 
-                                clearable
-                                placeholder="選択してください">
-                                <el-option v-for="tech in techs" :key="tech.value" :label="tech.label" :value="tech.value">
-                                </el-option>
-                            </el-select>
-                        </div>
-                        <div class="search-item">
-                            <el-button type="primary">検索</el-button>
-                            <el-button type="info">リセット</el-button>
-                        </div>
-                    </div>
-                </section>
+    <el-container id="app">
+        <!-- ヘッドの部分 各々の画面は同じです -->
+        <header class="common-header">
+            <div class="logo">
+                ブリッジ
+            </div>
+            <div class="login-info">
+                <el-badge :value="noticeCount" class="item">
+                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
+                </el-badge>
+                {{user.username}}さん、こんにちは！
+            </div>
+        </header>
     
-                <!-- 求人票リスト -->
-                <section>
-                    <div class="common-caption">
-                        <i class="el-icon-document icon"></i>
-                        合計<span class="em">15件</span>の求人案件を見つかりました
-                    </div>
-                    <div class="job-case-item" v-for="job in jobList">
-                        <div class="case-name-line">
-                            <div class="case-name">{{job.caseName}}</div>
-                            <div>
-                                <span>締切:</span>
-                                <span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
+        <!-- メインの部分 -->
+        <el-container class="common-mian job-case-main">
+            <!-- サイドメニュー -->
+            <el-aside width="200px">
+                <el-menu 
+                    default-active="1"
+                    class="el-menu-vertical-demo">
+                    <el-menu-item index="1">求人一覧</el-menu-item>
+                    <el-menu-item index="2">個人履歴</el-menu-item>
+                    <el-menu-item index="3">応募歴史</el-menu-item>
+                    <el-menu-item index="4">通知</el-menu-item>
+                </el-menu>
+            </el-aside>
+            
+            <el-container>
+                <el-main>
+                    <!-- 求人票検索 -->
+                    <section class="job-case-search-container">
+                        <div class="common-caption">
+                            <i class="el-icon-search icon"></i>
+                            お気の入り求人を検索してください
+                        </div>
+                        <div class="job-case-search">
+                            <div class="search-item">
+                                <div class="search-label">
+                                    求人名
+                                </div>
+                                <el-input 
+                                    clearable
+                                    placeholder="求人名を入力して検索"
+                                    v-model="searchJobCase.caseName">
+                                </el-input>
+                            </div>
+                            <div class="search-item">
+                                <div class="search-label">
+                                    予定期間
+                                </div>
+                                <el-input-number 
+                                    v-model="searchJobCase.maxDays" :min="1" :max="999">
+                                </el-input-number>
+                                <div class="mark">以内</div>
+                            </div>
+                            <div class="search-item">
+                                <div class="search-label">
+                                    報酬
+                                </div>
+                                <el-input-number v-model="searchJobCase.minMoney" :min="0.1" :max="99999">
+                                </el-input-number>
+                                <div class="mark">万円以上</div>
+                            </div>
+                            <div class="search-item">
+                                <div class="search-label">
+                                    必須技術条件
+                                </div>
+                                <el-select 
+                                    v-model="searchJobCase.requiredTech" 
+                                    multiple 
+                                    placeholder="選択してください"
+                                    clearable>
+                                    <el-option v-for="tech in techs" :key="tech.value" :label="tech.label" :value="tech.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div class="search-item">
+                                <div class="search-label">
+                                    プラス技術条件
+                                </div>
+                                <el-select 
+                                    v-model="searchJobCase.pulsTech" 
+                                    multiple 
+                                    clearable
+                                    placeholder="選択してください">
+                                    <el-option v-for="tech in techs" :key="tech.value" :label="tech.label" :value="tech.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div class="search-item">
+                                <el-button type="primary">検索</el-button>
+                                <el-button type="info">リセット</el-button>
                             </div>
                         </div>
-                        <div class="case-sub">
-                            <div class="case-sub-day">
-                                <span class="label">予定期間:&nbsp;&nbsp;&nbsp;</span>
-                                <span>{{job.workDays}}日</span>
+                    </section>
+        
+                    <!-- 求人票リスト -->
+                    <section>
+                        <div class="common-caption">
+                            <i class="el-icon-document icon"></i>
+                            合計<span class="em">15件</span>の求人案件を見つかりました
+                        </div>
+                        <div class="job-case-item" v-for="job in jobList">
+                            <div class="case-name-line">
+                                <div class="case-name">{{job.caseName}}</div>
+                                <div>
+                                    <span>締切:</span>
+                                    <span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
+                                </div>
                             </div>
-                            <div class="case-sub-money">
-                                <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
-                                <span>{{job.bonusMoney.toLocaleString()}}万円</span>
-                                <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
+                            <div class="case-sub">
+                                <div class="case-sub-day">
+                                    <span class="label">予定期間:&nbsp;&nbsp;&nbsp;</span>
+                                    <span>{{job.workDays}}日</span>
+                                </div>
+                                <div class="case-sub-money">
+                                    <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
+                                    <span>{{job.bonusMoney.toLocaleString()}}万円</span>
+                                    <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
+                                </div>
+                                <div class="case-sub-item">
+                                    <span class="label">募集人数:&nbsp;&nbsp;&nbsp;</span>
+                                    <span>{{job.number}}人</span>
+                                </div>
                             </div>
-                            <div class="case-sub-item">
-                                <span class="label">募集人数:&nbsp;&nbsp;&nbsp;</span>
-                                <span>{{job.number}}人</span>
+                            <div class="case-sub">
+                                <span class="label">クライアント氏名:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.customerName}}さん</span>
+                            </div>
+                            <div class="case-sub">
+                                <span class="label">必須技術条件:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.requiredTech}}</span>
+                            </div>
+                            <div class="case-sub">
+                                <span class="label">プラス技術条件:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.pulsTech}}</span>
+                            </div>
+                            <div class="case-sub">
+                                <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.description}}</span>
+                            </div>
+                            <div class="go-detail">
+                                詳細>>
                             </div>
                         </div>
-                        <div class="case-sub">
-                            <span class="label">クライアント氏名:&nbsp;&nbsp;&nbsp;</span>
-                            <span>{{job.customerName}}さん</span>
-                        </div>
-                        <div class="case-sub">
-                            <span class="label">必須技術条件:&nbsp;&nbsp;&nbsp;</span>
-                            <span>{{job.requiredTech}}</span>
-                        </div>
-                        <div class="case-sub">
-                            <span class="label">プラス技術条件:&nbsp;&nbsp;&nbsp;</span>
-                            <span>{{job.pulsTech}}</span>
-                        </div>
-                        <div class="case-sub">
-                            <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
-                            <span>{{job.description}}</span>
-                        </div>
-                        <div class="go-detail">
-                            詳細>>
-                        </div>
-                    </div>
-                </section>
-                <!-- ページ -->
-                <section>
-                    <el-pagination layout="prev, pager, next" :total="50">
-                    </el-pagination>
-                </section>
-            </el-main>
+                    </section>
+                    <!-- ページ -->
+                    <section>
+                        <el-pagination layout="prev, pager, next" :total="50">
+                        </el-pagination>
+                    </section>
+                </el-main>
+            </el-container>
         </el-container>
     </el-container>
 
@@ -181,6 +188,12 @@
         el: "#app",
         data(){
             return {
+                // ログインしたユーザー情報
+                user: {
+                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
+                    username: "鈴木　奈々", // ユーザー名
+                    noticeCount: 2, // 通知数
+                },
                 // 求人票のデータ
                 jobList: [{
                     caseName: "学生管理システムの制作",         // 求人プロジェクト名
