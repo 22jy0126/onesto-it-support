@@ -386,6 +386,15 @@
 }
 .common-header .login-info {
     padding-top: 13px;
+    display: flex;
+    align-items: center;
+}
+.common-header .login-info .el-avatar {
+  margin-right: 14px;
+}
+.common-header .login-info .el-badge__content.is-fixed {
+  top: 2px;
+  right: 25px;
 }
 .common-mian {
     padding: 70px 0px 0px 200px;
