@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     
     <link href="./css/common.css" rel="stylesheet" />
-    <link rel="stylesheet" href="./css/jobCase.css">
+    <link rel="stylesheet" href="./css/jobCase.css" />
     
     <!-- vue と elementUIの依存javascript -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
@@ -26,7 +26,7 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <el-badge :value="noticeCount" class="item">
+                <el-badge :value="user.noticeCount" class="item">
                     <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
                 </el-badge>
                 {{user.username}}さん、こんにちは！

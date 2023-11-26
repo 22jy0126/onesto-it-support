@@ -1,0 +1,11 @@
+.customer-case-edit-container .edit-item {
+    display: flex;
+    align-items: center;
+}
+.customer-case-edit-container .edit-item .label {
+    white-space: nowrap;
+    margin-right: 10px;
+}
+.required {
+    color: red;
+}
