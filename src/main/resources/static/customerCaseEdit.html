@@ -56,6 +56,10 @@
                     <!-- 案件登録 -->
                     <section>
                         <form>
+                            <div class="caption-wrapper">
+                                <i class="el-icon-edit-outline"></i>
+                                <div class="caption">案件の基本情報</div> 
+                            </div> 
                             <div class="edit-item">
                                 <div class="label">
                                     案件名:
@@ -65,6 +69,15 @@
                                     placeholder="例：xxxシステム作成" 
                                     v-model="jobCase.caseName" 
                                     clearable>
+                                </el-input>
+                            </div>
+                            <div class="edit-item edit-item-top">
+                                <div class="label">案件の説明:</div>
+                                <el-input
+                                    type="textarea"
+                                    :rows="3"
+                                    placeholder="例：案件のプロファイルなど"
+                                    v-model="jobCase.description">
                                 </el-input>
                             </div>
                             <div class="edit-item">
@@ -81,6 +94,91 @@
                                         :value="tech.value">
                                     </el-option>
                                 </el-select>
+                            </div>
+                            <div class="edit-item">
+                                <div class="label">プラス技術条件:</div>
+                                <el-select 
+                                    v-model="jobCase.pulsTech" 
+                                    multiple 
+                                    placeholder="選択してください" 
+                                    clearable>
+                                    <el-option 
+                                        v-for="tech in techs" 
+                                        :key="tech.value" 
+                                        :label="tech.label" 
+                                        :value="tech.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div class="edit-item">
+                                <div class="label">募集人数:</div>
+                                <el-input-number 
+                                    v-model="jobCase.number" 
+                                    :min="1" 
+                                    :max="999">
+                                </el-input-number>
+                                <div class="des">人</div>
+                            </div>
+                            <div class="edit-item">
+                                <div class="label">仕事予定期間:</div>
+                                <el-input-number 
+                                    v-model="jobCase.workDays" 
+                                    :min="1" 
+                                    :max="999">
+                                </el-input-number>
+                                <div class="des">日</div>
+                            </div>
+                            <div class="edit-item">
+                                <div class="label">報酬:</div>
+                                <el-input-number 
+                                    v-model="jobCase.bonusMoney" 
+                                    :min="1" 
+                                    :max="999">
+                                </el-input-number>
+                                <div class="des">万円</div>
+                                <div class="sub-edit">
+                                    <span class="sub-lable">相談可能</span>
+                                    <el-switch 
+                                        v-model="jobCase.bonusMoneyNegotiable">
+                                    </el-switch>
+                                </div>
+                            </div>
+                            <div class="functions-container">
+                                <div class="caption-wrapper">
+                                    <i class="el-icon-edit-outline"></i>
+                                    <div class="caption">機能の追加</div> 
+                                </div> 
+                                <div class="functions-edit-wrapper" 
+                                    v-for="(func, index) in jobCase.functions">
+                                    <div class="opts">
+                                        <div v-bind:class="index==0 ? 'opt-item-hidden' : 'opt-item'">
+                                            <i class="el-icon-top"></i>
+                                            上に移動
+                                        </div>
+                                        <div v-bind:class="index==(jobCase.functions.length-1) ? 'opt-item-hidden' : 'opt-item'">
+                                            <i class="el-icon-bottom"></i>
+                                            下に移動
+                                        </div>
+                                    </div>
+                                    <div class="func-edit">
+                                        <div class="label">機能名</div>
+                                        <el-input 
+                                            placeholder="例：検索機能..." 
+                                            v-model="func.functionName" 
+                                            clearable>
+                                        </el-input>
+                                    </div>
+                                    <div class="func-edit func-edit-top">
+                                        <div class="label">機能説明</div>
+                                        <el-input 
+                                            type="textarea"
+                                            :rows="3"
+                                            placeholder="例：検索機能は..です" 
+                                            v-model="func.functionDesc" 
+                                            clearable>
+                                        </el-input>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </section>
@@ -109,7 +207,23 @@
                     noticeCount: 2, // 通知数
                 },
                 jobCase: {
-                    caseName: "", // 案件名
+                    caseName: "",         // 案件名
+                    requiredTech:  "",    // 必須技術条件
+                    pulsTech:  "",        // プラス技術条件
+                    number: 3,            // 募集人数
+                    workDays: 15,         // 仕事予定期間
+                    bonusMoney: 5,                    //　報酬
+                    bonusMoneyNegotiable: false,       //　報酬相談可能
+                    description: "",      // 案件の説明
+                    functions: [{
+                        id: 0,
+                        functionName: "1",  // 機能名
+                        functionDesc: "1",  // 機能説明
+                    }, {
+                        id: 1,
+                        functionName: "2",  // 機能名
+                        functionDesc: "2",  // 機能説明
+                    }],
                 },
                 // 技術選択肢
                 techs: [{
@@ -148,5 +262,12 @@
                 }]
             };
         },
+        methods: {
+            // renderFunctions(h, { node, data, store }) {
+            //     return (
+                    
+            //     );
+            // }
+        }
     });
 </script>
