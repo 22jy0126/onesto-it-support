@@ -81,7 +81,7 @@
                                 </el-input>
                             </div>
                             <div class="edit-item">
-                                <div class="label">必須技術条件:</div>
+                                <div class="label">希望開発言語:</div>
                                 <el-select 
                                     v-model="jobCase.requiredTech" 
                                     multiple 
@@ -95,7 +95,7 @@
                                     </el-option>
                                 </el-select>
                             </div>
-                            <div class="edit-item">
+                            <!-- <div class="edit-item">
                                 <div class="label">プラス技術条件:</div>
                                 <el-select 
                                     v-model="jobCase.pulsTech" 
@@ -127,7 +127,7 @@
                                     :max="999">
                                 </el-input-number>
                                 <div class="des">日</div>
-                            </div>
+                            </div> -->
                             <div class="edit-item">
                                 <div class="label">報酬:</div>
                                 <el-input-number 
@@ -159,15 +159,18 @@
                                             <i class="el-icon-bottom"></i>
                                             下に移動
                                         </div>
+                                        <div v-bind:class="jobCase.functions.length==1 ? 'opt-item-hidden' : 'opt-item opt-item-red'">
+
+                                        </div>
                                     </div>
-                                    <div class="func-edit">
+                                    <!-- <div class="func-edit">
                                         <div class="label">機能名</div>
                                         <el-input 
                                             placeholder="例：検索機能..." 
                                             v-model="func.functionName" 
                                             clearable>
                                         </el-input>
-                                    </div>
+                                    </div> -->
                                     <div class="func-edit func-edit-top">
                                         <div class="label">機能説明</div>
                                         <el-input 
@@ -209,20 +212,24 @@
                 jobCase: {
                     caseName: "",         // 案件名
                     requiredTech:  "",    // 必須技術条件
-                    pulsTech:  "",        // プラス技術条件
-                    number: 3,            // 募集人数
-                    workDays: 15,         // 仕事予定期間
+                    // pulsTech:  "",        // プラス技術条件
+                    // number: 3,            // 募集人数
+                    // workDays: 15,         // 仕事予定期間
                     bonusMoney: 5,                    //　報酬
                     bonusMoneyNegotiable: false,       //　報酬相談可能
                     description: "",      // 案件の説明
                     functions: [{
                         id: 0,
-                        functionName: "1",  // 機能名
+                        // functionName: "1",  // 機能名
                         functionDesc: "1",  // 機能説明
                     }, {
                         id: 1,
-                        functionName: "2",  // 機能名
+                        // functionName: "2",  // 機能名
                         functionDesc: "2",  // 機能説明
+                    }, {
+                        id: 2,
+                        // functionName: "3",  // 機能名
+                        functionDesc: "3",  // 機能説明
                     }],
                 },
                 // 技術選択肢

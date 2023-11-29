@@ -64,7 +64,7 @@
                                     v-model="searchJobCase.caseName">
                             </el-input>
                         </div>
-                        <div class="search-item">
+                        <!-- <div class="search-item">
                             <div class="search-label">
                                 予定期間
                             </div>
@@ -72,7 +72,7 @@
                                     v-model="searchJobCase.maxDays" :min="1" :max="999">
                             </el-input-number>
                             <div class="mark">以内</div>
-                        </div>
+                        </div> -->
                         <div class="search-item">
                             <div class="search-label">
                                 報酬
@@ -126,7 +126,7 @@
                         <div class="case-name-line">
                             <div class="case-name">{{job.caseName}}</div>
                             <div>
-                                <span>締切:</span>
+                                <span>開発期限:</span>
                                 <span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
                             </div>
                         </div>
@@ -140,23 +140,23 @@
                                 <span>{{job.bonusMoney.toLocaleString()}}万円</span>
                                 <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
                             </div>
-                            <div class="case-sub-item">
+                            <!-- <div class="case-sub-item">
                                 <span class="label">募集人数:&nbsp;&nbsp;&nbsp;</span>
                                 <span>{{job.number}}人</span>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="case-sub">
                             <span class="label">クライアント氏名:&nbsp;&nbsp;&nbsp;</span>
                             <span>{{job.customerName}}さん</span>
                         </div>
                         <div class="case-sub">
-                            <span class="label">必須技術条件:&nbsp;&nbsp;&nbsp;</span>
+                            <span class="label">希望開発言語:&nbsp;&nbsp;&nbsp;</span>
                             <span>{{job.requiredTech}}</span>
                         </div>
-                        <div class="case-sub">
+                        <!-- <div class="case-sub">
                             <span class="label">プラス技術条件:&nbsp;&nbsp;&nbsp;</span>
                             <span>{{job.pulsTech}}</span>
-                        </div>
+                        </div> -->
                         <div class="case-sub">
                             <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
                             <span>{{job.description}}</span>
@@ -205,7 +205,7 @@
                     bonusMoney: 5,                    //　報酬
                     bonusMoneyNegotiable: true,             //　報酬相談可能
                     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日"                // 締切時間
+                    deadline: "2024年2月20日"                // 開発期限
                 }, {
                     caseName: "従業員管理システムの制作",       // 求人プロジェクト名
                     customerName: "小林　七海",　　　　　      // クライアント氏名
@@ -227,7 +227,7 @@
                     bonusMoney: 5,                    //　報酬
                     bonusMoneyNegotiable: true,             //　報酬相談可能
                     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日"                // 締切時間
+                    deadline: "2024年2月20日"                // 開発期限
                 }, {
                     caseName: "従業員管理システムの制作",       // 求人プロジェクト名
                     customerName: "小林　七海",　　　　　      // クライアント氏名

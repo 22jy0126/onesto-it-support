@@ -66,8 +66,15 @@
 }
 .opts {
     margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
 }
 .opt-item {
     color: #6694e3;
     cursor: pointer;
+    margin-left: 20px;
+}
+.opt-item-red {
+    color: red;
 }
