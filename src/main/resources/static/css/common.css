@@ -415,7 +415,7 @@ body {
     display: flex;
     align-items: center;
     font-size: 16px;
-    margin-bottom: 14px;
+    margin-bottom: 5px;
 }
 
 .login-form-container .caption {
@@ -528,4 +528,8 @@ body {
 
 .el-menu-item:hover {
     background-color: #ddd;
+}
+.common-mian-nologin {
+  padding-left: 20px;
+  padding-top: 90px;
 }
