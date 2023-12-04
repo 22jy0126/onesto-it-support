@@ -102,5 +102,10 @@
                 caseInfo: {}
             };
         },
+        mounted() {
+            const customerInfoStr = localStorage.getItem("tempCustomerInfo");
+            const customerInfo = JSON.parse(customerInfoStr);
+            console.log(customerInfo);
+        },
     });
 </script>

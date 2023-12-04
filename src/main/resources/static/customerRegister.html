@@ -232,7 +232,7 @@
         methods: {
             checkUsername() {
                 //TODO サーバに送って、使えるかどうかをチェックする
-                if (this.customerInfo.username == "aaaa") {
+                if (this.customerInfo.username != "aaaa") {
                     this.usernameCheck = true;
                     this.checkedUsername = this.customerInfo.username;
                 } else {
@@ -279,9 +279,9 @@
                     flag = false;
                 }
                 // パスワードフォーマットの検証
-                const pwdRegExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,12}$/;
+                const pwdRegExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
                 if (!pwdRegExp.test(password)) {
-                    this.errors.password = true;
+                    this.errors.passwordFormat = true;
                     flag = false;
                 }
                 // パスワード二回の入力一致することの検証
