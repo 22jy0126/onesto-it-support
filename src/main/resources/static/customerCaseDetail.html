@@ -6,15 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- TODO: ページの名にチェンジする -->
-    <title>お客様の案件登録確認</title>
+    <title>お客様の案件登録情報確認</title>
     <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
     <!-- vue と elementUIの依存css -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 
     <!-- システム共用のスタイルはこのファイルに追加する -->
     <link href="./css/common.css" rel="stylesheet" />
-    <link rel="stylesheet" href="css/customerCasePreview.css">
+    <link rel="stylesheet" href="./css/jobCase.css"/>
     <!-- TODO: 作るHTMLとペアでCSSファイルを作り、なるべく同じファイル名にする -->
+    <link rel="stylesheet" href="./css/customerCaseDetail.css" />
 
     <!-- vue と elementUIの依存javascript -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
@@ -45,14 +46,240 @@
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="1" class="el-menu-vertical-demo">
                     <el-menu-item index="1">新規案件登録</el-menu-item>
-                    <!--el-menu-item index="2">私の案件</el-menu-item-->
-                    <!--el-menu-item index="3">通知</el-menu-item-->
+                    <el-menu-item index="2">私の案件</el-menu-item>
+                    <el-menu-item index="3">通知</el-menu-item>
                 </el-menu>
             </el-aside>
 
-            <el-container>
+            <el-container class="customer-case-detail-container">
                 <el-main>
                     <!-- TODO: 内容はここに書く -->
+                    <section>
+                        <form>
+                            <div class="caption-wrapper">
+                                <i class="el-icon-edit-outline"></i>
+                                <div class="caption">案件の基本情報</div> 
+                            </div> 
+                            <div class="edit-item-wrapper">
+                                <div class="edit-item">
+                                    <div class="label">
+                                        案件名:
+                                        <span class="required"></span>
+                                    </div>
+                                    <div>{{jobCase.caseName}}</div>
+                                    <!-- <el-input 
+                                        v-bind:class="(errors.caseNameDraft || errors.caseNameErr) ? 'input-err' : ''"
+                                        placeholder="例：xxxシステム作成" 
+                                        v-model="jobCase.caseName" 
+                                        @input="errClean('caseName')"
+                                        clearable
+                                        readonly>
+                                    </el-input> -->
+                                </div>
+                                <div v-bind:class="errors.caseNameErr ? 'err-item' : 'opt-item-hidden'">
+                                    <i class="el-icon-warning error-icon"></i>
+                                    案件名を入力してください
+                                </div>
+                                <div v-bind:class="errors.caseNameDraft ? 'err-item' : 'opt-item-hidden'">
+                                    <i class="el-icon-warning error-icon"></i>
+                                    下書きを保存する際には、案件名が必要です
+                                </div>
+                            </div>
+                            <div class="edit-item-wrapper">
+                                <div class="edit-item edit-item-top">
+                                    <div class="label">案件の説明:<span class="required"></span></div>
+                                    <el-input
+                                        v-bind:class="errors.descriptionErr ? 'input-err' : ''"
+                                        type="textarea"
+                                        :rows="3"
+                                        @input="errClean('description')"
+                                        placeholder="例：案件のプロファイルなど"
+                                        v-model="jobCase.description"
+                                        readonly>
+                                    </el-input>
+                                </div>
+                                <div v-bind:class="errors.descriptionErr ? 'err-item' : 'opt-item-hidden'">
+                                    <i class="el-icon-warning error-icon"></i>
+                                    案件の説明を入力してください
+                                </div>
+                            </div>
+                            <div class="edit-item-wrapper">
+                                <div class="edit-item">
+                                    <div class="label">希望開発言語:</div>
+                                    <el-select 
+                                        v-model="jobCase.requiredTech" 
+                                        multiple 
+                                        placeholder="選択してください" 
+                                        clearable>
+                                        <el-option 
+                                            v-for="tech in techs" 
+                                            :key="tech.value" 
+                                            :label="tech.label" 
+                                            :value="tech.value">
+                                        </el-option>
+                                    </el-select>
+                                </div>
+                            </div>
+                            <!-- <div class="edit-item">
+                                <div class="label">プラス技術条件:</div>
+                                <el-select 
+                                    v-model="jobCase.pulsTech" 
+                                    multiple 
+                                    placeholder="選択してください" 
+                                    clearable>
+                                    <el-option 
+                                        v-for="tech in techs" 
+                                        :key="tech.value" 
+                                        :label="tech.label" 
+                                        :value="tech.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div class="edit-item">
+                                <div class="label">募集人数:</div>
+                                <el-input-number 
+                                    v-model="jobCase.number" 
+                                    :min="1" 
+                                    :max="999">
+                                </el-input-number>
+                                <div class="des">人</div>
+                            </div>
+                            <div class="edit-item">
+                                <div class="label">仕事予定期間:</div>
+                                <el-input-number 
+                                    v-model="jobCase.workDays" 
+                                    :min="1" 
+                                    :max="999">
+                                </el-input-number>
+                                <div class="des">日</div>
+                            </div> -->
+                            <div class="edit-item-wrapper">
+                                <div class="edit-item">
+                                    <div class="label">報酬:<span class="required"></span></div>
+                                    <el-input-number 
+                                        v-bind:class="errors.bonusMoneyErr ? 'input-err number-input' : 'number-input'"
+                                        placeholder="金額を入力してください"
+                                        @change="errClean('bonusMoney')"
+                                        v-model="jobCase.bonusMoney" 
+                                        :min="1" 
+                                        :max="999"
+                                        readonly>
+                                    </el-input-number>
+                                    <div class="des">万円</div>
+                                    <div class="sub-edit">
+                                        <span class="sub-lable">相談可否</span>
+                                        <el-switch 
+                                            v-model="jobCase.bonusMoneyNegotiable">
+                                        </el-switch>
+                                    </div>
+                                </div>
+                                <div v-bind:class="errors.bonusMoneyErr ? 'err-item' : 'opt-item-hidden'">
+                                    <i class="el-icon-warning error-icon"></i>
+                                    報酬額を入力してください
+                                </div>
+                            </div>
+                            <div class="edit-item-wrapper">
+                                <div class="edit-item">
+                                    <div class="label">開発期限:<span class="required"></span></div>
+                                    <el-date-picker 
+                                        v-bind:class="errors.deadlineErr ? 'input-err' : ''"
+                                        v-model="jobCase.deadline" 
+                                        type="date" 
+                                        @change="errClean('deadline')"
+                                        placeholder="Pick a day">
+                                    </el-date-picker>
+                                </div>
+                                <div v-bind:class="errors.deadlineErr ? 'err-item' : 'opt-item-hidden'">
+                                    <i class="el-icon-warning error-icon"></i>
+                                    開発期限を選択してください
+                                </div>
+                            </div>
+                            
+                            <div class="functions-container">
+                                <div class="caption-wrapper">
+                                    <i class="el-icon-edit-outline"></i>
+                                    <div class="caption">機能の追加<span class="required"></span></div> 
+                                    <span></span>
+                                </div> 
+                                <div class="functions-edit-wrapper" 
+                                    draggable="true"
+                                    @dragstart="onFunctionDragStart(index, $event)"
+                                    @dragover="onFunctionDragOver(index, $event)"
+                                    @drop="onFunctionDrop(index, $event)"
+                                    v-for="(func, index) in jobCase.functions">
+                                    <div class="opts">
+                                        <div 
+                                            @click="onFunctionUp(index)"
+                                            v-bind:class="index==0 ? 'opt-item-hidden' : 'opt-item'">
+                                            <i class="el-icon-top"></i>
+                                            上に移動
+                                        </div>
+                                        <div 
+                                            @click="onFunctionDown(index)"
+                                            v-bind:class="index==(jobCase.functions.length-1) ? 'opt-item-hidden' : 'opt-item'">
+                                            <i class="el-icon-bottom"></i>
+                                            下に移動
+                                        </div>
+                                        <el-popconfirm 
+                                            confirm-button-text='削除' 
+                                            cancel-button-text='削除しない' 
+                                            icon="el-icon-info" 
+                                            icon-color="red"
+                                            @confirm="onFunctionDel(index)"
+                                            title="削除した機能は戻らない、よろしいですか?">
+                                            <el-button 
+                                                slot="reference" 
+                                                icon="el-icon-delete"
+                                                v-bind:class="jobCase.functions.length==1 ? 'opt-item-hidden' : 'opt-item opt-item-del'">
+                                                削除
+                                            </el-button>
+                                        </el-popconfirm>
+                                    </div>
+                                    <!-- <div class="func-edit">
+                                        <div class="label">機能名</div>
+                                        <el-input 
+                                            placeholder="例：検索機能..." 
+                                            v-model="func.functionName" 
+                                            clearable>
+                                        </el-input>
+                                    </div> -->
+                                    <div class="func-edit-wrapper">
+                                        <div class="func-edit func-edit-top">
+                                            <div class="label">機能説明</div>
+                                            <el-input 
+                                                draggable="false"
+                                                v-bind:class="func.err ? 'input-err' : ''"
+                                                type="textarea"
+                                                :rows="3"
+                                                placeholder="例：検索機能は..です" 
+                                                v-model="func.functionDesc" 
+                                                @input="funcErrClear(index)"
+                                                clearable
+                                                readonly>
+                                            </el-input>
+                                        </div>
+                                        <div v-bind:class="func.err ? 'err-item err-item-func' : 'opt-item-hidden'">
+                                            <i class="el-icon-warning error-icon"></i>
+                                            機能説明を入力してください
+                                        </div>
+                                    </div>
+                                </div>
+                                <el-button 
+                                    icon="el-icon-plus" 
+                                    @click="onFunctionAdd">
+                                    機能追加
+                                </el-button>
+                            </div>
+                            <div class="save-btns">
+                                <el-button 
+                                    @click="onCaseCreate"
+                                    type="primary">登録する</el-button>
+                                <el-button 
+                                    @click="onDraftSave"
+                                    type="info">下書きとして保存</el-button>
+                            </div>
+                        </form>
+                    </section>
                     
                 </el-main>
             </el-container>
@@ -78,8 +305,216 @@
                     username: "鈴木　奈々", // ユーザー名
                     noticeCount: 2, // 通知数
                 },
-                
+                jobCase: {
+                    caseName: "",         // 案件名
+                    requiredTech:  "",    // 必須技術条件
+                    // pulsTech:  "",        // プラス技術条件
+                    // number: 3,            // 募集人数
+                    // workDays: 15,         // 仕事予定期間
+                    bonusMoney: undefined,   //　報酬
+                    bonusMoneyNegotiable: false,       //　報酬相談可能
+                    description: "",        // 案件の説明
+                    deadline: "",   // 開発期限
+                    functions: [{
+                        id: 0,
+                        // functionName: "1",  // 機能名
+                        functionDesc: "機能1",  // 機能説明
+                        // err: true,
+                    }, {
+                        id: 1,
+                        // functionName: "2",  // 機能名
+                        functionDesc: "機能2",  // 機能説明
+                    }, {
+                        id: 2,
+                        // functionName: "3",  // 機能名
+                        functionDesc: "機能3",  // 機能説明
+                    }],
+                },
+                // 技術選択肢
+                techs: [{
+                    value: "VBA",
+                    label: "VBA",
+                }, {
+                    value: "java",
+                    label: "java",
+                }, {
+                    value: "c++",
+                    label: "c++",
+                }, {
+                    value: "c#",
+                    label: "c#",
+                }, {
+                    value: "php",
+                    label: "php",
+                }, {
+                    value: "python",
+                    label: "python",
+                }, {
+                    value: "html",
+                    label: "html",
+                }, {
+                    value: "css",
+                    label: "css",
+                }, {
+                    value: "javaScript",
+                    label: "javaScript",
+                }, {
+                    value: "android",
+                    label: "android",
+                }, {
+                    value: "ios",
+                    label: "ios",
+                }],
+                // ドラッグドロップ管理
+                dragIndex: null,
+                // 機能のid記録
+                functionIdCnt: 3,
+                //　提出時のエラー展示
+                errors: {
+                    caseNameErr: false,
+                    caseNameDraft: false,
+                    bonusMoneyErr: false,
+                    descriptionErr: false,
+                    deadlineErr: false,
+                }
             };
         },
+        mounted() {
+            const jobCaseStr = localStorage.getItem("tempJobCase");
+            console.log(jobCaseStr);
+            const jobCase = JSON.parse(jobCaseStr);
+            this.jobCase = jobCase;
+        },
+        methods: {
+            onFunctionDragStart(index, e) {
+                this.dragIndex = index;
+                const { 
+                    functions = [],
+                } = this.jobCase;
+                functions[index].isTarget = true;
+            },
+            onFunctionDragOver(index, e) {
+                const ev = e || window.event;
+                ev.dataTransfer.dropEffect = "grab";
+                ev.preventDefault();
+            },
+            onFunctionDrop(index, e) {
+                let targetIndex;
+                let target;
+                const {
+                    functions = [],
+                } = this.jobCase;
+                functions.forEach(({ isTarget }, i) => {
+                    if (!isTarget) return;
+                    targetIndex = i;
+                    functions[i].isTarget = undefined;
+                    target = functions[i];
+                });
+                functions.splice(targetIndex, 1);
+                functions.splice(index, 0, target);
+            },
+            onFunctionDel(index) {
+                const {
+                    functions = [],
+                    functionIdCnt,
+                } = this.jobCase;
+                functions.splice(index, 1);
+            },
+            onFunctionAdd() {
+                const {
+                    functions = [],
+                    functionIdCnt,
+                } = this.jobCase;
+                functions.push({
+                    id: functionIdCnt,
+                    functionDesc: "",
+                });
+                this.functionIdCnt = functionIdCnt + 1;
+            },
+            onFunctionUp(index) {
+                const {
+                    functions = [],
+                    functionIdCnt,
+                } = this.jobCase;
+                const target = functions[index];
+                functions.splice(index, 1);
+                functions.splice(index - 1, 0, target);
+            },
+            onFunctionDown(index) {
+                const {
+                    functions = [],
+                    functionIdCnt,
+                } = this.jobCase;
+                const target = functions[index];
+                functions.splice(index, 1);
+                functions.splice(index + 1, 0, target);
+            },
+            errClean(itemName) {
+                if (itemName == "caseName") {
+                    this.errors.caseNameErr = false;
+                    this.errors.caseNameDraft = false;
+                    return;
+                }
+                const item = itemName + "Err";
+                this.errors[item] = false;
+            },
+            funcErrClear(index) {
+                const {
+                    functions = [],
+                    functionIdCnt,
+                } = this.jobCase;
+                functions[index].err = false;
+            },
+            onDraftSave() {
+                const {
+                    caseName = "",
+                } = this.jobCase;
+                if (caseName == "") {
+                    this.$message.error('下書きを保存する際には、案件名が必要です');
+                    this.errors.caseNameDraft = true;
+                    return;
+                }
+            },
+            onCaseCreate() {
+                const {
+                    caseName = "",
+                    bonusMoney = "",
+                    description = "",
+                    deadline = "",
+                    functions = [],
+                } = this.jobCase;
+                let flag = true;
+                if (caseName == "") {
+                    flag = false;
+                    this.errors.caseNameErr = true;
+                }
+                if (bonusMoney == "") {
+                    flag = false;
+                    this.errors.bonusMoneyErr = true;
+                }
+                if (description == "") {
+                    flag = false;
+                    this.errors.descriptionErr = true;
+                }
+                if (deadline == "") {
+                    flag = false;
+                    this.errors.deadlineErr = true;
+                }
+                functions.forEach((item = {}) => {
+                    const { functionDesc = "" } = item;
+                    if (functionDesc == "") {
+                        flag = false;
+                        item.err = true;
+                    }
+                });
+                if (!flag) {
+                    this.$message.error('未記入の必須項目があります。もう一度チェックしてください！');
+                    return;
+                }
+                localStorage.removeItem("tempJobCase");
+                const jobCaseStr = JSON.stringify(this.jobCase);
+                localStorage.setItem("tempJobCase", jobCaseStr);
+            }
+        }
     });
 </script>
