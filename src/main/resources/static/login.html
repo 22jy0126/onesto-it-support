@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログインページ</title>
+    <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
+    <!-- vue と elementUIの依存css -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    
+    <link href="./css/common.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/login.css">
+
+    <!-- vue と elementUIの依存javascript -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/@element-plus/icons-vue"></script>
+
+</head>
+<body >
+    <!-- ヘッドの部分 各々の画面は同じです -->
+    <header class="common-header">
+        <div class="logo">
+            ブリッジ
+        </div>
+        <div class="login-info">
+            未登録
+        </div>
+    </header>
+
+    <!-- メインの部分 -->
+    <main class="common-mian common-mian-nologin" id="app">
+
+        <el-container class="login-container-outer">
+            <el-container class="login-container">
+                <div class="caption">
+                    ログイン
+                </div>
+                <div class="login-form-wrapper">
+                    <div class="edit-item-wrapper">
+                        <div class="form-item">
+                            <label class="label" for="">
+                                ユーザ名<span class="required"></span>
+                            </label>
+                            <el-input 
+                                placeholder="例：denshi001" 
+                                @input="errClean('username')"
+                                v-bind:class="errors.username  ? 'input-err' : ''"
+                                v-model="loginInfo.username"></el-input>
+                        </div>
+                        <div v-bind:class="errors.username ? 'err-item' : 'opt-item-hidden'">
+                            <i class="el-icon-warning error-icon"></i>
+                            ユーザ名を入力してください
+                        </div>
+                    </div>
+                </div>
+            </el-container>
+        </el-container>
+
+        <!-- お客様の登録 -->
+        <!-- <section class="login-form-container">
+            <div class="caption">
+                ログイン
+            </div>
+            <form class="login-form">
+                <div class="edit-item-wrapper">
+                    <div class="form-item">
+                        <label class="label" for="">
+                            ユーザ名<span class="required">（必須）</span>
+                        </label>
+                        v-modelはフォームのデータを収集するための属性です
+                                        new Vueの中のdataの同じ属性と同じ値を保存する
+                        <el-input 
+                            placeholder="例：denshi001" 
+                            @input="errClean('username')"
+                            @change="checkUN"
+                            v-bind:class="(errors.username || errors.usernameDuplicate) ? 'input-err' : ''"
+                            v-model="customerInfo.username"></el-input>
+                        <div 
+                            v-bind:class="usernameCheck ? 'opt-item-hidden' : 'desc user-check'"
+                            v-on:click="checkUsername">
+                            使えるかどうかをチェックする
+                        </div>
+                        <div v-bind:class="usernameCheck ? 'check-ok' : 'opt-item-hidden'">
+                            <i class="el-icon-success"></i>
+                        </div>
+                    </div>
+                    <div v-bind:class="errors.username ? 'err-item' : 'opt-item-hidden'">
+                        <i class="el-icon-warning error-icon"></i>
+                        ユーザ名を入力してください
+                    </div>
+                    <div v-bind:class="errors.usernameDuplicate ? 'err-item' : 'opt-item-hidden'">
+                        <i class="el-icon-warning error-icon"></i>
+                        ユーザ名はすでに存在しています
+                    </div>
+                </div>
+                <div class="edit-item-wrapper">
+                    <div class="form-item">
+                        <label class="label" for="">
+                            氏&nbsp;&nbsp;名<span class="required">（必須）</span>
+                        </label>
+                        <el-input 
+                            placeholder="例：電子　花子" 
+                            @input="errClean('name')"
+                            v-bind:class="errors.name ? 'input-err' : ''"
+                            v-model="customerInfo.name"></el-input>
+                    </div>
+                    <div v-bind:class="errors.name ? 'err-item' : 'opt-item-hidden'">
+                        <i class="el-icon-warning error-icon"></i>
+                        氏名を入力してください
+                    </div>
+                </div>
+                <div class="edit-item-wrapper">
+                    <div class="form-item">
+                        <label class="label"  for="">
+                            パスワード<span class="required">（必須）</span>
+                        </label>
+                        <el-input 
+                            placeholder="例：dqdqyi66&&" 
+                            show-password
+                            @input="errClean('password')"
+                            v-bind:class="(errors.password || errors.passwordFormat) ? 'input-err' : ''"
+                            v-model="customerInfo.password"></el-input>
+                        <div class="desc">
+                            (8-20桁、数字とアルファベット両方とも1桁以上)
+                        </div>
+                    </div>
+                    <div v-bind:class="errors.password ? 'err-item' : 'opt-item-hidden'">
+                        <i class="el-icon-warning error-icon"></i>
+                        パスワードを入力してください
+                    </div>
+                    <div v-bind:class="errors.passwordFormat ? 'err-item' : 'opt-item-hidden'">
+                        <i class="el-icon-warning error-icon"></i>
+                        パスワードのフォーマットは正しくない
+                    </div>
+                </div>
+                <div class="edit-item-wrapper">
+                    <div class="form-item">
+                        <label class="label" for="">
+                            パスワード確認<span class="required">（必須）</span>
+                        </label>
+                        <el-input 
+                            placeholder="例：dqdqyi66&&" 
+                            show-password
+                            @input="errClean('passwordIncon')"
+                            v-bind:class="errors.passwordIncon ? 'input-err' : ''"
+                            v-model="customerInfo.password2"></el-input>
+                    </div>
+                    <div v-bind:class="errors.passwordIncon ? 'err-item' : 'opt-item-hidden'">
+                        <i class="el-icon-warning error-icon"></i>
+                        パスワードは一致しない
+                    </div>
+                </div>
+                
+                <div class="form-item">
+                    <label class="label" for="">
+                        性&nbsp;&nbsp;別<span class="required">（必須）</span>
+                    </label>
+                    <el-radio-group v-model="customerInfo.gender">
+                        <el-radio :label="0">男性</el-radio>
+                        <el-radio :label="1">女性</el-radio>
+                        <el-radio :label="2">指定しない</el-radio>
+                    </el-radio-group>
+                </div>
+                <div class="form-item">
+                    <label class="label" for="">
+                        生年月日<span class="required">（必須）</span>
+                    </label>
+                    <el-date-picker
+                        v-model="value1"
+                        type="date"
+                        placeholder="Pick a day">
+                    </el-date-picker>
+                </div>
+                <div class="edit-item-wrapper">
+                    <div class="form-item">
+                        <label class="label" for="">
+                            TEL<span class="required">（必須）</span>
+                        </label>
+                        <el-input 
+                            placeholder="例：09000000000" 
+                            @input="errClean('tel')"
+                            v-bind:class="errors.tel ? 'input-err' : ''"
+                            v-model="customerInfo.tel"></el-input>
+                        <div class="desc">
+                            (半角、"-"なしで)
+                        </div>
+                    </div>
+                    <div v-bind:class="errors.tel ? 'err-item' : 'opt-item-hidden'">
+                        <i class="el-icon-warning error-icon"></i>
+                        ハイフンなしで正しい電話番号を入力してください
+                    </div>
+                </div>
+                <div class="edit-item-wrapper">
+                    <div class="form-item">
+                        <label class="label" for="">
+                            Email<span class="required">（必須）</span>
+                        </label>
+                        <el-input 
+                            placeholder="例：dennshi@onesto.co.jp" 
+                            @input="errClean('email')"
+                            v-bind:class="errors.email ? 'input-err' : ''"
+                            v-model="customerInfo.email"></el-input>
+                        <div class="desc">
+                            (半角)
+                        </div>
+                    </div>
+                    <div v-bind:class="errors.email ? 'err-item' : 'opt-item-hidden'">
+                        <i class="el-icon-warning error-icon"></i>
+                        正しいメールアドレスを入力してください
+                    </div>
+                </div>
+                <div class="form-item btn-form-item">
+                    <el-button 
+                        @click="onCreate"
+                        type="primary">登録する</el-button>
+                </div>
+            </form>
+        </section> -->
+    </main>
+</body>
+</html>
+<script>
+	// elementの日本語対応
+    ELEMENT.locale(ELEMENT.lang.ja); 
+       
+    let vm;
+    vm = new Vue({
+
+        // id はapp の属性の中の部分を管理する
+        el: "#app",
+        data(){
+            return {
+                // html の中の　v-model　属性と同じ値
+                loginInfo: {
+                    username: "",
+                    name: "",
+                    password: "",
+                    password2: "",
+                    tel: "",
+                    email: "",
+				},
+                usernameCheck: false,
+                checkedUsername: "",
+                errors: {
+                    username: false,
+                    usernameDuplicate: false,
+                    name: false,
+                    password: false,
+                    passwordIncon: false, //二回のパスワード入力は一致しない
+                    passwordFormat: false, //パスワードのフォーマットは正しくない
+                    tel: false,
+                    email: false,
+                }
+            };
+        },
+        methods: {
+            errClean(itemName) {
+                if (itemName == "username") {
+                    this.errors.username = false;
+                    this.errors.usernameDuplicate = false;
+                    return;
+                }
+                if (itemName == "password") {
+                    this.errors.password = false;
+                    this.errors.passwordFormat = false;
+                    return;
+                }
+                this.errors[itemName] = false;
+            },
+            onCreate() {
+                const {
+                    username = "",
+                    name = "",
+                    password = "",
+                    password2 = "",
+                    tel = "",
+                    email = "",
+                } = this.customerInfo;
+                let flag = true;
+                // ユーザネーム必須の検証
+                if (username == "") {
+                    this.errors.username = true;
+                    flag = false;
+                }
+                // 氏名必須の検証
+                if (name == "") {
+                    this.errors.name = true;
+                    flag = false;
+                }
+                // パスワードフォーマットの検証
+                const pwdRegExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
+                if (!pwdRegExp.test(password)) {
+                    this.errors.passwordFormat = true;
+                    flag = false;
+                }
+                // パスワード二回の入力一致することの検証
+                if (password2 != password) {
+                    this.errors.passwordIncon = true;
+                    flag = false;
+                }
+                // 電話番号フォーマットの検証
+                const telRegExp = /^0\d{9}$/;  //　固定電話
+                const mobileRegExp = /^0[789]0\d{8}$/; // 携帯電話
+                if (!telRegExp.test(tel) && !mobileRegExp.test(tel)) {
+                    this.errors.tel = true;
+                    flag = false;
+                }
+                // メールアドレスフォーマットの検証
+                const emailRegExp = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+                if (!emailRegExp.test(email)) {
+                    this.errors.email = true;
+                    flag = false;
+                }
+                if (!this.usernameCheck) {
+                    this.$message.error('ユーザ名が使えるかどうか確認してください！');
+                    return;
+                }
+                if (this.errors.usernameDuplicate) {
+                    flag = false;
+                }
+                if (flag == false) {
+                    this.$message.error('記入不備な項目があるので、もう一度チェックしてください！');
+                }
+
+                localStorage.removeItem("tempCustomerInfo");
+                const customerInfoStr = JSON.stringify(this.customerInfo);
+                localStorage.setItem("tempCustomerInfo", customerInfoStr);
+            }
+        },
+    });
+</script>

@@ -1,0 +1,46 @@
+.login-container-outer {
+    display: flex;
+    justify-content: center;
+    padding-top: 100px;
+}
+.login-container {
+    flex: 0.5;
+    border: 1px solid #ddd;
+    padding: 20px;
+    display: block;
+}
+.login-container .caption {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-size: 20px;
+    color: #999;
+    font-weight: bold;
+}
+.login-form-wrapper .form-item {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+.login-form-wrapper .edit-item-wrapper {
+    margin-bottom: 14px;
+}
+.err-item {
+    display: flex;
+    align-items: center;
+    color: red;
+    padding-left: 188px;
+    font-size: 12px;
+}
+.opt-item-hidden {
+    display: none;
+}
+.error-icon {
+    font-size: 16px;
+    margin-right: 5px;
+}
+.input-err input, .input-err textarea {
+    border-color: red;
+}

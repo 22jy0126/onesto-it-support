@@ -97,7 +97,7 @@
                             v-bind:class="(errors.password || errors.passwordFormat) ? 'input-err' : ''"
                             v-model="customerInfo.password"></el-input>
                         <div class="desc">
-                            (8-12桁、数字とアルファベット両方とも1桁以上)
+                            (8-20桁、数字とアルファベット両方とも1桁以上)
                         </div>
                     </div>
                     <div v-bind:class="errors.password ? 'err-item' : 'opt-item-hidden'">
