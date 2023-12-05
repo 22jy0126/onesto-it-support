@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- TODO: ページの名にチェンジする -->
+    <title>個人履歴</title>
+    <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
+    <!-- vue と elementUIの依存css -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <!-- システム共用のスタイルはこのファイルに追加する -->
+    <link href="./css/common.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/employeeInfo.css">
+    <!-- TODO: 作るHTMLとペアでCSSファイルを作り、なるべく同じファイル名にする -->
+
+    <!-- vue と elementUIの依存javascript -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
+
+</head>
+
+<body>
+    <el-container id="app">
+        <!-- ヘッドの部分 各々の画面は同じです -->
+        <header class="common-header">
+            <div class="logo">
+                ブリッジ
+            </div>
+            <div class="login-info">
+                <el-badge :value="user.noticeCount" class="item">
+                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
+                </el-badge>
+                {{user.username}}さん、こんにちは！
+            </div>
+        </header>
+
+        <!-- メインの部分 -->
+        <el-container class="common-mian job-case-main">
+            <!-- サイドメニュー -->
+            <el-aside width="200px">
+                <!-- TODO: default-active は今いるのメニューです -->
+                <el-menu default-active="2" class="el-menu-vertical-demo">
+                    <el-menu-item index="1">求人一覧</el-menu-item>
+                    <el-menu-item index="2">個人履歴</el-menu-item>
+                    <el-menu-item index="3">応募歴史</el-menu-item>
+                    <el-menu-item index="4">通知</el-menu-item>
+                </el-menu>
+            </el-aside>
+
+            <el-container>
+                <el-main>
+                    <!-- TODO: 内容はここに書く -->
+                    
+                    <!--プロフィール-->
+                    <section>
+						<div class="common-caption">
+	                        <i class="el-icon-notebook-1 icon"></i>
+	                        プロフィール
+                    	</div>
+                    	
+                    	<el-card class="box-card">
+							 <div class="profile">
+								 <table>
+								<tr>
+									<th rowspan="4"><img class="arvater" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" /></th>
+									<td>
+										<i class="el-icon-user icon"></i>
+										{{infos.name}}
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<i class="el-icon-s-opportunity icon"></i>
+										{{infos.birthday}}	
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<i class="el-icon-message icon"></i>
+										{{infos.mail}}	
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<i class="el-icon-phone icon"></i>
+										{{infos.tell}}	
+									</td>
+								</tr>
+							</table>
+							 </div>
+						</el-card>
+					</section>
+                    
+					
+					<!--職務経歴-->
+					<section>
+						<div class="common-caption">
+							<i class="el-icon-notebook-1 icon"></i>
+							職務経歴
+						</div>
+						<el-timeline>
+							<el-timeline-item 
+								v-for="history in infos.historys"
+								:timestamp=`${history.startMonth}～`
+								placement="top">
+						      <el-card>
+						        <h4>{{history.project}}</h4>
+						        <table class="history">
+									<tr>
+										<th>
+											開発期間
+										</th>
+										<td>
+											{{history.dperiod}}
+										</td>
+									</tr>
+									<tr>
+										<th>
+											役職
+										</th>
+										<td>
+											{{history.post}}
+										</td>
+									</tr>
+									<tr>
+										<th>
+											担当内容
+										</th>
+										<td>
+											{{history.responsible}}
+										</td>
+									</tr>
+									<tr>
+										<th>
+											概要
+										</th>
+										<td>
+											{{history.desc}}
+										</td>
+									</tr>
+									<tr>
+										<th>
+											使用言語
+										</th>
+										<td>
+											{{history.dlanguage}}
+										</td>
+									</tr>
+								</table>
+						      </el-card>
+						    </el-timeline-item>
+						</el-timeline>
+					</section>
+                	
+                </el-main>
+            </el-container>
+        </el-container>
+    </el-container>
+
+</body>
+
+</html>
+<script>
+    // elementの日本語対応
+    ELEMENT.locale(ELEMENT.lang.ja);
+
+    let vm;
+    vm = new Vue({
+        // id はapp の属性の中の部分を管理する
+        el: "#app",
+        data() {
+            return {
+                // ログインしたユーザー情報
+                user: {
+                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
+                    username: "鈴木　奈々", // ユーザー名
+                    noticeCount: 2, // 通知数
+                },
+                // 求人票のデータ
+                infos: {
+					name: "鈴木　奈々",
+					birthday: "2000年1月1日",
+					mail: "xxxxxxxx@jec.ac.jp",
+					tell: "090-4564-xxxx",
+					techs: "VBA,java",
+					historys:[{
+						project: "業務管理システムのリニューアル",
+						startMonth:"2018/4",//開発開始月
+						dperiod: "115日",//開発期間
+						post:"エンジニア",//役職
+						responsible:"設計、実装、テスト",//担当内容
+						dlanguage:"java",//使用言語
+						desc: "企業内の業務管理を支援するためのシステムをリニューアル。新機能の追加、既存機能の最適化、ユーザビリティの向上を図り、効率的で使いやすいシステムの構築。",
+					}, {
+						project: " ヘルプデスクの効率化",
+						startMonth:"2019/6",//開発開始月
+						dperiod: "80日",//開発期間
+						post:"システムエンジニア",//役職
+						responsible:"自動化ツールの導入、タスクの優先度付けの見直し",//担当内容
+						dlanguage:"java",//使用言語
+						desc: "ユーザーサポートプロセスの改善を目的としたプロジェクト。自動化ツールの導入、タスクの優先度付けの見直し、ユーザートレーニングの強化などを通じて、ヘルプデスクの効率を向上させる。",
+					}],
+				}
+                
+            };
+        },
+    });
+</script>
