@@ -141,6 +141,7 @@
                 const {
                     username = "",
                     password = "",
+                    role,
                 } = this.loginInfo;
                 let flag = true;
                 if (username == "") {
@@ -151,7 +152,11 @@
                     flag = false;
                     this.errors.password = true;
                 }
+                //TODO: サーバーに送る
                 
+                if (role == 1) {
+                    location.href = "customerCaseEdit.html";
+                }
             }
         },
     });
