@@ -32,7 +32,7 @@
     margin-right: 5px;
 }
 .err-item-func {
-    padding-left: 63px !important;
+    padding-left: 0px !important;
 }
 .input-err input, .input-err textarea {
     border-color: red;
@@ -69,4 +69,11 @@
     color: red;
     border: none !important;
     background-color: transparent !important;
+}
+.btns-container {
+    padding-left: 26px;
+    margin-bottom: 30px;
+}
+.required {
+    color: red;
 }

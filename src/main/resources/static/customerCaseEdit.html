@@ -184,6 +184,7 @@
                                         v-model="jobCase.deadline" 
                                         type="date" 
                                         @change="errClean('deadline')"
+                                        format="yyyy年MM月dd日"
                                         placeholder="Pick a day">
                                     </el-date-picker>
                                 </div>
@@ -375,6 +376,13 @@
                 }
             };
         },
+        mounted() {
+            const jobCaseStr = localStorage.getItem("tempJobCase") || "";
+            if (jobCaseStr != "") {
+                const jobCase = JSON.parse(jobCaseStr);
+                this.jobCase = jobCase;
+            }
+        },
         methods: {
             onFunctionDragStart(index, e) {
                 this.dragIndex = index;
@@ -464,6 +472,11 @@
                     this.errors.caseNameDraft = true;
                     return;
                 }
+                this.$message({
+                    message: '下書きを保存しました！',
+                    type: 'success'
+                });
+                
             },
             onCaseCreate() {
                 const {
@@ -504,6 +517,8 @@
                 localStorage.removeItem("tempJobCase");
                 const jobCaseStr = JSON.stringify(this.jobCase);
                 localStorage.setItem("tempJobCase", jobCaseStr);
+               
+                location.href = "customerCaseDetail.html";
             }
         }
     });

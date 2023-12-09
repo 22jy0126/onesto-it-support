@@ -65,45 +65,43 @@
                             <el-timeline-item
                                 v-for="(milestoneItem, index) in jobCase.mileStones"
                                 :key="index"
-                                draggable="true"
-                                @dragstart="onMilestonenDragStart(index, $event)"
-                                @dragover="onMilestonenDragOver(index, $event)"
-                                @drop="onMilestonenDrop(index, $event)"
                                 size="large">
                               <div class="milestone-item">
                                 <div class="func-edit-wrapper">
                                     <div class="milestone-edit">
-                                        <div class="label">マイルストーン名</div>
+                                        <div class="label">マイルストーン名<span class="required">（必須）</span></div>
                                         <el-input 
                                             draggable="false"
-                                            v-bind:class="milestoneItem.err ? 'input-err' : ''"
+                                            v-bind:class="milestoneItem.nameErr ? 'input-err' : ''"
                                             :rows="3"
                                             placeholder="例：設計完成" 
                                             v-model="milestoneItem.name" 
-                                            @input="errClear(index)"
+                                            @input="errClear(index, 'name')"
                                             clearable>
                                         </el-input>
                                     </div>
-                                    <div v-bind:class="milestoneItem.err ? 'err-item err-item-func' : 'opt-item-hidden'">
+                                    <!-- <div>1111{{milestoneItem.nameErr}}</div> -->
+                                    <div v-bind:class="milestoneItem.nameErr ? 'err-item err-item-func' : 'opt-item-hidden'">
                                         <i class="el-icon-warning error-icon"></i>
+                                        
                                         マイルストーン名を入力してください
                                     </div>
                                 </div>
                                 <div class="func-edit-wrapper">
                                     <div class="milestone-edit">
-                                        <div class="label">説明</div>
+                                        <div class="label">説明<span class="required">（必須）</span></div>
                                         <el-input 
                                             draggable="false"
-                                            v-bind:class="milestoneItem.err ? 'input-err' : ''"
+                                            v-bind:class="milestoneItem.descErr ? 'input-err' : ''"
                                             type="textarea"
                                             :rows="3"
                                             placeholder="例：アクティビティ図の完成..." 
                                             v-model="milestoneItem.description" 
-                                            @input="errClear(index)"
+                                            @input="errClear(index, 'desc')"
                                             clearable>
                                         </el-input>
                                     </div>
-                                    <div v-bind:class="milestoneItem.err ? 'err-item err-item-func' : 'opt-item-hidden'">
+                                    <div v-bind:class="milestoneItem.descErr ? 'err-item err-item-func' : 'opt-item-hidden'">
                                         <i class="el-icon-warning error-icon"></i>
                                         マイルストーンの説明を入力してください
                                     </div>
@@ -140,6 +138,24 @@
                             </el-timeline-item>
                           </el-timeline>
                     </div>
+                    <div class="btns-container">
+                        <el-button 
+                            icon="el-icon-plus"
+                            @click="onMilestonenAdd" 
+                        >
+                            マイルストーン追加
+                        </el-button>
+                    </div>
+                    <div class="btns-container">
+                        <el-button type="primary" 
+                            @click="onFinish"
+                        >
+                            クライアントに送る
+                        </el-button>
+                        <el-button type="info">
+                            下書きとして保存
+                        </el-button>
+                    </div>
                 </el-main>
             </el-container>
         </el-container>
@@ -167,48 +183,15 @@
                 jobCase: {
                     caseName: "学生管理システムの作成",
                     mileStones: [{
+                        nameErr: false,
+                        descErr: false,
                         // name: "設計",
                         // description: "設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計"
-                    }, {
-                        // name: "実装",
-                        // description: "実装実装実装実装実装実装実装実装実装実装実装実装実装"
-                    }, {
-                        // name: "テスト",
-                        // description: "テストテストテストテストテストテストテストテストテストテストテストテスト"
                     }],
-                }
-                
+                },
             };
         },
         methods: {
-            onMilestonenDragStart(index, e) {
-                alert(1);
-                this.dragIndex = index;
-                const { 
-                    mileStones = [],
-                } = this.jobCase;
-                mileStones[index].isTarget = true;
-            },
-            onMilestonenDragOver(index, e) {
-                const ev = e || window.event;
-                ev.dataTransfer.dropEffect = "grab";
-                ev.preventDefault();
-            },
-            onMilestonenDrop(index, e) {
-                let targetIndex;
-                let target;
-                const {
-                    mileStones = [],
-                } = this.jobCase;
-                mileStones.forEach(({ isTarget }, i) => {
-                    if (!isTarget) return;
-                    targetIndex = i;
-                    mileStones[i].isTarget = undefined;
-                    target = mileStones[i];
-                });
-                mileStones.splice(targetIndex, 1);
-                mileStones.splice(index, 0, target);
-            },
             onMilestonenDel(index) {
                 const {
                     mileStones = [],
@@ -219,7 +202,9 @@
                 const {
                     mileStones = [],
                 } = this.jobCase;
-                functions.push({
+                mileStones.push({
+                    nameErr: false,
+                    descErr: false,
                 });
             },
             onMilestonenUp(index) {
@@ -238,8 +223,44 @@
                 mileStones.splice(index, 1);
                 mileStones.splice(index + 1, 0, target);
             },
-            errClear(index) {
+            errClear(index, attr) {
+                const {
+                    mileStones = [],
+                } = this.jobCase;
+                const attrName = attr + "Err";
+                mileStones[index][attrName] = false;
+            },
+            onFinish() {
+                const {
+                    mileStones = [],
+                } = this.jobCase;
+                let flag = true;
+                mileStones.forEach((item = {}) => {
+                    const { 
+                        name = "",
+                        description = "",
+                    } = item;
+                    if (name == "") {
+                        item.nameErr = true;
+                        flag = false;
+                    }
+                    if (description == "") {
+                        flag = false;
+                        item.descErr = true;
+                    }
+                });
+                if (!flag) {
+                    this.$message.error('未記入の必須項目があります。もう一度チェックしてください！');
+                    return;
+                }
 
+                //TODO: サーバーにマイルストーンのデータを送る
+                this.$confirm('確認するまでしばらくお待ちください', 'クライアントに送りました', {
+                    confirmButtonText: '分かりました',
+                    type: 'success',
+                    center: true,
+                    showCancelButton: false,
+                });
             }
         }
     });
