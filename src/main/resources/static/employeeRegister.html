@@ -11,6 +11,7 @@
     
     <link href="./css/common.css" rel="stylesheet" />
     <link rel="stylesheet" href="./css/customerRegister.css">
+    <link rel="stylesheet" href="./css/employeeRegister.css">
     
     <!-- vue と elementUIの依存javascript -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
@@ -38,6 +39,7 @@
                 社員情報の登録
             </div>
             <form class="login-form">
+				
                 <div class="edit-item-wrapper">
                     <div class="form-item">
                         <label class="label" for="">
@@ -46,18 +48,20 @@
                         <!-- v-modelはフォームのデータを収集するための属性です
                                         new Vueの中のdataの同じ属性と同じ値を保存する -->
                         <el-input 
-                        
-                            placeholder="例：055485" 
-                            @input="errClean('username')"
-                            @change="checkUN"
-                            v-bind:class="(errors.username || errors.usernameDuplicate) ? 'input-err' : ''"
-                            v-model="employeeInfo.username"></el-input>
+                            placeholder="例：123456" 
+                            @input="errClean('empnumber')"
+                            @change="checkEN"
+                            v-bind:class="(errors.empnumber || errors.empnumberDuplicate) ? 'input-err' : ''"
+                            v-model="employeeInfo.empnumber"></el-input>
+                            <div class="desc">
+	                            (半角)
+	                        </div>
                         <div 
-                            v-bind:class="usernameCheck ? 'opt-item-hidden' : 'desc user-check'"
-                            v-on:click="checkUsername">
+                            v-bind:class="empnumberCheck ? 'opt-item-hidden' : 'desc user-check'"
+                            v-on:click="checkEmpnumber">
                             使えるかどうかをチェックする
                         </div>
-                        <div v-bind:class="usernameCheck ? 'check-ok' : 'opt-item-hidden'">
+                        <div v-bind:class="empnumberCheck ? 'check-ok' : 'opt-item-hidden'">
                             <i class="el-icon-success"></i>
                         </div>
                     </div>
@@ -70,6 +74,7 @@
                         社員番号はすでに存在しています
                     </div>
                 </div>
+                
                 <div class="edit-item-wrapper">
                     <div class="form-item">
                         <label class="label" for="">
@@ -186,7 +191,7 @@
                     </div>
                 </div>
                 <div class="edit-item-wrapper">
-                	<div class="edit-item">
+                	<div class="form-item">
                     	<label class="label" for="">
                             経験開発言語<span class="required">（必須）</span>
                         </label>
@@ -204,25 +209,152 @@
                             </el-select>
                 	</div>
             	</div>
-<!--            職歴-->
-				<div class="func-edit-wrapper">
-                	<div class="func-edit func-edit-top">
-                    	<div class="label">機能説明</div>
-                        	<el-input 
-                            	draggable="false"
-                                v-bind:class="func.err ? 'input-err' : ''"
-                                type="textarea"
-                                :rows="3"
-                                placeholder="例：検索機能は..です" 
-                                v-model="func.functionDesc" 
-                                @input="funcErrClear(index)"
-                                clearable>
-                            	</el-input>
+            	
+            	
+				<div class="functions-container">
+                                <div class="caption-wrapper">
+                                    <label class="label" for="">
+										職務経歴<span class="required">（必須）</span>
+									</label> 
+                                    <span>※ドラッグ&ドロップで経歴の順番を変えることができます。</span>
+                                </div> 
+                                <div class="functions-edit-wrapper" 
+                                    draggable="true"
+                                    @dragstart="onFunctionDragStart(index, $event)"
+                                    @dragover="onFunctionDragOver(index, $event)"
+                                    @drop="onFunctionDrop(index, $event)"
+                                    v-for="(func, index) in employeeInfo.workHistory">
+                                    <div class="opts">
+                                        <div 
+                                            @click="onFunctionUp(index)"
+                                            v-bind:class="index==0 ? 'opt-item-hidden' : 'opt-item'">
+                                            <i class="el-icon-top"></i>
+                                            上に移動
+                                        </div>
+                                        <div 
+                                            @click="onFunctionDown(index)"
+                                            v-bind:class="index==(employeeInfo.workHistory.length-1) ? 'opt-item-hidden' : 'opt-item'">
+                                            <i class="el-icon-bottom"></i>
+                                            下に移動
+                                        </div>
+                                        <el-popconfirm
+                                            confirm-button-text='削除'
+                                            cancel-button-text='削除しない' 
+                                            icon="el-icon-info" 
+                                            icon-color="red"
+                                            @confirm="onFunctionDel(index)"
+                                            title="削除した機能は戻らない、よろしいですか?">
+                                            <el-button 
+                                                slot="reference" 
+                                                icon="el-icon-delete"
+                                                v-bind:class="employeeInfo.workHistory.length==1 ? 'opt-item-hidden' : 'opt-item opt-item-del'">
+                                                削除
+                                            </el-button>
+                                        </el-popconfirm>
+                                    </div>
+                                    <div class="func-edit-wrapper">
+                                        <div class="func-edit func-edit-top">
+<!--                                            <div class="label2">経歴の説明</div>-->
+<!--                                            <el-input -->
+<!--                                                draggable="false"-->
+<!--                                                v-bind:class="func.err ? 'input-err' : ''"-->
+<!--                                                type="textarea"-->
+<!--                                                :rows="3"-->
+<!--                                                placeholder="例：職務経歴は..です" -->
+<!--                                                v-model="func.functionDesc" -->
+<!--                                                @input="funcErrClear(index)"-->
+<!--                                                clearable>-->
+<!--                                            </el-input>-->
                                         </div>
                                         <div v-bind:class="func.err ? 'err-item err-item-func' : 'opt-item-hidden'">
                                             <i class="el-icon-warning error-icon"></i>
                                             機能説明を入力してください
                                         </div>
+                                        
+                                        <table class="history">
+											<tr>
+												<th rowspan="7" class="">
+													経歴の説明
+												</th>
+												<th class="title">
+													プロジェクト名<span class="required">（必須）</span>
+												</th>
+												<td>
+													<el-input placeholder="Please input" v-model="input"></el-input>
+												</td>
+											</tr>
+											<tr>
+												<th class="title">
+													開発期間<span class="required">（必須）</span>
+												</th>
+												<td><el-input-number v-model="num" @change="handleChange" :min="1"></el-input-number>
+													日
+												</td>
+											</tr>
+											<tr>
+												<th class="title">
+													開始時期
+												</thclass="title">
+												<td>
+													<div class="block">
+													    <span class="demonstration"></span>
+													    <el-date-picker
+													      v-model="value2"
+													      type="month"
+													      placeholder="Pick a month">
+													    </el-date-picker>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th class="title">
+													役職<span class="required">（必須）</span>
+												</thclass="title">
+												<td>
+													<el-input placeholder="Please input" v-model="input"></el-input>
+												</td>
+											</tr>
+											<tr>
+												<th class="title">
+													担当内容<span class="required">（必須）</span>
+												</th>
+												<td>
+													<el-input placeholder="Please input" v-model="input"></el-input>
+												</td>
+											</tr>
+											<tr>
+												<th class="title">
+													概要<span class="required">（必須）</span>
+												</th>
+												<td>
+													<el-input
+														type="textarea"
+														:rows="2"
+														placeholder="Please input"
+														v-model="textarea">
+													</el-input>
+												</td>
+											</tr>
+											<tr>
+												<th class="title">
+													使用言語<span class="required">（必須）</span>
+												</th>
+												<td>
+													<el-select 
+							                            v-model="employeeInfo.requiredTech" 
+							                            multiple 
+							                            placeholder="選択してください" 
+							                            clearable>
+							                            	<el-option 
+							                                	v-for="tech in techs" 
+							                                	:key="tech.value" 
+							                                	:label="tech.label" 
+							                                	:value="tech.value">
+							                                </el-option>
+							                        </el-select>
+												</td>
+											</tr>
+										</table>
                                     </div>
                                 </div>
                                 <el-button 
@@ -230,6 +362,9 @@
                                     @click="onFunctionAdd">
                                     機能追加
                                 </el-button>
+                            </div>
+                            
+                            
                 <div class="form-item btn-form-item">
                     <el-button 
                         @click="onCreate"
@@ -241,6 +376,7 @@
     </main>
 </body>
 </html>
+<script src="./js/consts.js"></script>
 <script>
 	// elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja); 
@@ -254,53 +390,23 @@
             return {
                 // html の中の　v-model　属性と同じ値
                 employeeInfo: {
-                    username: "",
+                    empnumber: "",
                     name: "",
                     password: "",
                     password2: "",
                     tel: "",
                     email: "",
                     requiredTech: "",
+                    workHistory: [{}],
 				},
-				techs: [{
-                    value: "VBA",
-                    label: "VBA",
-                }, {
-                    value: "java",
-                    label: "java",
-                }, {
-                    value: "c++",
-                    label: "c++",
-                }, {
-                    value: "c#",
-                    label: "c#",
-                }, {
-                    value: "php",
-                    label: "php",
-                }, {
-                    value: "python",
-                    label: "python",
-                }, {
-                    value: "html",
-                    label: "html",
-                }, {
-                    value: "css",
-                    label: "css",
-                }, {
-                    value: "javaScript",
-                    label: "javaScript",
-                }, {
-                    value: "android",
-                    label: "android",
-                }, {
-                    value: "ios",
-                    label: "ios",
-                }],
+				techs,
+                // ドラッグドロップ管理
+                dragIndex: null,
                 usernameCheck: false,
                 checkedUsername: "",
                 errors: {
-                    username: false,
-                    usernameDuplicate: false,
+                    empnumber: false,
+                    empnumberDuplicate: false,
                     name: false,
                     password: false,
                     passwordIncon: false, //二回のパスワード入力は一致しない
@@ -311,25 +417,25 @@
             };
         },
         methods: {
-            checkUsername() {
+            checkEmpnumber() {
                 //TODO サーバに送って、使えるかどうかをチェックする
-                if (this.customerInfo.username != "aaaa") {
-                    this.usernameCheck = true;
+                if (this.customerInfo.empnumber != "123456") {
+                    this.empnumberCheck = true;
                     this.checkedUsername = this.customerInfo.username;
                 } else {
-                    this.errors.usernameDuplicate = true;
-                    this.usernameCheck = false;
+                    this.errors.empnumberDuplicate = true;
+                    this.empnumberCheck = false;
                 }
             },
-            checkUN() {
-                if (!this.usernameCheck) return;
-                if (this.customerInfo.username == this.checkedUsername) return;
-                this.usernameCheck = false;
+            checkEN() {
+                if (!this.empnumberCheck) return;
+                if (this.employeeInfo.empnumber == this.checkedEmpnumber) return;
+                this.empnumberCheck = false;
             },
             errClean(itemName) {
-                if (itemName == "username") {
-                    this.errors.username = false;
-                    this.errors.usernameDuplicate = false;
+                if (itemName == "empnumber") {
+                    this.errors.empnumber = false;
+                    this.errors.empnumberDuplicate = false;
                     return;
                 }
                 if (itemName == "password") {
@@ -341,7 +447,7 @@
             },
             onCreate() {
                 const {
-                    username = "",
+                    empnumber = "",
                     name = "",
                     password = "",
                     password2 = "",
@@ -350,8 +456,8 @@
                 } = this.customerInfo;
                 let flag = true;
                 // ユーザネーム必須の検証
-                if (username == "") {
-                    this.errors.username = true;
+                if (empnumber == "") {
+                    this.errors.empnumber = true;
                     flag = false;
                 }
                 // 氏名必須の検証
@@ -383,7 +489,7 @@
                     this.errors.email = true;
                     flag = false;
                 }
-                if (!this.usernameCheck) {
+                if (!this.empnumberCheck) {
                     this.$message.error('ユーザ名が使えるかどうか確認してください！');
                     return;
                 }
@@ -397,7 +503,72 @@
                 localStorage.removeItem("tempCustomerInfo");
                 const customerInfoStr = JSON.stringify(this.customerInfo);
                 localStorage.setItem("tempCustomerInfo", customerInfoStr);
-            }
+            },
+            
+            
+            onFunctionDragStart(index, e) {
+                this.dragIndex = index;
+                const { 
+                    functions = [],
+                } = this.jobCase;
+                functions[index].isTarget = true;
+            },
+            onFunctionDragOver(index, e) {
+                const ev = e || window.event;
+                ev.dataTransfer.dropEffect = "grab";
+                ev.preventDefault();
+            },
+            onFunctionDrop(index, e) {
+                let targetIndex;
+                let target;
+                const {
+                    functions = [],
+                } = this.jobCase;
+                functions.forEach(({ isTarget }, i) => {
+                    if (!isTarget) return;
+                    targetIndex = i;
+                    functions[i].isTarget = undefined;
+                    target = functions[i];
+                });
+                functions.splice(targetIndex, 1);
+                functions.splice(index, 0, target);
+            },
+            onFunctionDel(index) {
+                const {
+                    functions = [],
+                    functionIdCnt,
+                } = this.jobCase;
+                functions.splice(index, 1);
+            },
+            onFunctionAdd() {
+                const {
+                    functions = [],
+                    functionIdCnt,
+                } = this.jobCase;
+                functions.push({
+                    id: functionIdCnt,
+                    functionDesc: "",
+                });
+                this.functionIdCnt = functionIdCnt + 1;
+            },
+            onFunctionUp(index) {
+                const {
+                    functions = [],
+                    functionIdCnt,
+                } = this.jobCase;
+                const target = functions[index];
+                functions.splice(index, 1);
+                functions.splice(index - 1, 0, target);
+            },
+            onFunctionDown(index) {
+                const {
+                    functions = [],
+                    functionIdCnt,
+                } = this.jobCase;
+                const target = functions[index];
+                functions.splice(index, 1);
+                functions.splice(index + 1, 0, target);
+            },
         },
     });
 </script>
