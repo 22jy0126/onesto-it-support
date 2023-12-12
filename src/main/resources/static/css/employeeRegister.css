@@ -1,0 +1,25 @@
+.edit-item-wrapper {
+    margin-bottom: 14px;
+}
+.err-item {
+    display: flex;
+    align-items: center;
+    color: red;
+    padding-left: 188px;
+    font-size: 12px;
+}
+.opt-item-hidden {
+    display: none;
+}
+.error-icon {
+    font-size: 16px;
+    margin-right: 5px;
+}
+.input-err input, .input-err textarea {
+    border-color: red;
+}
+.check-ok {
+    color: #67C23A;
+    font-size: 20px;
+    padding-left: 10px;
+}
