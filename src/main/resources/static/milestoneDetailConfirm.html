@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- TODO: ページの名にチェンジする -->
-    <title>求人一覧</title>
+    <title>マイルストーンの確認</title>
     <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
     <!-- vue と elementUIの依存css -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
@@ -52,8 +51,71 @@
 
             <el-container>
                 <el-main>
-                    <!-- TODO: 内容はここに書く -->
-                    
+                    <div class="milestone-detail-container">
+                        <div class="caption">
+                            <i class="el-icon-s-order"></i>
+                            {{jobCase.caseName}}
+                        </div>
+                        <div class="sub-caption">
+                            マイルストーンの確認
+                        </div>
+                        <section class="milestone-wrapper">
+                            <el-timeline>
+                                <el-timeline-item
+                                    v-for="(milestoneItem, index) in jobCase.milestones"
+                                    :key="index"
+                                    size="large">
+                                    <div class="name">
+                                        {{milestoneItem.name}}
+                                    </div>
+                                    <div class="desc">
+                                        {{milestoneItem.description}}
+                                    </div>
+                                    <div class="opt-line">
+                                        <span v-bind:class="milestoneItem.isComment ? 'hidden' : 'comment-add'" 
+                                            @click="onCommentAdd(index)">
+                                            コメント追加
+                                        </span>
+                                        <div v-bind:class="!milestoneItem.isComment ? 'hidden' : 'comment-edit'">
+                                            <el-input 
+                                                class="comment-input"
+                                                type="textarea"
+                                                :rows="3"
+                                                placeholder="コメントを入力してください" 
+                                                v-model="milestoneItem.comment" 
+                                                clearable>
+                                            </el-input>
+                                            <div class="btn-wrapper">
+                                                <el-popconfirm
+                                                    confirm-button-text='キャンセル'
+                                                    cancel-button-text='キャンセルしない' 
+                                                    icon="el-icon-info" 
+                                                    icon-color="red"
+                                                    @confirm="onCommentCancel(index)"
+                                                    title="キャンセルしたコメントは戻らない、よろしいですか?">
+                                                    <el-button 
+                                                        slot="reference" 
+                                                        class="opt-item-del">
+                                                        キャンセル
+                                                    </el-button>
+                                                </el-popconfirm>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </el-timeline-item>
+                            </el-timeline>
+                        </section>
+                        <div class="btns-container">
+                            <el-button type="primary" 
+                                @click="onOk"
+                            >
+                                同意する
+                            </el-button>
+                            <el-button type="info">
+                                コメントを踏んで、直してほうしい
+                            </el-button>
+                        </div>
+                    </div>
                 </el-main>
             </el-container>
         </el-container>
@@ -80,25 +142,52 @@
                 },
                 jobCase: {
                     caseName: "学生管理システムの作成",
-                    mileStones: [{
+                    milestones: [{
                         id: 0,
                         name: "上流設計完成",
-                        description: "アクティビティ図とユースケース図の完成、画面の項目と画面の遷移を明確にして、説明の詳細はドキュメントにする"
+                        description: "アクティビティ図とユースケース図の完成、画面の項目と画面の遷移を明確にして、説明の詳細はドキュメントにする",
+                        isComment: false,
                     }, {
                         id: 1,
                         name: "詳細設計完成",
-                        description: "モックアップの作成して、オブジェクト図とシーケンス図が完成して、データベースの設計の完成する,"
+                        description: "モックアップの作成して、オブジェクト図とシーケンス図が完成して、データベースの設計の完成する,",
+                        isComment: false,
                     }, {
                         id: 2,
                         name: "実装完成",
-                        description: "設計通りに開発完成する、機能は全部実現する"
+                        description: "設計通りに開発完成する、機能は全部実現する",
+                        isComment: false,
                     }, {
                         id: 3,
                         name: "テスト完成",
-                        description: "機能は全部設計通りに実現するのは検証して、完全性とパーフォーマンスも検証する"
+                        description: "機能は全部設計通りに実現するのは検証して、完全性とパーフォーマンスも検証する",
+                        isComment: false,
                     }],
                 },
             };
         },
+        methods: {
+            onCommentAdd(index) {
+                const {
+                    milestones = [],
+                } = this.jobCase;
+                milestones[index].isComment = true;
+            },
+            onCommentCancel(index) {
+                const {
+                    milestones = [],
+                } = this.jobCase;
+                milestones[index].comment = "";
+                milestones[index].isComment = false;
+            },
+            onOk() {
+                this.$confirm('同意したマイルストーンは後で直せません、よろしいですか?', '確認', {
+                    confirmButtonText: '同意する',
+                    cancelButtonText: "もうちょっど考える",
+                    type: 'warning',
+                    center: false,
+                });
+            }
+        }
     });
 </script>

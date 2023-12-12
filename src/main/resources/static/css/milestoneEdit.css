@@ -20,6 +20,9 @@
     padding: 14px;
     border-radius: 5px;
 }
+.milestone-edit-container .comment-view {
+    color: #e36fab;
+}
 .err-item {
     display: flex;
     align-items: center;
