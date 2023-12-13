@@ -77,22 +77,17 @@
                                     <div v-bind:class="milestoneItem.isComment ? 'comment-view' : 'hidden'">
                                         ※コメント： {{milestoneItem.comment}}
                                     </div>
-                                    <!-- <div class="opt-line">
-                                        {{ milestoneItem.statusText }}
-                                    </div> -->
+                                    <div v-bind:class="milestoneItem.status != 2 ? 'hidden' : 'opt-line'">
+                                        <el-button 
+                                            size="small" 
+                                            @click="onFinish(index)"
+                                            type="primary">
+                                            作業完了
+                                        </el-button>
+                                    </div>
                                 </el-timeline-item>
                             </el-timeline>
                         </section>
-                        <!-- <div class="btns-container">
-                            <el-button type="primary" 
-                                @click="onOk"
-                            >
-                                同意する
-                            </el-button>
-                            <el-button type="info">
-                                コメントを踏んで、直してほうしい
-                            </el-button>
-                        </div> -->
                     </div>
                 </el-main>
             </el-container>
@@ -102,6 +97,7 @@
 </body>
 
 </html>
+<!-- <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script> -->
 <script src="./js/consts.js"></script>
 <script>
     // elementの日本語対応
@@ -147,12 +143,12 @@
                         description: "モックアップの作成して、オブジェクト図とシーケンス図が完成して、データベースの設計の完成する,",
                         isComment: true,
                         status: 2,
-                        comment: "もうちょっど詳しく書いてほうしい",
+                        comment: "もうちょっど詳しく書いてほしい",
                     }, {
                         id: 2,
                         name: "実装完成",
                         description: "設計通りに開発完成する、機能は全部実現する",
-                        status: 3,
+                        status: 1,
                         isComment: false,
                     }, {
                         id: 3,
@@ -174,26 +170,19 @@
                 jobCase.milestones = milestones;
                 this.jobCase = jobCase;
             },
-
-            onCommentAdd(index) {
-                const {
-                    milestones = [],
-                } = this.jobCase;
-                milestones[index].isComment = true;
-            },
-            onCommentCancel(index) {
-                const {
-                    milestones = [],
-                } = this.jobCase;
-                milestones[index].comment = "";
-                milestones[index].isComment = false;
-            },
-            onOk() {
-                this.$confirm('同意したマイルストーンは後で直せません、よろしいですか?', '確認', {
-                    confirmButtonText: '同意する',
-                    cancelButtonText: "もうちょっど考える",
-                    type: 'warning',
-                    center: false,
+            onFinish(index) {
+                this.$confirm('確認するまでしばらくお待ちください', 'クライアントに通知しました', {
+                    confirmButtonText: '分かりました',
+                    type: 'success',
+                    center: true,
+                    showCancelButton: false,
+                }).then(() => {
+                    const milestones = { ...this.jobCase.milestones };
+                    milestones[index].status = 3;
+                    milestones[index].statusText = "確認待ち";
+                    milestones[index].color = "#7dd3e7";
+                    milestones[index].markCls = "mark mark-3";
+                    this.jobCase.milestones = milestones;
                 });
             }
         }

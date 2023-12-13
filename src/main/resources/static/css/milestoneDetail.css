@@ -18,6 +18,7 @@
 }
 .milestone-detail-container .milestone-wrapper  .name {
     font-size: 18px;
+    margin-bottom: 8px;
     /* font-weight: bold; */
 }
 .name .mark {
@@ -40,9 +41,9 @@
     background-color: #d5eaff;
 }
 .name .mark-3 {
-    color: #58a334;
-    border: 1px solid #a0db83;
-    background-color: #e0f7d5;
+    color: #3abcdb;
+    border: 1px solid #7dd3e7;
+    background-color: #e0f7fd;
 }
 .name .mark-4 {
     color: #51af3f;

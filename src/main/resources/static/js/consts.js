@@ -49,8 +49,8 @@ const milestoneStatus = [{
     color: "#409eff",
 }, {
     code: "3",
-    text: "作業完了",
-    color: "#a7e987",
+    text: "確認待ち",
+    color: "#7dd3e7",
 }, {
     code: "4",
     text: "確認済み",
