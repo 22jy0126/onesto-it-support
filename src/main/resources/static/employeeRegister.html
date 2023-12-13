@@ -212,161 +212,148 @@
             	
             	
 				<div class="functions-container">
-                                <div class="caption-wrapper">
-                                    <label class="label" for="">
-										職務経歴<span class="any">（任意）</span>
-									</label> 
-                                </div> 
-                                <div class="functions-edit-wrapper" 
-                                    v-for="(workItem, index) in employeeInfo.workHistory">
-                                    <div class="opts">
-                                        <div 
-                                            @click="onFunctionUp(index)"
-                                            v-bind:class="index==0 ? 'opt-item-hidden' : 'opt-item'">
-                                            <i class="el-icon-top"></i>
-                                            上に移動
-                                        </div>
-                                        <div 
-                                            @click="onFunctionDown(index)"
-                                            v-bind:class="index==(employeeInfo.workHistory.length-1) ? 'opt-item-hidden' : 'opt-item'">
-                                            <i class="el-icon-bottom"></i>
-                                            下に移動
-                                        </div>
-                                        <el-popconfirm
-                                            confirm-button-text='削除'
-                                            cancel-button-text='削除しない' 
-                                            icon="el-icon-info" 
-                                            icon-color="red"
-                                            @confirm="onFunctionDel(index)"
-                                            title="削除した機能は戻らない、よろしいですか?">
-                                            <el-button 
-                                                slot="reference" 
-                                                icon="el-icon-delete"
-                                                v-bind:class="employeeInfo.workHistory.length==1 ? 'opt-item-hidden' : 'opt-item opt-item-del'">
-                                                削除
-                                            </el-button>
-                                        </el-popconfirm>
-                                    </div>
-                                    <div class="func-edit-wrapper">
-                                        <div class="func-edit func-edit-top">
-<!--                                            <div class="label2">経歴の説明</div>-->
-<!--                                            <el-input -->
-<!--                                                draggable="false"-->
-<!--                                                v-bind:class="func.err ? 'input-err' : ''"-->
-<!--                                                type="textarea"-->
-<!--                                                :rows="3"-->
-<!--                                                placeholder="例：職務経歴は..です" -->
-<!--                                                v-model="func.functionDesc" -->
-<!--                                                @input="funcErrClear(index)"-->
-<!--                                                clearable>-->
-<!--                                            </el-input>-->
-                                        </div>
-                                        
-										<div  class="history">
-										    <table>
-										        <tr>
-										            <th rowspan="7">
-										                経歴の説明
-										            </th>
-										            <th class="title">
-										                経歴名<span class="required">（必須）</span>
-										            </th>
-										            <td>
-										                <el-input 
-										                	placeholder="例：業務管理システムのリニューアル" 
-										                	v-model="workItem.workName">
-										                </el-input>
-										            </td>
-										        </tr>
-										        <tr>
-										            <th class="title">
-										                開発期間<span class="required">（必須）</span>
-										            </th>
-										            <td>
-										                <el-input-number 
-										                	v-model="workItem.workPeriod" 
-										                	:min="1">
-										                </el-input-number> 日
-										            </td>
-										        </tr>
-										        <tr>
-										            <th class="title">
-										                開始時期
-										            </th>
-										            <td>
-										                <div class="block">
-										                    <span class="demonstration"></span>
-										                    <el-date-picker 
-										                    	v-model="workItem.workStart" 
-										                    	type="month" 
-										                    	placeholder="Pick a month">
-										                    </el-date-picker>
-										                </div>
-										            </td>
-										        </tr>
-										        <tr>
-										            <th class="title">
-										                役職<span class="required">（必須）</span>
-										            </th>
-										            <td>
-										                <el-input 
-										                	placeholder="例：システムエンジニア" 
-										                	v-model="workItem.workPost">
-										                </el-input>
-										            </td>
-										        </tr>
-										        <tr>
-										            <th class="title">
-										                担当内容<span class="required">（必須）</span>
-										            </th>
-										            <td>
-										                <el-input 
-										                	placeholder="例：設計、実装" 
-										                	v-model="workItem.workCharge">
-										                </el-input>
-										            </td>
-										        </tr>
-										        <tr>
-										            <th class="title">
-										                概要<span class="required">（必須）</span>
-										            </th>
-										            <td>
-										                <el-input 
-										                	type="textarea" 
-										                	:rows="2" 
-										                	placeholder="例：企業内の業務管理を支援するためのシステムをリニューアル..." 
-										                	v-model="workItem.workContent">
-										                </el-input>
-										            </td>
-										        </tr>
-										        <tr>
-										            <th class="title">
-										                使用言語<span class="required">（必須）</span>
-										            </th>
-										            <td>
-										                <el-select 
-										                	v-model="employeeInfo.requiredTech" 
-										                	multiple placeholder="選択してください" clearable>
-										                    <el-option 
-                                                                v-for="tech in techs"
-										                    	:key="tech.value" 
-										                    	:label="tech.label" 
-										                    	:value="tech.value">
-										                    </el-option>
-										                </el-select>
-										            </td>
-										        </tr>
-										    </table>
-										</div>
-
-                                    </div>
-                                </div>
-                                <el-button 
-                                    icon="el-icon-plus" 
-                                    @click="workHistoryAdd">
-                                    機能追加
-                                </el-button>
-                            </div>
+	                    <div class="caption-wrapper">
+	                        <label class="label" for="">
+								職務経歴<span class="any">（任意）</span>
+							</label> 
+	                    </div> 
+	                    <div class="functions-edit-wrapper" 
+	                        v-for="(workItem, index) in employeeInfo.workHistory">
+	                        <div class="opts">
+	                            <div 
+	                                @click="onFunctionUp(index)"
+	                                v-bind:class="index==0 ? 'opt-item-hidden' : 'opt-item'">
+	                                <i class="el-icon-top"></i>
+	                                上に移動
+	                            </div>
+	                            <div 
+	                                @click="onFunctionDown(index)"
+	                                v-bind:class="index==(employeeInfo.workHistory.length-1) ? 'opt-item-hidden' : 'opt-item'">
+	                                <i class="el-icon-bottom"></i>
+	                                下に移動
+	                            </div>
+	                            <el-popconfirm
+	                                confirm-button-text='削除'
+	                                cancel-button-text='削除しない' 
+	                                icon="el-icon-info" 
+	                                icon-color="red"
+	                                
+	                                @confirm="workHistoryDel(index)"
+	                                
+	                                title="削除した機能は戻らない、よろしいですか?">
+	                                <el-button 
+	                                    slot="reference" 
+	                                    icon="el-icon-delete"
+	                                    class="opt-item opt-item-del">
+	                                    削除
+	                                </el-button>
+	                            </el-popconfirm>
+	                        </div>
+	                            
+							<div  class="history">
+							    <table>
+							        <tr>
+							            <th rowspan="7">
+							                経歴の説明
+							            </th>
+							            <th class="title">
+							                経歴名<span class="required">（必須）</span>
+							            </th>
+							            <td>
+							                <el-input 
+							                	placeholder="例：業務管理システムのリニューアル" 
+							                	v-model="workItem.workName">
+							                </el-input>
+							            </td>
+							        </tr>
+							        <tr>
+							            <th class="title">
+							                開発期間<span class="required">（必須）</span>
+							            </th>
+							            <td>
+							                <el-input-number 
+							                	v-model="workItem.workPeriod" 
+							                	:min="1">
+							                </el-input-number> 日
+							            </td>
+							        </tr>
+							        <tr>
+							            <th class="title">
+							                開始時期
+							            </th>
+							            <td>
+							                <div class="block">
+							                    <span class="demonstration"></span>
+							                    <el-date-picker 
+							                    	v-model="workItem.workStart" 
+							                    	type="month" 
+							                    	placeholder="Pick a month">
+							                    </el-date-picker>
+							                </div>
+							            </td>
+							        </tr>
+							        <tr>
+							            <th class="title">
+							                役職<span class="required">（必須）</span>
+							            </th>
+							            <td>
+							                <el-input 
+							                	placeholder="例：システムエンジニア" 
+							                	v-model="workItem.workPost">
+							                </el-input>
+							            </td>
+							        </tr>
+							        <tr>
+							            <th class="title">
+							                担当内容<span class="required">（必須）</span>
+							            </th>
+							            <td>
+							                <el-input 
+							                	placeholder="例：設計、実装" 
+							                	v-model="workItem.workCharge">
+							                </el-input>
+							            </td>
+							        </tr>
+							        <tr>
+							            <th class="title">
+							                概要<span class="required">（必須）</span>
+							            </th>
+							            <td>
+							                <el-input 
+							                	type="textarea" 
+							                	:rows="2" 
+							                	placeholder="例：企業内の業務管理を支援するためのシステムをリニューアル..." 
+							                	v-model="workItem.workContent">
+							                </el-input>
+							            </td>
+							        </tr>
+							        <tr>
+							            <th class="title">
+							                使用言語<span class="required">（必須）</span>
+							            </th>
+							            <td>
+							                <el-select 
+							                	v-model="employeeInfo.requiredTech" 
+							                	multiple placeholder="選択してください" clearable>
+							                    <el-option 
+	                                                v-for="tech in techs"
+							                    	:key="tech.value" 
+							                    	:label="tech.label" 
+							                    	:value="tech.value">
+							                    </el-option>
+							                </el-select>
+							            </td>
+							        </tr>
+							    </table>
+							</div>
+	
+	                      </div>
+					</div>
+                    <el-button 
+                        icon="el-icon-plus" 
+                        @click="workHistoryAdd">
+                        職務履歴を追加
+                    </el-button>
                             
                             
                 <div class="form-item btn-form-item">
@@ -402,15 +389,17 @@
                     email: "",        //メールアドレス
                     requiredTech: "", //経験開発言語
                     
-                    workHistory: [{   //職務経歴
-						workName: "",      	//経歴名
-						workPeriod: "",		//開発期間
-						workStart: "",		//開発開始時期
-						workPost: "",		//役職
-						workCharge: "",		//担当内容
-						workContent: "",	//概要
-						workTech: "",		//使用言語
-					}],
+                    workHistory: [],
+                    /**
+                    * 職務経歴
+                    * workName: "",      	//経歴名
+					  workStart: "",		//開発開始時期
+					  workPeriod: "",		//開発期間
+					  workPost: "",		    //役職
+					  workCharge: "",		//担当内容
+					  workContent: "",	    //概要
+					  workTech: "",		    //使用言語
+                    */
 				},
 				techs,
                 // ドラッグドロップ管理
@@ -434,6 +423,10 @@
 			workHistoryAdd() {
 				const workHistory = this.employeeInfo.workHistory;
 				workHistory.push({});
+			},
+			workHistoryDel(index) {
+				const workHistory = this.employeeInfo.workHistory;
+				workHistory.splice(index, 1);
 			},
 			
             checkEmpnumber() {
