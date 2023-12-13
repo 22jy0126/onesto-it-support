@@ -285,7 +285,6 @@
 										            <td>
 										                <el-input-number 
 										                	v-model="workItem.workPeriod" 
-										                	@change="handleChange" 
 										                	:min="1">
 										                </el-input-number> 日
 										            </td>
@@ -349,7 +348,7 @@
 										                	v-model="employeeInfo.requiredTech" 
 										                	multiple placeholder="選択してください" clearable>
 										                    <el-option 
-										                    	v-for="workItem.workTech" 
+                                                                v-for="tech in techs"
 										                    	:key="tech.value" 
 										                    	:label="tech.label" 
 										                    	:value="tech.value">
