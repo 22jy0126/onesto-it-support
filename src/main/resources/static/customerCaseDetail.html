@@ -25,7 +25,7 @@
 </head>
 
 <body>
-    <el-container id="app">
+    <el-container id="app" v-cloak>
         <!-- ヘッドの部分 各々の画面は同じです -->
         <header class="common-header">
             <div class="logo">
@@ -186,41 +186,6 @@
                         functionDesc: "機能3",  // 機能説明
                     }],
                 },
-                // 技術選択肢
-                techs: [{
-                    value: "VBA",
-                    label: "VBA",
-                }, {
-                    value: "java",
-                    label: "java",
-                }, {
-                    value: "c++",
-                    label: "c++",
-                }, {
-                    value: "c#",
-                    label: "c#",
-                }, {
-                    value: "php",
-                    label: "php",
-                }, {
-                    value: "python",
-                    label: "python",
-                }, {
-                    value: "html",
-                    label: "html",
-                }, {
-                    value: "css",
-                    label: "css",
-                }, {
-                    value: "javaScript",
-                    label: "javaScript",
-                }, {
-                    value: "android",
-                    label: "android",
-                }, {
-                    value: "ios",
-                    label: "ios",
-                }],
             };
         },
         mounted() {

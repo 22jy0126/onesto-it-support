@@ -1,0 +1,58 @@
+.milestone-detail-container .caption {
+    font-size: 18px;
+    padding-bottom: 20px;
+}
+.milestone-detail-container .caption i {
+    color: #ef89be;
+    font-size: 20px;
+}
+.milestone-detail-container .sub-caption {
+    font-size: 16px;
+    padding-bottom: 20px;
+}
+.milestone-detail-container .milestone-wrapper {
+    background-color: aliceblue;
+    padding-top: 38px;
+    border: 1px solid #cde0f1;
+    padding-right: 30px;
+}
+.milestone-detail-container .milestone-wrapper  .name {
+    font-size: 18px;
+    /* font-weight: bold; */
+}
+.milestone-detail-container .comment-add {
+    text-decoration: underline;
+    color: #f177b7;
+    font-size: 14px;
+    cursor: pointer;
+}
+.hidden {
+    display: none;
+}
+.milestone-detail-container .opt-line {
+    padding-top: 20px;
+}
+.milestone-wrapper .btn-wrapper {
+
+}
+/* .milestone-wrapper .btn-wrapper span {
+    color: red;
+} */
+.milestone-wrapper .opt-item-del {
+    color: #f177c7;
+    border: none !important;
+    margin-left: -20px !important;
+    position: relative;
+    top: 1px;
+    background-color: transparent;
+    text-decoration: underline;
+}
+.opt-item-del:hover {
+    color: #f177c7;
+    border: none !important;
+    background-color: transparent !important;
+}
+.btns-container {
+    margin-bottom: 30px;
+    padding-top: 20px;
+}

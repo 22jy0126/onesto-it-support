@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    <el-container id="app">
+    <el-container id="app" v-cloak>
         <!-- ヘッドの部分 各々の画面は同じです -->
         <header class="common-header">
             <div class="logo">
@@ -52,7 +52,6 @@
 
             <el-container>
                 <el-main>
-                    <!-- TODO: 内容はここに書く -->
                     <div class="milestone-edit-container">
                         <div class="caption">
                             <i class="el-icon-s-order"></i>
@@ -63,7 +62,7 @@
                         </div>
                         <el-timeline>
                             <el-timeline-item
-                                v-for="(milestoneItem, index) in jobCase.mileStones"
+                                v-for="(milestoneItem, index) in jobCase.milestones"
                                 :key="index"
                                 size="large">
                               <div class="milestone-item">
@@ -106,6 +105,9 @@
                                         マイルストーンの説明を入力してください
                                     </div>
                                 </div>
+                                <div v-bind:class="milestoneItem.isComment ? 'comment-view' : 'hidden'">
+                                    ※コメント： {{milestoneItem.comment}}
+                                </div>
                                 <div class="opts">
                                     <div 
                                         @click="onMilestonenUp(index)"
@@ -115,7 +117,7 @@
                                     </div>
                                     <div 
                                         @click="onMilestonenDown(index)"
-                                        v-bind:class="index==(jobCase.mileStones.length-1) ? 'opt-item-hidden' : 'opt-item'">
+                                        v-bind:class="index==(jobCase.milestones.length-1) ? 'opt-item-hidden' : 'opt-item'">
                                         <i class="el-icon-bottom"></i>
                                         下に移動
                                     </div>
@@ -129,7 +131,7 @@
                                         <el-button 
                                             slot="reference" 
                                             icon="el-icon-delete"
-                                            v-bind:class="jobCase.mileStones.length==1 ? 'opt-item-hidden' : 'opt-item opt-item-del'">
+                                            v-bind:class="jobCase.milestones.length==1 ? 'opt-item-hidden' : 'opt-item opt-item-del'">
                                             削除
                                         </el-button>
                                     </el-popconfirm>
@@ -182,9 +184,11 @@
                 },
                 jobCase: {
                     caseName: "学生管理システムの作成",
-                    mileStones: [{
+                    milestones: [{
                         nameErr: false,
                         descErr: false,
+                        isComment: true,
+                        comment: "もうちょっど詳しく書いてほうしい",
                         // name: "設計",
                         // description: "設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計"
                     }],
@@ -194,48 +198,48 @@
         methods: {
             onMilestonenDel(index) {
                 const {
-                    mileStones = [],
+                    milestones = [],
                 } = this.jobCase;
-                mileStones.splice(index, 1);
+                milestones.splice(index, 1);
             },
             onMilestonenAdd() {
                 const {
-                    mileStones = [],
+                    milestones = [],
                 } = this.jobCase;
-                mileStones.push({
+                milestones.push({
                     nameErr: false,
                     descErr: false,
                 });
             },
             onMilestonenUp(index) {
                 const {
-                    mileStones = [],
+                    milestones = [],
                 } = this.jobCase;
-                const target = mileStones[index];
-                mileStones.splice(index, 1);
-                mileStones.splice(index - 1, 0, target);
+                const target = milestones[index];
+                milestones.splice(index, 1);
+                milestones.splice(index - 1, 0, target);
             },
             onMilestonenDown(index) {
                 const {
-                    mileStones = [],
+                    milestones = [],
                 } = this.jobCase;
-                const target = mileStones[index];
-                mileStones.splice(index, 1);
-                mileStones.splice(index + 1, 0, target);
+                const target = milestones[index];
+                milestones.splice(index, 1);
+                milestones.splice(index + 1, 0, target);
             },
             errClear(index, attr) {
                 const {
-                    mileStones = [],
+                    milestones = [],
                 } = this.jobCase;
                 const attrName = attr + "Err";
-                mileStones[index][attrName] = false;
+                milestones[index][attrName] = false;
             },
             onFinish() {
                 const {
-                    mileStones = [],
+                    milestones = [],
                 } = this.jobCase;
                 let flag = true;
-                mileStones.forEach((item = {}) => {
+                milestones.forEach((item = {}) => {
                     const { 
                         name = "",
                         description = "",
