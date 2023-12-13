@@ -214,16 +214,11 @@
 				<div class="functions-container">
                                 <div class="caption-wrapper">
                                     <label class="label" for="">
-										職務経歴<span class="required">（必須）</span>
+										職務経歴<span class="any">（任意）</span>
 									</label> 
-                                    <span>※ドラッグ&ドロップで経歴の順番を変えることができます。</span>
                                 </div> 
                                 <div class="functions-edit-wrapper" 
-                                    draggable="true"
-                                    @dragstart="onFunctionDragStart(index, $event)"
-                                    @dragover="onFunctionDragOver(index, $event)"
-                                    @drop="onFunctionDrop(index, $event)"
-                                    v-for="(func, index) in employeeInfo.workHistory">
+                                    v-for="(workItem, index) in employeeInfo.workHistory">
                                     <div class="opts">
                                         <div 
                                             @click="onFunctionUp(index)"
@@ -266,100 +261,110 @@
 <!--                                                clearable>-->
 <!--                                            </el-input>-->
                                         </div>
-                                        <div v-bind:class="func.err ? 'err-item err-item-func' : 'opt-item-hidden'">
-                                            <i class="el-icon-warning error-icon"></i>
-                                            機能説明を入力してください
-                                        </div>
                                         
-                                        <table class="history">
-											<tr>
-												<th rowspan="7" class="">
-													経歴の説明
-												</th>
-												<th class="title">
-													プロジェクト名<span class="required">（必須）</span>
-												</th>
-												<td>
-													<el-input placeholder="Please input" v-model="input"></el-input>
-												</td>
-											</tr>
-											<tr>
-												<th class="title">
-													開発期間<span class="required">（必須）</span>
-												</th>
-												<td><el-input-number v-model="num" @change="handleChange" :min="1"></el-input-number>
-													日
-												</td>
-											</tr>
-											<tr>
-												<th class="title">
-													開始時期
-												</thclass="title">
-												<td>
-													<div class="block">
-													    <span class="demonstration"></span>
-													    <el-date-picker
-													      v-model="value2"
-													      type="month"
-													      placeholder="Pick a month">
-													    </el-date-picker>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<th class="title">
-													役職<span class="required">（必須）</span>
-												</thclass="title">
-												<td>
-													<el-input placeholder="Please input" v-model="input"></el-input>
-												</td>
-											</tr>
-											<tr>
-												<th class="title">
-													担当内容<span class="required">（必須）</span>
-												</th>
-												<td>
-													<el-input placeholder="Please input" v-model="input"></el-input>
-												</td>
-											</tr>
-											<tr>
-												<th class="title">
-													概要<span class="required">（必須）</span>
-												</th>
-												<td>
-													<el-input
-														type="textarea"
-														:rows="2"
-														placeholder="Please input"
-														v-model="textarea">
-													</el-input>
-												</td>
-											</tr>
-											<tr>
-												<th class="title">
-													使用言語<span class="required">（必須）</span>
-												</th>
-												<td>
-													<el-select 
-							                            v-model="employeeInfo.requiredTech" 
-							                            multiple 
-							                            placeholder="選択してください" 
-							                            clearable>
-							                            	<el-option 
-							                                	v-for="tech in techs" 
-							                                	:key="tech.value" 
-							                                	:label="tech.label" 
-							                                	:value="tech.value">
-							                                </el-option>
-							                        </el-select>
-												</td>
-											</tr>
-										</table>
+										<div  class="history">
+										    <table>
+										        <tr>
+										            <th rowspan="7">
+										                経歴の説明
+										            </th>
+										            <th class="title">
+										                経歴名<span class="required">（必須）</span>
+										            </th>
+										            <td>
+										                <el-input 
+										                	placeholder="例：業務管理システムのリニューアル" 
+										                	v-model="workItem.workName">
+										                </el-input>
+										            </td>
+										        </tr>
+										        <tr>
+										            <th class="title">
+										                開発期間<span class="required">（必須）</span>
+										            </th>
+										            <td>
+										                <el-input-number 
+										                	v-model="workItem.workPeriod" 
+										                	@change="handleChange" 
+										                	:min="1">
+										                </el-input-number> 日
+										            </td>
+										        </tr>
+										        <tr>
+										            <th class="title">
+										                開始時期
+										            </th>
+										            <td>
+										                <div class="block">
+										                    <span class="demonstration"></span>
+										                    <el-date-picker 
+										                    	v-model="workItem.workStart" 
+										                    	type="month" 
+										                    	placeholder="Pick a month">
+										                    </el-date-picker>
+										                </div>
+										            </td>
+										        </tr>
+										        <tr>
+										            <th class="title">
+										                役職<span class="required">（必須）</span>
+										            </th>
+										            <td>
+										                <el-input 
+										                	placeholder="例：システムエンジニア" 
+										                	v-model="workItem.workPost">
+										                </el-input>
+										            </td>
+										        </tr>
+										        <tr>
+										            <th class="title">
+										                担当内容<span class="required">（必須）</span>
+										            </th>
+										            <td>
+										                <el-input 
+										                	placeholder="例：設計、実装" 
+										                	v-model="workItem.workCharge">
+										                </el-input>
+										            </td>
+										        </tr>
+										        <tr>
+										            <th class="title">
+										                概要<span class="required">（必須）</span>
+										            </th>
+										            <td>
+										                <el-input 
+										                	type="textarea" 
+										                	:rows="2" 
+										                	placeholder="例：企業内の業務管理を支援するためのシステムをリニューアル..." 
+										                	v-model="workItem.workContent">
+										                </el-input>
+										            </td>
+										        </tr>
+										        <tr>
+										            <th class="title">
+										                使用言語<span class="required">（必須）</span>
+										            </th>
+										            <td>
+										                <el-select 
+										                	v-model="employeeInfo.requiredTech" 
+										                	multiple placeholder="選択してください" clearable>
+										                    <el-option 
+										                    	v-for="workItem.workTech" 
+										                    	:key="tech.value" 
+										                    	:label="tech.label" 
+										                    	:value="tech.value">
+										                    </el-option>
+										                </el-select>
+										            </td>
+										        </tr>
+										    </table>
+										</div>
+
                                     </div>
                                 </div>
                                 <el-button 
                                     icon="el-icon-plus" 
-                                    @click="onFunctionAdd">
+                                    @click="workHistoryAdd">
                                     機能追加
                                 </el-button>
                             </div>
@@ -390,14 +395,23 @@
             return {
                 // html の中の　v-model　属性と同じ値
                 employeeInfo: {
-                    empnumber: "",
-                    name: "",
-                    password: "",
-                    password2: "",
-                    tel: "",
-                    email: "",
-                    requiredTech: "",
-                    workHistory: [{}],
+                    empnumber: "",    //社員番号
+                    name: "",         //氏名
+                    password: "",     //パスワード
+                    password2: "",    //パスワード確認
+                    tel: "",          //電話番号
+                    email: "",        //メールアドレス
+                    requiredTech: "", //経験開発言語
+                    
+                    workHistory: [{   //職務経歴
+						workName: "",      	//経歴名
+						workPeriod: "",		//開発期間
+						workStart: "",		//開発開始時期
+						workPost: "",		//役職
+						workCharge: "",		//担当内容
+						workContent: "",	//概要
+						workTech: "",		//使用言語
+					}],
 				},
 				techs,
                 // ドラッグドロップ管理
@@ -417,6 +431,12 @@
             };
         },
         methods: {
+			
+			workHistoryAdd() {
+				const workHistory = this.employeeInfo.workHistory;
+				workHistory.push({});
+			},
+			
             checkEmpnumber() {
                 //TODO サーバに送って、使えるかどうかをチェックする
                 if (this.customerInfo.empnumber != "123456") {
