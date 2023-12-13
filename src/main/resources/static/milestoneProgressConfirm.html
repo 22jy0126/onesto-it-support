@@ -75,7 +75,7 @@
                                         {{milestoneItem.description}}
                                     </div>
                                     <div class="opt-line">
-                                        <span v-bind:class="milestoneItem.isComment ? 'hidden' : 'comment-add'" 
+                                        <span v-bind:class="!milestoneItem.isComment && milestoneItem.status == 3 ? 'comment-add' : 'hidden'" 
                                             @click="onCommentAdd(index)">
                                             コメント追加
                                         </span>
@@ -212,7 +212,14 @@
                     milestones[index].markCls = "mark mark-3";
                     this.jobCase.milestones = milestones;
                 });
-            }
+            },
+            onCommentCancel(index) {
+                const {
+                    milestones = [],
+                } = this.jobCase;
+                milestones[index].comment = "";
+                milestones[index].isComment = false;
+            },
         }
     });
 </script>
