@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイルストーンの進捗更新</title>
+    <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
+    <!-- vue と elementUIの依存css -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <!-- システム共用のスタイルはこのファイルに追加する -->
+    <link href="./css/common.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/milestoneDetail.css">
+    <!-- TODO: 作るHTMLとペアでCSSファイルを作り、なるべく同じファイル名にする -->
+
+    <!-- vue と elementUIの依存javascript -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
+
+</head>
+
+<body>
+    <el-container id="app" v-cloak>
+        <!-- ヘッドの部分 各々の画面は同じです -->
+        <header class="common-header">
+            <div class="logo">
+                ブリッジ
+            </div>
+            <div class="login-info">
+                <el-badge :value="user.noticeCount" class="item">
+                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
+                </el-badge>
+                {{user.username}}さん、こんにちは！
+            </div>
+        </header>
+
+        <!-- メインの部分 -->
+        <el-container class="common-mian job-case-main">
+            <!-- サイドメニュー -->
+            <el-aside width="200px">
+                <!-- TODO: default-active は今いるのメニューです -->
+                <el-menu default-active="3" class="el-menu-vertical-demo">
+                    <el-menu-item index="1">求人一覧</el-menu-item>
+                    <el-menu-item index="2">個人履歴</el-menu-item>
+                    <el-menu-item index="3">応募歴史</el-menu-item>
+                    <el-menu-item index="4">通知</el-menu-item>
+                </el-menu>
+            </el-aside>
+
+            <el-container>
+                <el-main>
+                    <div class="milestone-detail-container">
+                        <div class="caption">
+                            <i class="el-icon-s-order"></i>
+                            {{jobCase.caseName}}
+                        </div>
+                        <div class="sub-caption">
+                            マイルストーンの進捗
+                        </div>
+                        <section class="milestone-wrapper">
+                            <el-timeline>
+                                <el-timeline-item
+                                    v-for="(milestoneItem, index) in jobCase.milestones"
+                                    :key="index"
+                                    :color="milestoneItem.color"
+                                    size="large">
+                                    <div class="name">
+                                        <span>{{milestoneItem.name}}</span>
+                                        <span v-bind:class="milestoneItem.markCls">{{milestoneItem.statusText}}</span>
+                                    </div>
+                                    <div class="desc">
+                                        {{milestoneItem.description}}
+                                    </div>
+                                    <div v-bind:class="milestoneItem.isComment ? 'comment-view' : 'hidden'">
+                                        ※コメント： {{milestoneItem.comment}}
+                                    </div>
+                                    <!-- <div class="opt-line">
+                                        {{ milestoneItem.statusText }}
+                                    </div> -->
+                                </el-timeline-item>
+                            </el-timeline>
+                        </section>
+                        <!-- <div class="btns-container">
+                            <el-button type="primary" 
+                                @click="onOk"
+                            >
+                                同意する
+                            </el-button>
+                            <el-button type="info">
+                                コメントを踏んで、直してほうしい
+                            </el-button>
+                        </div> -->
+                    </div>
+                </el-main>
+            </el-container>
+        </el-container>
+    </el-container>
+
+</body>
+
+</html>
+<script src="./js/consts.js"></script>
+<script>
+    // elementの日本語対応
+    ELEMENT.locale(ELEMENT.lang.ja);
+
+    let vm;
+    vm = new Vue({
+        // id はapp の属性の中の部分を管理する
+        el: "#app",
+        data() {
+            return {
+                // ログインしたユーザー情報
+                user: {
+                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
+                    username: "鈴木　奈々", // ユーザー名
+                    noticeCount: 2, // 通知数
+                },
+                jobCase: {},
+            };
+        },
+        mounted() {
+            this.init();
+        },
+        methods: {
+            init() {
+                this.getMilestoneData();
+            },
+            /**
+             * 案件のデータをゲット
+            */
+            getMilestoneData() {
+                const mock = {
+                    caseName: "学生管理システムの作成",
+                    milestones: [{
+                        id: 0,
+                        name: "上流設計完成",
+                        description: "アクティビティ図とユースケース図の完成、画面の項目と画面の遷移を明確にして、説明の詳細はドキュメントにする",
+                        isComment: false,
+                        status: 4,
+                    }, {
+                        id: 1,
+                        name: "詳細設計完成",
+                        description: "モックアップの作成して、オブジェクト図とシーケンス図が完成して、データベースの設計の完成する,",
+                        isComment: true,
+                        status: 2,
+                        comment: "もうちょっど詳しく書いてほうしい",
+                    }, {
+                        id: 2,
+                        name: "実装完成",
+                        description: "設計通りに開発完成する、機能は全部実現する",
+                        status: 3,
+                        isComment: false,
+                    }, {
+                        id: 3,
+                        name: "テスト完成",
+                        description: "機能は全部設計通りに実現するのは検証して、完全性とパーフォーマンスも検証する",
+                        status: 1,
+                        isComment: false,
+                    }],
+                };
+                const jobCase = mock;
+                const milestones = jobCase.milestones;
+                milestones.forEach(item => {
+                    const { status } = item;
+                    const s = milestoneStatus.find(({code: c}) => c == status);
+                    item.statusText = s.text;
+                    item.color = s.color;
+                    item.markCls = `mark mark-${s.code}`;
+                });
+                jobCase.milestones = milestones;
+                this.jobCase = jobCase;
+            },
+
+            onCommentAdd(index) {
+                const {
+                    milestones = [],
+                } = this.jobCase;
+                milestones[index].isComment = true;
+            },
+            onCommentCancel(index) {
+                const {
+                    milestones = [],
+                } = this.jobCase;
+                milestones[index].comment = "";
+                milestones[index].isComment = false;
+            },
+            onOk() {
+                this.$confirm('同意したマイルストーンは後で直せません、よろしいですか?', '確認', {
+                    confirmButtonText: '同意する',
+                    cancelButtonText: "もうちょっど考える",
+                    type: 'warning',
+                    center: false,
+                });
+            }
+        }
+    });
+</script>
