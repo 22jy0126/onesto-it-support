@@ -52,6 +52,10 @@
             <el-container>
                 <el-main>
                     <div class="milestone-detail-container">
+                        <div class="goback">
+                            <i class="el-icon-back"></i>
+                            案件詳細に戻る
+                        </div>
                         <div class="caption">
                             <i class="el-icon-s-order"></i>
                             {{jobCase.caseName}}
@@ -76,14 +80,14 @@
                                     <div class="opt-line">
                                         <span v-bind:class="!milestoneItem.isComment && milestoneItem.status == 3 ? 'comment-add' : 'hidden'" 
                                             @click="onCommentAdd(index)">
-                                            コメント追加
+                                            完成物についてのコメントを追加
                                         </span>
                                         <div v-bind:class="!milestoneItem.isComment ? 'hidden' : 'comment-edit'">
                                             <el-input 
                                                 class="comment-input"
                                                 type="textarea"
                                                 :rows="3"
-                                                placeholder="コメントを入力してください" 
+                                                placeholder="完成物についてのコメントを入力してください" 
                                                 v-model="milestoneItem.comment" 
                                                 clearable>
                                             </el-input>
@@ -107,7 +111,7 @@
                                     <div v-bind:class="milestoneItem.status != 3 ? 'hidden' : 'opt-line'">
                                         <el-button 
                                             size="small" 
-                                            @click="onFinish(index)"
+                                            @click="onConfirm(index)"
                                             type="primary">
                                             作業完成確認
                                         </el-button>
@@ -168,9 +172,9 @@
                         id: 1,
                         name: "詳細設計完成",
                         description: "モックアップの作成して、オブジェクト図とシーケンス図が完成して、データベースの設計の完成する,",
-                        isComment: true,
+                        isComment: false,
                         status: 3,
-                        comment: "もうちょっど詳しく書いてほしい",
+                        // comment: "もうちょっど詳しく書いてほしい",
                     }, {
                         id: 2,
                         name: "実装完成",
@@ -197,20 +201,32 @@
                 jobCase.milestones = milestones;
                 this.jobCase = jobCase;
             },
-            onFinish(index) {
-                this.$confirm('確認するまでしばらくお待ちください', 'クライアントに通知しました', {
-                    confirmButtonText: '分かりました',
-                    type: 'success',
-                    center: true,
-                    showCancelButton: false,
-                }).then(() => {
-                    const milestones = { ...this.jobCase.milestones };
-                    milestones[index].status = 3;
-                    milestones[index].statusText = "確認待ち";
-                    milestones[index].color = "#7dd3e7";
-                    milestones[index].markCls = "mark mark-3";
-                    this.jobCase.milestones = milestones;
-                });
+            onConfirm(index) {
+                this.$confirm('確認を完了すると前の状態には戻れません、よろしいですか?', '確認', {
+                    confirmButtonText: '確認する',
+                    cancelButtonText: "もうちょっと考える",
+                    type: 'warning',
+                    center: false,
+                })
+                    .then(() => {
+                        const milestones = { ...this.jobCase.milestones };
+                        milestones[index].status = 4;
+                        milestones[index].statusText = "確認済み";
+                        milestones[index].color = "#67c23a";
+                        milestones[index].markCls = "mark mark-4";
+
+                        milestones[index + 1].status = 2;
+                        milestones[index + 1].statusText = "作業中";
+                        milestones[index + 1].color = "#409eff";
+                        milestones[index + 1].markCls = "mark mark-2";
+                        this.jobCase.milestones = milestones;
+                    });
+            },
+            onCommentAdd(index) {
+                const {
+                    milestones = [],
+                } = this.jobCase;
+                milestones[index].isComment = true;
             },
             onCommentCancel(index) {
                 const {
