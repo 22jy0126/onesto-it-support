@@ -366,6 +366,10 @@ body {
     position: absolute;
 }
 
+[v-cloak] {
+    display: none !important;
+}
+
 .common-header {
     position: fixed;
     top: 0;

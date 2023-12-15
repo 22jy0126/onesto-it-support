@@ -1,0 +1,99 @@
+.milestone-detail-container .caption {
+    font-size: 18px;
+    padding-bottom: 20px;
+}
+.milestone-detail-container .caption i {
+    color: #ef89be;
+    font-size: 20px;
+}
+.milestone-detail-container .sub-caption {
+    font-size: 16px;
+    padding-bottom: 20px;
+}
+.milestone-detail-container .milestone-wrapper {
+    background-color: aliceblue;
+    padding-top: 38px;
+    border: 1px solid #cde0f1;
+    padding-right: 30px;
+}
+.milestone-detail-container .milestone-wrapper  .name {
+    font-size: 18px;
+    margin-bottom: 8px;
+    /* font-weight: bold; */
+}
+.name .mark {
+    font-size: 12px;
+    display: inline-block;
+    padding: 4px 7px;
+    border-radius: 3px;
+    position: relative;
+    top: -2px;
+    left: 2px;
+}
+.name .mark-1 {
+    color: #999;
+    border: 1px solid #ccc;
+    background-color: #eaf3fb;
+}
+.name .mark-2 {
+    color: #409eff;
+    border: 1px solid #409eff;
+    background-color: #d5eaff;
+}
+.name .mark-3 {
+    color: #3abcdb;
+    border: 1px solid #7dd3e7;
+    background-color: #e0f7fd;
+}
+.name .mark-4 {
+    color: #51af3f;
+    border: 1px solid #67c23a;
+    background-color: #d6f5c8;
+}
+.milestone-detail-container .comment-add {
+    text-decoration: underline;
+    color: #f177b7;
+    font-size: 14px;
+    cursor: pointer;
+}
+.hidden {
+    display: none;
+}
+.milestone-detail-container .opt-line {
+    padding-top: 20px;
+}
+.milestone-wrapper .btn-wrapper {
+
+}
+/* .milestone-wrapper .btn-wrapper span {
+    color: red;
+} */
+.milestone-wrapper .opt-item-del {
+    color: #f177c7;
+    border: none !important;
+    margin-left: -20px !important;
+    position: relative;
+    top: 1px;
+    background-color: transparent;
+    text-decoration: underline;
+}
+.opt-item-del:hover {
+    color: #f177c7;
+    border: none !important;
+    background-color: transparent !important;
+}
+.btns-container {
+    margin-bottom: 30px;
+    padding-top: 20px;
+}
+.comment-view {
+    color: #e36fab;
+    margin-top: 10px;
+    padding-top: 5px;
+    border-top: 1px dashed #f3afd2;
+}
+.goback {
+    color: #409eff;
+    padding: 10px 0 20px;
+    cursor: pointer;
+}

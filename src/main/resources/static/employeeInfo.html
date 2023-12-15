@@ -24,7 +24,7 @@
 </head>
 
 <body>
-    <el-container id="app">
+    <el-container id="app" v-cloak>
         <!-- ヘッドの部分 各々の画面は同じです -->
         <header class="common-header">
             <div class="logo">
@@ -66,7 +66,7 @@
 							 <div class="profile">
 								 <table>
 								<tr>
-									<th rowspan="4"><img class="arvater" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" /></th>
+									<!-- <th rowspan="4"><img class="arvater" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" /></th> -->
 									<td>
 										<i class="el-icon-user icon"></i>
 										{{infos.name}}

@@ -24,7 +24,7 @@
 </head>
 
 <body>
-    <el-container id="app">
+    <el-container id="app" v-cloak>
         <!-- ヘッドの部分 各々の画面は同じです -->
         <header class="common-header">
             <div class="logo">
@@ -55,7 +55,56 @@
                 <el-main>
                     <!-- TODO: 内容はここに書く -->
                     <section class="employee-Apply-History">
-
+                        <div class="common-caption">
+                            <i class="el-icon-document icon"></i>
+                            <span class="em">求人応募履歴</span>
+                        </div>
+                        <div class="job-case-item" v-for="job in jobList">
+                            <div class="case-name-line">
+                                <div class="case-name">{{job.caseName}}</div>
+                                <div>
+                                    <span>開発期限:</span>
+                                    <span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
+                                </div>
+                            </div>
+                            <div class="case-sub">
+                                <div class="case-sub-day">
+                                    <span class="label">予定期間:&nbsp;&nbsp;&nbsp;</span>
+                                    <span>{{job.workDays}}日</span>
+                                </div>
+                                <div class="case-sub-money">
+                                    <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
+                                    <span>{{job.bonusMoney.toLocaleString()}}万円</span>
+                                    <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
+                                </div>
+                                <!-- <div class="case-sub-item">
+                                    <span class="label">募集人数:&nbsp;&nbsp;&nbsp;</span>
+                                    <span>{{job.number}}人</span>
+                                </div> -->
+                            </div>
+                            <div class="case-sub">
+                                <span class="label">クライアント氏名:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.customerName}}さん</span>
+                            </div>
+                            <div class="case-sub">
+                                <span class="label">希望開発言語:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.requiredTech}}</span>
+                            </div>
+                            <!-- <div class="case-sub">
+                                <span class="label">プラス技術条件:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.pulsTech}}</span>
+                            </div> -->
+                            <div class="case-sub">
+                                <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.description}}</span>
+                            </div>
+                            <div class="case-sub">
+                                状況:
+                            </div>
+                            <div class="go-detail">
+                                詳細>>
+                            </div>
+                        </div>
                     </section>
                 </el-main>
             </el-container>
@@ -81,7 +130,52 @@
                     username: "鈴木　奈々", // ユーザー名
                     noticeCount: 2, // 通知数
                 },
-                
+                // 求人票のデータ
+                jobList: [{
+                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                    customerName: "小林　七海",　　　　　       // クライアント氏名
+                    requiredTech: "HTML CSS",               //　必須技術条件
+                    pulsTech: "Javascript Java",            //　プラス技術条件
+                    number: 3,                              //　募集人数
+                    workDays: 15,                           //　仕事予定期間
+                    bonusMoney: 5,                    //　報酬
+                    bonusMoneyNegotiable: true,             //　報酬相談可能
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadline: "2024年2月20日"                // 開発期限
+                }, {
+                    caseName: "従業員管理システムの制作",       // 求人プロジェクト名
+                    customerName: "小林　七海",　　　　　      // クライアント氏名
+                    requiredTech: "HTML CSS",               //　必須技術条件
+                    pulsTech: "Javascript Java",            //　プラス技術条件
+                    number: 3,                              //　募集人数
+                    workDays: 15,                           //　仕事予定期間
+                    bonusMoney: 7.5,                    //　報酬
+                    bonusMoneyNegotiable: false,             //　報酬相談可能                                               
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadline: "2099年12月31日"
+                }, {
+                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                    customerName: "小林　七海",　　　　　       // クライアント氏名
+                    requiredTech: "HTML CSS",               //　必須技術条件
+                    pulsTech: "Javascript Java",            //　プラス技術条件
+                    number: 3,                              //　募集人数
+                    workDays: 15,                           //　仕事予定期間
+                    bonusMoney: 5,                    //　報酬
+                    bonusMoneyNegotiable: true,             //　報酬相談可能
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadline: "2024年2月20日"                // 開発期限
+                }, {
+                    caseName: "従業員管理システムの制作",       // 求人プロジェクト名
+                    customerName: "小林　七海",　　　　　      // クライアント氏名
+                    requiredTech: "HTML CSS",               //　必須技術条件
+                    pulsTech: "Javascript Java",            //　プラス技術条件
+                    number: 3,                              //　募集人数
+                    workDays: 15,                           //　仕事予定期間
+                    bonusMoney: 7.5,                    //　報酬
+                    bonusMoneyNegotiable: false,             //　報酬相談可能                                               
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadline: "2099年12月31日"
+                }],
             };
         },
     });

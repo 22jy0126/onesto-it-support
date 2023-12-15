@@ -1,0 +1,82 @@
+.milestone-edit-container .caption {
+    font-size: 18px;
+    padding-bottom: 20px;
+}
+.milestone-edit-container .caption i {
+    color: #ef89be;
+    font-size: 20px;
+}
+.milestone-edit-container .sub-caption {
+    font-size: 16px;
+    padding-bottom: 20px;
+}
+
+.milestone-edit-container .el-timeline {
+    padding-left: 0 !important;
+}
+
+.milestone-edit-container .milestone-item {
+    border: 1px solid #ddd;
+    padding: 14px;
+    border-radius: 5px;
+}
+.milestone-edit-container .comment-view {
+    color: #e36fab;
+}
+.err-item {
+    display: flex;
+    align-items: center;
+    color: red;
+    padding-left: 130px;
+    font-size: 12px;
+}
+.error-icon {
+    font-size: 16px;
+    margin-right: 5px;
+}
+.err-item-func {
+    padding-left: 0px !important;
+}
+.input-err input, .input-err textarea {
+    border-color: red;
+}
+.opt-item-hidden {
+    display: none;
+}
+.milestone-edit {
+    margin-bottom: 10px;
+}
+.milestone-edit .label {
+    margin-bottom: 5px;
+}
+.opts {
+    /* margin-bottom: 10px; */
+    display: flex;
+    align-items: center;
+    /* justify-content: end; */
+}
+.opt-item {
+    color: #6694e3;
+    cursor: pointer;
+    margin-right: 20px;
+}
+.opt-item-del {
+    color: red;
+    border: none !important;
+    margin-left: -12px !important;
+    position: relative;
+    top: 1px;
+    background-color: transparent;
+}
+.opt-item-del:hover {
+    color: red;
+    border: none !important;
+    background-color: transparent !important;
+}
+.btns-container {
+    padding-left: 26px;
+    margin-bottom: 30px;
+}
+.required {
+    color: red;
+}

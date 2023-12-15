@@ -25,7 +25,7 @@
 </head>
 
 <body>
-    <el-container id="app">
+    <el-container id="app" v-cloak>
         <!-- ヘッドの部分 各々の画面は同じです -->
         <header class="common-header">
             <div class="logo">
@@ -286,6 +286,7 @@
 </body>
 
 </html>
+<script src="./js/consts.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -315,7 +316,7 @@
                     functions: [{
                         id: 0,
                         // functionName: "1",  // 機能名
-                        functionDesc: "機能1",  // 機能説明
+                        functionDesc: "機能1********",  // 機能説明
                         // err: true,
                     }, {
                         id: 1,
@@ -328,40 +329,7 @@
                     }],
                 },
                 // 技術選択肢
-                techs: [{
-                    value: "VBA",
-                    label: "VBA",
-                }, {
-                    value: "java",
-                    label: "java",
-                }, {
-                    value: "c++",
-                    label: "c++",
-                }, {
-                    value: "c#",
-                    label: "c#",
-                }, {
-                    value: "php",
-                    label: "php",
-                }, {
-                    value: "python",
-                    label: "python",
-                }, {
-                    value: "html",
-                    label: "html",
-                }, {
-                    value: "css",
-                    label: "css",
-                }, {
-                    value: "javaScript",
-                    label: "javaScript",
-                }, {
-                    value: "android",
-                    label: "android",
-                }, {
-                    value: "ios",
-                    label: "ios",
-                }],
+                techs,
                 // ドラッグドロップ管理
                 dragIndex: null,
                 // 機能のid記録
