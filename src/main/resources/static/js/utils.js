@@ -15,3 +15,9 @@ function dateFormat(time) {
     day = numTo2(day);
     return year + "年" + month + "月" + day + "日";
 }
+
+function getURLParam(key) {
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+    return params.get(key);
+}

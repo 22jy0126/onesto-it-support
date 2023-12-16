@@ -36,6 +36,9 @@
     align-items: center;
     margin-bottom: 18px;
 }
+.caption-wrapper-title-edit {
+    justify-content: space-between;
+}
 .caption-wrapper i {
     font-size: 18px;
     color: #ef89be;
@@ -120,5 +123,9 @@
 }
 .input-err input, .input-err textarea {
     border-color: red;
+}
+.caption-wrapper-title {
+    display: flex;
+    align-items: center;
 }
     

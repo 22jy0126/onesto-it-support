@@ -3,9 +3,7 @@
     align-items: center;
     margin-bottom: 5px;
 }
-.edit-item-top {
-    align-items: baseline !important;
-}
+
 .customer-case-edit-container .edit-item .label {
     white-space: nowrap;
     margin-right: 10px;
@@ -14,15 +12,7 @@
 .required {
     color: red;
 }
-.edit-item-wrapper {
-    margin-bottom: 14px;
-}
-.edit-item .el-select {
-    width: 100%;
-}
-.edit-item .des {
-    margin-left: 10px;
-}
+
 .sub-edit {
     display: flex;
     align-items: center;
@@ -34,14 +24,16 @@
 .caption-wrapper {
     display: flex;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 10px;
 }
 .caption-wrapper i {
     font-size: 18px;
     color: #ef89be;
+    position: relative;
+    top: 1px;
 }
 .caption-wrapper .caption {
-    /* font-size: 18px; */
+    font-size: 16px;
     font-weight: bold;
     position: relative;
     top: 1px;
@@ -49,27 +41,6 @@
 }
 .functions-container {
     margin-top: 30px;
-}
-.functions-edit-wrapper {
-    border: 1px solid #eee;
-    border-radius: 3px;
-    padding: 20px;
-    margin-bottom: 10px;
-    cursor:grab;
-}
-.functions-edit-wrapper .func-edit {
-    display: flex;
-    margin-bottom: 10px;
-    align-items: center;
-}
-.functions-edit-wrapper .func-edit .label {
-    width: 70px;
-}
-.func-edit-top {
-    align-items: baseline !important;
-}
-.opt-item-hidden {
-    display: none;
 }
 .opts {
     margin-bottom: 10px;
@@ -121,4 +92,56 @@
 .input-err input, .input-err textarea {
     border-color: red;
 }
-    
+.hidden {
+    display: none;
+}   
+.goback {
+    color: #409eff;
+    padding: 0px 0 10px;
+} 
+.back {
+    cursor: pointer;
+}
+.base-infos {
+    border: 1px solid #8bb3f7;
+    background-color: #e6edfa;
+    padding: 14px;
+}
+.info-item {
+    padding-bottom: 10px;
+}
+.info-item-last {
+    padding-bottom: 0px;
+}
+
+.functions-infos {
+    margin-top: 20px;
+}
+.functions-item {
+    display: flex;
+    padding-bottom: 10px;
+}
+.functions-item .index {
+    width: 70px;
+}
+.functions-item .index i {
+    color: #8bb3f8;
+}
+
+.functions-item .desc {
+    flex: 1;
+}
+.info-item-long {
+    display: flex;
+}
+.info-item-long .txt {
+    flex: 1;
+}
+.label-desc {
+    width: 83px;
+    white-space: nowrap;
+}
+.label-tools {
+    width: 114px;
+    white-space: nowrap;
+}

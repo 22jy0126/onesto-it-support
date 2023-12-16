@@ -44,9 +44,9 @@
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="2" class="el-menu-vertical-demo">
-                    <el-menu-item index="1">求人一覧</el-menu-item>
+                    <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
                     <el-menu-item index="2">個人履歴</el-menu-item>
-                    <el-menu-item index="3">応募歴史</el-menu-item>
+                    <el-menu-item index="3" @click="goEmployeeApplyHistory">応募歴史</el-menu-item>
                     <el-menu-item index="4">通知</el-menu-item>
                 </el-menu>
             </el-aside>
@@ -164,6 +164,7 @@
 </body>
 
 </html>
+<script src="./js/pageJump.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -208,5 +209,9 @@
                 
             };
         },
+		methods: {
+			goJobCases,
+			goEmployeeApplyHistory,
+		}
     });
 </script>

@@ -55,74 +55,56 @@
                 <el-main>
                     <!-- TODO: 内容はここに書く -->
                     <section>
-                        <form>
                             <div class="caption-wrapper">
-                                <i class="el-icon-edit-outline"></i>
+                                <i class="el-icon-s-order"></i>
                                 <div class="caption">案件の基本情報</div> 
                             </div> 
-                            <div class="edit-item-wrapper">
-                                <div class="edit-item">
-                                    <div class="label">
-                                        案件名：{{jobCase.caseName}}
-                                        <span class="required"></span>
+                            <section class="base-infos">
+                                <div class="info-item">
+                                    案件名：{{jobCase.caseName}}
+                                </div>
+                                <div class="info-item-long info-item">
+                                    <div class="label-desc">
+                                        案件の説明：
+                                    </div>
+                                    <div class="txt">
+                                        {{jobCase.description}}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="edit-item-wrapper">
-                                <div class="edit-item edit-item-top">
-                                    <div class="label">
-                                        案件の説明：{{jobCase.description}}
-                                        <span class="required"></span>
+                                <div class="info-item info-item-long">
+                                    <div class="label-tools">
+                                        希望開発ツール：
+                                    </div>
+                                    <div>
+                                        {{jobCase.developTools}}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="edit-item-wrapper">
-                                <div class="edit-item">
-                                    <div class="label">希望開発言語：
-                                        <span v-for="tech in jobCase.requiredTech">
-                                            {{tech}}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="edit-item-wrapper">
-                                <div class="edit-item">
-                                    <div class="label">報酬：{{jobCase.bonusMoney}}万円<span class="required"></span>
-                                        <span class="sub-lable">相談可否</span>
-                                        <el-switch 
-                                            v-model="jobCase.bonusMoneyNegotiable">
-                                        </el-switch>
-                                    </div>
-                                    <div class="sub-edit">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="edit-item-wrapper">
-                                <div class="edit-item">
+                                <div class="info-item">
                                     <div class="label">開発期限：{{jobCase.deadlineVal}}
-                                        <span class="required"></span>
-                                    </div>
-                            </div>
-                            
-                            <div class="functions-container">
-                                <div class="caption-wrapper">
-                                    <i class="el-icon-edit-outline"></i>
-                                    <div class="caption">追加した機能<span class="required"></span></div> 
-                                    <span></span>
-                                </div> 
-                                <div class="functions-edit-wrapper" 
-                                    draggable="true"
-                                    @dragstart="onFunctionDragStart(index, $event)"
-                                    @dragover="onFunctionDragOver(index, $event)"
-                                    @drop="onFunctionDrop(index, $event)"
-                                    v-for="(func, index) in jobCase.functions">
-                                    <div class="func-edit-wrapper">
-                                        <div class="label">
-                                            機能説明：{{func.functionDesc}}
-                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                                <div class="info-item info-item-last">
+                                    <div class="label">報酬：{{jobCase.bonusMoney}}万円<span class="required"></span>
+                                        <span>（{{jobCase.bonusMoneyNegotiable ? "相談可能" : "相談不可"}}）</span>
+                                    </div>
+                                </div>
+                            </section>
+                            
+                            <section class="functions-infos">
+                                <div class="caption-wrapper">
+                                    <i class="el-icon-menu"></i>
+                                    <div class="caption">機能の詳細</div>
+                                </div>
+                                <div class="functions-item" v-for="(func, index) in jobCase.functions">
+                                    <div class="index">
+                                        <i class="el-icon-caret-right"></i>
+                                        機能{{index+1}}：
+                                    </div>
+                                    <div class="desc">
+                                        {{func.functionDesc}}
+                                    </div>
+                                </div>
+                            </section>
                             <div class="save-btns">
                                 <el-button 
                                     @click="onBackPage"
@@ -134,7 +116,6 @@
                                     @click="onDraftSave"
                                     type="info">下書きとして保存</el-button>
                             </div>
-                        </form>
                     </section>
                     
                 </el-main>

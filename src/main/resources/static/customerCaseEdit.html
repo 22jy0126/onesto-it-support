@@ -56,9 +56,17 @@
                     <!-- 案件登録 -->
                     <section>
                         <form>
-                            <div class="caption-wrapper">
-                                <i class="el-icon-edit-outline"></i>
-                                <div class="caption">案件の基本情報</div> 
+                            <div class="caption-wrapper caption-wrapper-title-edit">
+                                <div class="caption-wrapper-title">
+                                    <i class="el-icon-edit-outline"></i>
+                                    <div class="caption">案件の基本情報</div> 
+                                </div>
+                                <el-button 
+                                    type="danger" 
+                                    @click="onReset"
+                                    plain>
+                                    リセット
+                                </el-button>
                             </div> 
                             <div class="edit-item-wrapper">
                                 <div class="edit-item">
@@ -103,55 +111,17 @@
                                 </div>
                             </div>
                             <div class="edit-item-wrapper">
-                                <div class="edit-item">
-                                    <div class="label">希望開発言語:</div>
-                                    <el-select 
-                                        v-model="jobCase.requiredTech" 
-                                        multiple 
-                                        placeholder="選択してください" 
+                                <div class="edit-item edit-item-top">
+                                    <div class="label">希望開発ツール:</div>
+                                    <el-input 
+                                        type="textarea" 
+                                        :rows="3"
+                                        placeholder="例：C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成等..." 
+                                        v-model="jobCase.developTools" 
                                         clearable>
-                                        <el-option 
-                                            v-for="tech in techs" 
-                                            :key="tech.value" 
-                                            :label="tech.label" 
-                                            :value="tech.value">
-                                        </el-option>
-                                    </el-select>
+                                    </el-input>
                                 </div>
                             </div>
-                            <!-- <div class="edit-item">
-                                <div class="label">プラス技術条件:</div>
-                                <el-select 
-                                    v-model="jobCase.pulsTech" 
-                                    multiple 
-                                    placeholder="選択してください" 
-                                    clearable>
-                                    <el-option 
-                                        v-for="tech in techs" 
-                                        :key="tech.value" 
-                                        :label="tech.label" 
-                                        :value="tech.value">
-                                    </el-option>
-                                </el-select>
-                            </div>
-                            <div class="edit-item">
-                                <div class="label">募集人数:</div>
-                                <el-input-number 
-                                    v-model="jobCase.number" 
-                                    :min="1" 
-                                    :max="999">
-                                </el-input-number>
-                                <div class="des">人</div>
-                            </div>
-                            <div class="edit-item">
-                                <div class="label">仕事予定期間:</div>
-                                <el-input-number 
-                                    v-model="jobCase.workDays" 
-                                    :min="1" 
-                                    :max="999">
-                                </el-input-number>
-                                <div class="des">日</div>
-                            </div> -->
                             <div class="edit-item-wrapper">
                                 <div class="edit-item">
                                     <div class="label">報酬:<span class="required">（必須）</span></div>
@@ -287,6 +257,7 @@
 
 </html>
 <script src="./js/consts.js"></script>
+<script src="./js/pageJump.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -304,27 +275,20 @@
                     noticeCount: 2, // 通知数
                 },
                 jobCase: {
-                    caseName: "",         // 案件名
-                    requiredTech:  "",    // 必須技術条件
-                    // pulsTech:  "",        // プラス技術条件
-                    // number: 3,            // 募集人数
-                    // workDays: 15,         // 仕事予定期間
+                    caseName: "",            // 案件名
+                    developTools: "",        // 希望開発ツール
                     bonusMoney: undefined,   //　報酬
                     bonusMoneyNegotiable: false,       //　報酬相談可能
                     description: "",        // 案件の説明
-                    deadline: "",   // 開発期限
+                    deadline: "",           // 開発期限
                     functions: [{
                         id: 0,
-                        // functionName: "1",  // 機能名
                         functionDesc: "機能1********",  // 機能説明
-                        // err: true,
                     }, {
                         id: 1,
-                        // functionName: "2",  // 機能名
                         functionDesc: "機能2",  // 機能説明
                     }, {
                         id: 2,
-                        // functionName: "3",  // 機能名
                         functionDesc: "機能3",  // 機能説明
                     }],
                 },
@@ -352,6 +316,31 @@
             }
         },
         methods: {
+            onReset() {
+                this.$confirm('リセットした案件は戻れません、よろしいですか?', '確認', {
+                    confirmButtonText: 'リセット',
+                    cancelButtonText: "キャンセル",
+                    type: 'warning',
+                    center: false,
+                })
+                    .then(() => {
+                        const jobCase = {
+                            functions: [{
+                                id: 0,
+                                functionDesc: "",
+                            }],
+                        };
+                        this.jobCase = jobCase;
+                        this.functionIdCnt = 1;
+                        this.errors = {
+                            caseNameErr: false,
+                            caseNameDraft: false,
+                            bonusMoneyErr: false,
+                            descriptionErr: false,
+                            deadlineErr: false,
+                        };
+                    });
+            },
             onFunctionDragStart(index, e) {
                 this.dragIndex = index;
                 const { 
@@ -378,6 +367,7 @@
                 });
                 functions.splice(targetIndex, 1);
                 functions.splice(index, 0, target);
+                this.dragIndex = null;
             },
             onFunctionDel(index) {
                 const {
@@ -486,7 +476,7 @@
                 const jobCaseStr = JSON.stringify(this.jobCase);
                 localStorage.setItem("tempJobCase", jobCaseStr);
                
-                location.href = "customerCaseDetail.html";
+                goCustomerCaseDetail();
             }
         }
     });
