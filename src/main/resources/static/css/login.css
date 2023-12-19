@@ -63,3 +63,19 @@
     align-items: center;
     justify-content: center;
 }
+.register-guide {
+    font-size: 14px;
+}
+.register-guide .tips {
+    color: #eb217e;
+}
+.guide-wrapper {
+    display: flex;
+}
+.guide-item {
+    cursor: pointer;
+    color: #409eff;
+    text-decoration: underline;
+    display: inline-block;
+    margin-right: 5px;
+}

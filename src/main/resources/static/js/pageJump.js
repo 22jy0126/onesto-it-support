@@ -92,6 +92,9 @@ const goCustomerCaseDetail = () => {
 };
 
 // お客様・登録した案件リスト
+const goCustomerCaseView = () => {
+    goTo("/customercaseview.html");
+};
 
 // お客様・案件のマイルストーン確認
 const goMilestoneDetailConfirm = () => {

@@ -88,6 +88,18 @@
                             </el-radio-group>
                         </div>
                     </div>
+                    <div class="register-guide">
+                        <div class="tips"><i class="el-icon-question"></i>アカウントない？</div>
+                        <div class="guide-wrapper">
+                            <div>
+                                あなたは：
+                            </div>
+                            <div>
+                                <span class="guide-item" @click="goCustomerRegister">お客様</span>
+                                <span class="guide-item" @click="goEmployeeRegister">社員</span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="btn-wrapper">
                         <el-button 
                             @click="onLogin"
@@ -101,6 +113,7 @@
     </main>
 </body>
 </html>
+<script src="./js/pageJump.js"></script>
 <script>
 	// elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja); 
@@ -125,6 +138,10 @@
             };
         },
         methods: {
+            goEmployeeRegister,
+            goCustomerRegister,
+            goJobCases,
+            goCustomerCaseEdit,
             errClean(itemName) {
                 if (itemName == "username") {
                     this.errors.username = false;
@@ -152,10 +169,16 @@
                     flag = false;
                     this.errors.password = true;
                 }
+                if (!flag) {
+                    return;
+                }
                 //TODO: サーバーに送る
                 
                 if (role == 1) {
-                    location.href = "customerCaseEdit.html";
+                    goCustomerCaseEdit();
+                }
+                if (role == 2) {
+                    goJobCases();
                 }
             }
         },
