@@ -1,0 +1,43 @@
+.manage-search {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.manage-search .search-item {
+    width: 30%;
+    margin-right: 2%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.manage-search .search-item .search-label {
+    white-space: nowrap;
+    margin-right: 10px;
+}
+.manage-search .search-item .mark {
+    margin-left: 10px;
+}
+.common-caption {
+    /* font-weight: bold; */
+    font-size: 16px;
+    color: #999;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+.common-caption .icon {
+    color: #ef89be;
+    font-size: 24px;
+    margin-right: 10px;
+}
+.em {
+    color: #000;
+    /* font-weight: bold; */
+}
+.manage-search .search-item .el-select {
+    width: 100%;
+}
+.page-container {
+    margin-top: 20px;
+}
