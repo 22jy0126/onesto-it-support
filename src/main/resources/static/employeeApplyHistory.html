@@ -68,10 +68,10 @@
                                 </div>
                             </div>
                             <div class="case-sub">
-                                <div class="case-sub-day">
+                                <!-- <div class="case-sub-day">
                                     <span class="label">予定期間:&nbsp;&nbsp;&nbsp;</span>
                                     <span>{{job.workDays}}日</span>
-                                </div>
+                                </div> -->
                                 <div class="case-sub-money">
                                     <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
                                     <span>{{job.bonusMoney.toLocaleString()}}万円</span>
@@ -82,12 +82,12 @@
                                     <span>{{job.number}}人</span>
                                 </div> -->
                             </div>
-                            <div class="case-sub">
+                            <!-- <div class="case-sub">
                                 <span class="label">クライアント氏名:&nbsp;&nbsp;&nbsp;</span>
                                 <span>{{job.customerName}}さん</span>
-                            </div>
+                            </div> -->
                             <div class="case-sub">
-                                <span class="label">希望開発言語:&nbsp;&nbsp;&nbsp;</span>
+                                <span class="label">希望開発ツール:&nbsp;&nbsp;&nbsp;</span>
                                 <span>{{job.requiredTech}}</span>
                             </div>
                             <!-- <div class="case-sub">
@@ -101,7 +101,9 @@
                             <div class="case-sub">
                                 状況:
                             </div>
-                            <div class="go-detail">
+                            <div class="go-detail"
+                                @click="goCaseDetail(1,1)"
+                            >
                                 詳細>>
                             </div>
                         </div>
@@ -182,6 +184,7 @@
         methods: {
             goJobCases,
             goEmployeeInfo,
+            goCaseDetail
         },
     });
 </script>
