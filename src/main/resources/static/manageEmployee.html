@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- TODO: ページの名にチェンジする -->
-    <title>お客様を管理画面</title>
+    <title>社員を管理画面</title>
     <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
     <!-- vue と elementUIの依存css -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
@@ -42,7 +42,7 @@
             <!-- サイドメニュー -->
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
-                <el-menu default-active="1" class="el-menu-vertical-demo">
+                <el-menu default-active="2" class="el-menu-vertical-demo">
                     <el-menu-item index="1">お客様管理</el-menu-item>
                     <el-menu-item index="2">社員管理</el-menu-item>
                 </el-menu>
@@ -54,12 +54,12 @@
                     <section class="manage-search-container">
                         <div class="common-caption">
                             <i class="el-icon-search icon"></i>
-                            お客様を検索してください
+                            社員を検索してください
                         </div>
                         <div class="manage-search">
                             <div class="search-item">
                                 <div class="search-label">
-                                    氏名
+                                    社員番号
                                 </div>
                                 <el-input
                                         clearable
@@ -69,7 +69,7 @@
                             </div>
                             <div class="search-item">
                                 <div class="search-label">
-                                    案件数
+                                    参加案件数
                                 </div>
                                 <el-input-number v-model="search.caseCount" :min="1" :max="99999">
                                 </el-input-number>
@@ -88,17 +88,17 @@
                             合計<span class="em">15名</span>のお客様を見つかりました
                         </div>
                         <el-table
-                            :data="customers"
+                            :data="employees"
                             style="width: 100%">
                             <el-table-column
-                                prop="username"
-                                label="ユーザ名"
-                                width="200">
+                                prop="employeeNo"
+                                label="社員番号"
+                                width="120">
                             </el-table-column>
                             <el-table-column
                                 prop="name"
                                 label="氏名"
-                                width="200">
+                                width="120">
                             </el-table-column>
                             <el-table-column
                                 prop="caseCount"
@@ -107,12 +107,23 @@
                             </el-table-column>
                             <el-table-column
                                 prop="tel"
+                                width="200"
                                 label="電話番号">
                             </el-table-column>
                             <el-table-column
                                 prop="email"
-                                width="300"
+                                width="200"
                                 label="メールアドレス">
+                            </el-table-column>
+                            <el-table-column
+                                prop="birthday"
+                                width="200"
+                                label="誕生日">
+                            </el-table-column>
+                            <el-table-column
+                                prop="skill"
+                                width="300"
+                                label="スキル">
                             </el-table-column>
                             <el-table-column
                                 fixed="right"
@@ -153,7 +164,7 @@
                     username: "管理者", // ユーザー名
                     noticeCount: 2, // 通知数
                 },
-                customers: [],
+                employees: [],
                 search: {
                     caseCount: 1,
                 },
@@ -164,64 +175,88 @@
         },
         methods: {
             init() {
-                const customers = [{
-                    id: 0,
-                    username: "suzuki001", // ユーザ名
+                const employees = [{
+                    employeeNo: "100001",          // 社員番号
                     name: "鈴木　七海",     // 氏名
                     caseCount: 2,          // 案件数
                     tel: 08012345678,      // 電話番号
                     email: "suzuki001@gmail.com",   // メールアドレス
+                    birthday: "2000年1月1日",  // 誕生日
+                    skill: "VBA,java",     // スキル
                 }, {
-                    id: 1,
-                    username: "suzuki001",
-                    name: "内田　洋介",
-                    caseCount: 1,
-                    tel: 09012345678,
-                    email: "yyyyyy@gmail.com",
+                    employeeNo: "100002",          // 社員番号
+                    name: "鈴木　七海",     // 氏名
+                    caseCount: 2,          // 案件数
+                    tel: 08012345678,      // 電話番号
+                    email: "suzuki001@gmail.com",   // メールアドレス
+                    birthday: "2000年1月1日",  // 誕生日
+                    skill: "VBA,java",     // スキル
                 }, {
-                    id: 3,
-                    username: "suzuki001",
-                    name: "鈴木　七海",
-                    caseCount: 2,
-                    tel: 08012345678,
-                    email: "suzuki001@gmail.com",
+                    employeeNo: "100003",          // 社員番号
+                    name: "鈴木　七海",     // 氏名
+                    caseCount: 2,          // 案件数
+                    tel: 08012345678,      // 電話番号
+                    email: "suzuki001@gmail.com",   // メールアドレス
+                    birthday: "2000年1月1日",  // 誕生日
+                    skill: "VBA,java",     // スキル
                 }, {
-                    id: 4,
-                    username: "suzuki001",
-                    name: "内田　洋介",
-                    caseCount: 1,
-                    tel: 09012345678,
-                    email: "yyyyyy@gmail.com",
+                    employeeNo: "100004",          // 社員番号
+                    name: "鈴木　七海",     // 氏名
+                    caseCount: 2,          // 案件数
+                    tel: 08012345678,      // 電話番号
+                    email: "suzuki001@gmail.com",   // メールアドレス
+                    birthday: "2000年1月1日",  // 誕生日
+                    skill: "VBA,java",     // スキル
                 }, {
-                    id: 5,
-                    username: "suzuki001",
-                    name: "鈴木　七海",
-                    caseCount: 2,
-                    tel: 08012345678,
-                    email: "suzuki001@gmail.com",
+                    employeeNo: "100005",          // 社員番号
+                    name: "鈴木　七海",     // 氏名
+                    caseCount: 2,          // 案件数
+                    tel: 08012345678,      // 電話番号
+                    email: "suzuki001@gmail.com",   // メールアドレス
+                    birthday: "2000年1月1日",  // 誕生日
+                    skill: "VBA,java",     // スキル
                 }, {
-                    id: 6,
-                    username: "suzuki001",
-                    name: "内田　洋介",
-                    caseCount: 1,
-                    tel: 09012345678,
-                    email: "yyyyyy@gmail.com",
+                    employeeNo: "100006",          // 社員番号
+                    name: "鈴木　七海",     // 氏名
+                    caseCount: 2,          // 案件数
+                    tel: 08012345678,      // 電話番号
+                    email: "suzuki001@gmail.com",   // メールアドレス
+                    birthday: "2000年1月1日",  // 誕生日
+                    skill: "VBA,java",     // スキル
                 }, {
-                    id: 7,
-                    username: "suzuki001",
-                    name: "鈴木　七海",
-                    caseCount: 2,
-                    tel: 08012345678,
-                    email: "suzuki001@gmail.com",
+                    employeeNo: "100007",          // 社員番号
+                    name: "鈴木　七海",     // 氏名
+                    caseCount: 2,          // 案件数
+                    tel: 08012345678,      // 電話番号
+                    email: "suzuki001@gmail.com",   // メールアドレス
+                    birthday: "2000年1月1日",  // 誕生日
+                    skill: "VBA,java",     // スキル
                 }, {
-                    id: 9,
-                    username: "suzuki001",
-                    name: "内田　洋介",
-                    caseCount: 1,
-                    tel: 09012345678,
-                    email: "yyyyyy@gmail.com",
+                    employeeNo: "100008",          // 社員番号
+                    name: "鈴木　七海",     // 氏名
+                    caseCount: 2,          // 案件数
+                    tel: 08012345678,      // 電話番号
+                    email: "suzuki001@gmail.com",   // メールアドレス
+                    birthday: "2000年1月1日",  // 誕生日
+                    skill: "VBA,java",     // スキル
+                }, {
+                    employeeNo: "100009",          // 社員番号
+                    name: "鈴木　七海",     // 氏名
+                    caseCount: 2,          // 案件数
+                    tel: 08012345678,      // 電話番号
+                    email: "suzuki001@gmail.com",   // メールアドレス
+                    birthday: "2000年1月1日",  // 誕生日
+                    skill: "VBA,java",     // スキル
+                }, {
+                    employeeNo: "100010",          // 社員番号
+                    name: "鈴木　七海",     // 氏名
+                    caseCount: 2,          // 案件数
+                    tel: 08012345678,      // 電話番号
+                    email: "suzuki001@gmail.com",   // メールアドレス
+                    birthday: "2000年1月1日",  // 誕生日
+                    skill: "VBA,java",     // スキル
                 }];
-                this.customers = customers;
+                this.employees = employees;
             }
         },
     });
