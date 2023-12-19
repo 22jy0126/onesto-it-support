@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- TODO: ページの名にチェンジする -->
-    <title>求人一覧</title>
+    <title>通知画面</title>
     <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
     <!-- vue と elementUIの依存css -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
@@ -43,16 +43,36 @@
             <!-- サイドメニュー -->
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
-                <el-menu default-active="1" class="el-menu-vertical-demo">
-                    <el-menu-item index="1">menu1</el-menu-item>
-                    <el-menu-item index="2">menu2</el-menu-item>
+                <el-menu default-active="4" class="el-menu-vertical-demo">
+                    <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
+                    <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
+                    <el-menu-item index="3">応募履歴</el-menu-item>
+                    <el-menu-item index="4">通知</el-menu-item>
                 </el-menu>
             </el-aside>
 
             <el-container>
                 <el-main>
                     <!-- TODO: 内容はここに書く -->
-                    
+                    <section class="employee-Notification">
+                        <div class="common-caption">
+                            <i class="el-icon-document icon"></i>
+                            <span class="em">通知一覧</span>
+                        </div>
+                        <div class="job-case-item" v-for="job in noticeMessage">
+                            <div class="case-sub">
+                                <span>{{job.dateSent}}</span>
+                            </div>
+                            <div class="case-sub">
+                                <span>{{job.customerName}}さんが{{job.message}}</span>
+                            </div>
+                            <div class="go-detail"
+                                @click="goCaseDetail(1,1)"
+                            >
+                                詳細>>
+                            </div>
+                        </div>
+                    </section>
                 </el-main>
             </el-container>
         </el-container>
@@ -77,7 +97,15 @@
                     username: "鈴木　奈々", // ユーザー名
                     noticeCount: 2, // 通知数
                 },
-                
+                noticeMessage: [{
+                    customerName: "小林　七海",　　　　　       // クライアント氏名
+                    message: "マイルストーンに同意しました。",   // 通知内容
+                    dateSent: "2024年2月20日",                // 送信日時
+                }, {
+                    customerName: "小林　七海",　　　　　       // クライアント氏名
+                    message: "あなたと契約を結びました。詳細を確認してください。",   // 通知内容
+                    dateSent: "2024年2月10日",                // 送信日時
+                }],
             };
         },
     });
