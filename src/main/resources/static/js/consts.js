@@ -56,3 +56,23 @@ const milestoneStatus = [{
     text: "確認済み",
     color: "#67c23a",
 }];
+
+/**
+ * 応募状況
+*/
+const applyStatus = [{
+    code: "0",
+    text: "未応募",
+}, {
+    code: "1",
+    text: "応募中",
+},{
+    code: "2",
+    text: "応募終わり",
+},{
+    code: "3",
+    text: "案件開始中",
+},{
+    code: "4",
+    text: "案件終わり",
+}];
