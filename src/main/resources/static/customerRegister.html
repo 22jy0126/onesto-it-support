@@ -126,27 +126,6 @@
                         パスワードは一致しない
                     </div>
                 </div>
-                
-                <!-- <div class="form-item">
-                    <label class="label" for="">
-                        性&nbsp;&nbsp;別<span class="required">（必須）</span>
-                    </label>
-                    <el-radio-group v-model="customerInfo.gender">
-                        <el-radio :label="0">男性</el-radio>
-                        <el-radio :label="1">女性</el-radio>
-                        <el-radio :label="2">指定しない</el-radio>
-                    </el-radio-group>
-                </div>
-                <div class="form-item">
-                    <label class="label" for="">
-                        生年月日<span class="required">（必須）</span>
-                    </label>
-                    <el-date-picker
-                        v-model="value1"
-                        type="date"
-                        placeholder="Pick a day">
-                    </el-date-picker>
-                </div> -->
                 <div class="edit-item-wrapper">
                     <div class="form-item">
                         <label class="label" for="">
@@ -185,6 +164,105 @@
                         正しいメールアドレスを入力してください
                     </div>
                 </div>
+                <div class="edit-item-wrapper">
+                    <div class="form-item form-item-up">
+                        <label class="label" for="">
+                            住所<span class="required">（必須）</span>
+                        </label>
+                        <div class="addr-wrapper">
+                            <div class="addr-item addr-item-wrapper">
+                                <label class="sub-label">
+                                    郵便番号
+                                </label>
+                                <el-input 
+                                    class="min-input"
+                                    placeholder="例：8120012(半角数字)" 
+                                    @input="errClean('zipcode')"
+                                    v-bind:class="errors.zipcode ? 'input-err' : ''"
+                                    v-model="customerInfo.zipcode"></el-input>
+                                <el-button 
+                                    type="primary" 
+                                    @click="addrSearchByZipcode"
+                                    plain>
+                                    住所検索
+                                </el-button>
+                                <div v-bind:class="errors.zipcode ? 'err-item err-item-zipcode' : 'opt-item-hidden'">
+                                    <i class="el-icon-warning error-icon"></i>
+                                    郵便番号から住所が見つかりませんでした。
+                                </div>
+                                <div v-bind:class="errors.zipcodeEmpty ? 'err-item err-item-zipcode' : 'opt-item-hidden'">
+                                    <i class="el-icon-warning error-icon"></i>
+                                    郵便番号を入力してください
+                                </div>
+                            </div>
+                            <div class="addr-line">
+                                <div class="addr-item-wrapper">
+                                    <div class="addr-item">
+                                        <label class="sub-label">
+                                            都道府県
+                                        </label>
+                                        <el-input 
+                                            class="min-input"
+                                            placeholder="" 
+                                            @input="errClean('addr1')"
+                                            v-bind:class="errors.addr1 ? 'input-err' : ''"
+                                            v-model="customerInfo.addr1"></el-input>
+                                    </div>
+                                    <div v-bind:class="errors.addr1 ? 'err-item err-item-d' : 'opt-item-hidden'">
+                                        <i class="el-icon-warning error-icon"></i>
+                                        都道府県を入力してください
+                                    </div>
+                                </div>
+                                <div class="addr-item-wrapper">
+                                    <div class="addr-item">
+                                        <label class="sub-label">
+                                            市区町村
+                                        </label>
+                                        <el-input 
+                                            class="min-input"
+                                            placeholder="" 
+                                            @input="errClean('addr2')"
+                                            v-bind:class="errors.addr2 ? 'input-err' : ''"
+                                            v-model="customerInfo.addr2"></el-input>
+                                    </div>
+                                    <div v-bind:class="errors.addr2 ? 'err-item err-item-d' : 'opt-item-hidden'">
+                                        <i class="el-icon-warning error-icon"></i>
+                                        市区町村を入力してください
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="addr-item-wrapper">
+                                <div class="addr-item">
+                                    <label class="sub-label">
+                                        町域・番地
+                                    </label>
+                                    <el-input 
+                                        class="input-l"
+                                        placeholder="" 
+                                        @input="errClean('addr3')"
+                                        v-bind:class="errors.addr3 ? 'input-err' : ''"
+                                        v-model="customerInfo.addr3"></el-input>
+                                </div>
+                                <div v-bind:class="errors.addr3 ? 'err-item err-item-d' : 'opt-item-hidden'">
+                                    <i class="el-icon-warning error-icon"></i>
+                                    町域・番地を入力してください
+                                </div>
+                            
+                            </div>
+                            <div class="addr-item addr-item-wrapper">
+                                <label class="sub-label">
+                                    建物名・<br/>部屋番号
+                                </label>
+                                <el-input 
+                                    class="input-l"
+                                    placeholder="" 
+                                    @input="errClean('addr4')"
+                                    v-bind:class="errors.addr4 ? 'input-err' : ''"
+                                    v-model="customerInfo.addr4"></el-input>
+                            </div>
+                        </div>
+                    </div>      
+                </div>
                 <div class="form-item btn-form-item">
                     <el-button 
                         @click="onCreate"
@@ -195,6 +273,8 @@
     </main>
 </body>
 </html>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fetch-jsonp@1.1.3/build/fetch-jsonp.min.js"></script>
 <script>
 	// elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja); 
@@ -214,6 +294,11 @@
                     password2: "",
                     tel: "",
                     email: "",
+                    zipcode: "",   // 郵便番号
+                    addr1: "",     // 都道府県
+                    addr2: "",     // 市区町村
+                    addr3: "",     // 町域・番地
+                    addr4: "",     // 建物名・部屋番号
 				},
                 usernameCheck: false,
                 checkedUsername: "",
@@ -226,6 +311,11 @@
                     passwordFormat: false, //パスワードのフォーマットは正しくない
                     tel: false,
                     email: false,
+                    zipcode: false,
+                    zipcodeEmpty: false,
+                    addr1: false,
+                    addr2: false,
+                    addr3: false,
                 }
             };
         },
@@ -266,6 +356,10 @@
                     password2 = "",
                     tel = "",
                     email = "",
+                    zipcodeEmpty = "",
+                    addr1 = "",
+                    addr2 = "",
+                    addr3 = "",
                 } = this.customerInfo;
                 let flag = true;
                 // ユーザネーム必須の検証
@@ -302,6 +396,22 @@
                     this.errors.email = true;
                     flag = false;
                 }
+                if (zipcodeEmpty == "") {
+                    this.errors.zipcodeEmpty = true;
+                    flag = false;
+                }
+                if (addr1 == "") {
+                    this.errors.addr1 = true;
+                    flag = false;
+                }
+                if (addr2 == "") {
+                    this.errors.addr2 = true;
+                    flag = false;
+                }
+                if (addr3 == "") {
+                    this.errors.addr3 = true;
+                    flag = false;
+                }
                 if (!this.usernameCheck) {
                     this.$message.error('ユーザ名が使えるかどうか確認してください！');
                     return;
@@ -309,14 +419,48 @@
                 if (this.errors.usernameDuplicate) {
                     flag = false;
                 }
+                
                 if (flag == false) {
                     this.$message.error('記入不備な項目があるので、もう一度チェックしてください！');
+                    return;
                 }
 
                 localStorage.removeItem("tempCustomerInfo");
                 const customerInfoStr = JSON.stringify(this.customerInfo);
                 localStorage.setItem("tempCustomerInfo", customerInfoStr);
-            }
+            },
+            addrSearchByZipcode() {
+                const {
+                    zipcode,  // 郵便番号
+                    addr1,    // 都道府県
+                    addr2,    // 市区町村
+                    addr3,    // 町域・番地
+                    addr4,    // 建物名・部屋番号
+                } = this.customerInfo;
+
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+
+                fetchJsonp(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zipcode}`, {
+                    timeout: 10000, //タイムアウト時間
+                }).then((response) => {
+                    return response.json(); 
+                }).then((data = {}) => {
+                    loading.close();
+                    if (data.results == null) {
+                        this.errors.zipcode = true;
+                        return;
+                    }
+                    this.customerInfo.addr1 = data.results[0].address1;
+                    this.customerInfo.addr2 = data.results[0].address2;
+                    this.customerInfo.addr3 = data.results[0].address3;
+                });
+                
+            },
         },
     });
 </script>

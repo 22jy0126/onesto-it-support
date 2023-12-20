@@ -58,21 +58,18 @@ const milestoneStatus = [{
 }];
 
 /**
- * 応募状況
+ * 求人状態
 */
-const applyStatus = [{
-    code: "0",
-    text: "未応募",
+const jobStatus = [{
+    code: 0,
+    text: "下書き",
 }, {
-    code: "1",
-    text: "応募中",
-},{
-    code: "2",
-    text: "応募終わり",
-},{
-    code: "3",
-    text: "案件開始中",
-},{
-    code: "4",
-    text: "案件終わり",
+    code: 1,
+    text: "求人中",
+}, {
+    code: 2,
+    text: "開始中",
+}, {
+    code: 3,
+    text: "終わり",
 }];

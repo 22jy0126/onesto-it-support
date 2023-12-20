@@ -56,7 +56,7 @@
                     <!-- TODO: 内容はここに書く -->
                     <section class="employee-Apply-History">
                         <div class="common-caption">
-                            <i class="el-icon-document icon"></i>
+                            <i class="el-icon-s-data icon"></i>
                             <span class="em">求人応募履歴</span>
                         </div>
                         <div class="job-case-item" v-for="job in jobList">
@@ -68,32 +68,16 @@
                                 </div>
                             </div>
                             <div class="case-sub">
-                                <!-- <div class="case-sub-day">
-                                    <span class="label">予定期間:&nbsp;&nbsp;&nbsp;</span>
-                                    <span>{{job.workDays}}日</span>
-                                </div> -->
                                 <div class="case-sub-money">
                                     <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
                                     <span>{{job.bonusMoney.toLocaleString()}}万円</span>
                                     <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
                                 </div>
-                                <!-- <div class="case-sub-item">
-                                    <span class="label">募集人数:&nbsp;&nbsp;&nbsp;</span>
-                                    <span>{{job.number}}人</span>
-                                </div> -->
                             </div>
-                            <!-- <div class="case-sub">
-                                <span class="label">クライアント氏名:&nbsp;&nbsp;&nbsp;</span>
-                                <span>{{job.customerName}}さん</span>
-                            </div> -->
                             <div class="case-sub">
                                 <span class="label">希望開発ツール:&nbsp;&nbsp;&nbsp;</span>
                                 <span>{{job.requiredTech}}</span>
                             </div>
-                            <!-- <div class="case-sub">
-                                <span class="label">プラス技術条件:&nbsp;&nbsp;&nbsp;</span>
-                                <span>{{job.pulsTech}}</span>
-                            </div> -->
                             <div class="case-sub">
                                 <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
                                 <span>{{job.description}}</span>
@@ -180,6 +164,17 @@
                     deadline: "2099年12月31日"
                 }],
             };
+        },
+        mounted() {
+            const applyList = [{
+                caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                bonusMoney: 5,                    //　報酬
+                bonusMoneyNegotiable: true,       //　報酬相談可能
+                developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+                description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                deadline: "2024年2月20日",        // 開発期限
+                bind: false,                      // 
+            }];
         },
         methods: {
             goJobCases,

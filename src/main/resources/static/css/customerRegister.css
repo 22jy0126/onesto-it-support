@@ -23,3 +23,36 @@
     font-size: 20px;
     padding-left: 10px;
 }
+.addr-item-wrapper {
+    margin-bottom: 10px;
+}
+.addr-wrapper .addr-item {
+    display: flex;
+    align-items: center;
+}
+.min-input {
+    width: 200px !important;
+    margin-right: 10px;
+}
+.input-l {
+    width: 502px !important;
+    margin-right: 10px;
+}
+.sub-label {
+    margin-right: 10px;
+    width: 82px;
+    text-align: right;
+}
+.form-item-up {
+    align-items: baseline !important;
+}
+.addr-line {
+    display: flex;
+    align-items: center;
+}
+.err-item-zipcode {
+    padding-left: 10px;
+}
+.err-item-d {
+    padding-left: 90px !important;
+}
