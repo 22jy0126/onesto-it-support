@@ -59,9 +59,14 @@
                             <i class="el-icon-s-data icon"></i>
                             <span class="em">求人応募履歴</span>
                         </div>
-                        <div class="job-case-item" v-for="job in jobList">
+                        <div class="job-case-item" v-for="job in applyList">
                             <div class="case-name-line">
-                                <div class="case-name">{{job.caseName}}</div>
+                                <div class="title">
+                                    <div class="case-name">{{job.caseName}}</div>
+                                    <div v-bind:class="job.statusCls">
+                                        {{job.applyStatusText}}
+                                    </div>
+                                </div>
                                 <div>
                                     <span>開発期限:</span>
                                     <span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
@@ -82,9 +87,9 @@
                                 <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
                                 <span>{{job.description}}</span>
                             </div>
-                            <div class="case-sub">
+                            <!-- <div class="case-sub">
                                 状況:
-                            </div>
+                            </div> -->
                             <div class="go-detail"
                                 @click="goCaseDetail(1,1)"
                             >
@@ -118,63 +123,84 @@
                     noticeCount: 2, // 通知数
                 },
                 // 求人票のデータ
-                jobList: [{
-                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                    customerName: "小林　七海",　　　　　       // クライアント氏名
-                    requiredTech: "HTML CSS",               //　必須技術条件
-                    pulsTech: "Javascript Java",            //　プラス技術条件
-                    number: 3,                              //　募集人数
-                    workDays: 15,                           //　仕事予定期間
-                    bonusMoney: 5,                    //　報酬
-                    bonusMoneyNegotiable: true,             //　報酬相談可能
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日",                // 開発期限
-                }, {
-                    caseName: "従業員管理システムの制作",       // 求人プロジェクト名
-                    customerName: "小林　七海",　　　　　      // クライアント氏名
-                    requiredTech: "HTML CSS",               //　必須技術条件
-                    pulsTech: "Javascript Java",            //　プラス技術条件
-                    number: 3,                              //　募集人数
-                    workDays: 15,                           //　仕事予定期間
-                    bonusMoney: 7.5,                    //　報酬
-                    bonusMoneyNegotiable: false,             //　報酬相談可能                                               
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2099年12月31日"
-                }, {
-                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                    customerName: "小林　七海",　　　　　       // クライアント氏名
-                    requiredTech: "HTML CSS",               //　必須技術条件
-                    pulsTech: "Javascript Java",            //　プラス技術条件
-                    number: 3,                              //　募集人数
-                    workDays: 15,                           //　仕事予定期間
-                    bonusMoney: 5,                    //　報酬
-                    bonusMoneyNegotiable: true,             //　報酬相談可能
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日"                // 開発期限
-                }, {
-                    caseName: "従業員管理システムの制作",       // 求人プロジェクト名
-                    customerName: "小林　七海",　　　　　      // クライアント氏名
-                    requiredTech: "HTML CSS",               //　必須技術条件
-                    pulsTech: "Javascript Java",            //　プラス技術条件
-                    number: 3,                              //　募集人数
-                    workDays: 15,                           //　仕事予定期間
-                    bonusMoney: 7.5,                    //　報酬
-                    bonusMoneyNegotiable: false,             //　報酬相談可能                                               
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2099年12月31日"
-                }],
+                applyList: [],
+                // applyStatus: [{
+                //     type: 1,
+                //     text: "応募中",
+                // }, {
+                //     type: 2,
+                //     text: "応募終了",
+                // }, {
+                //     type: 3,
+                //     text: "案件作業中",
+                // }, {
+                //     type: 4,
+                //     text: "案件終了",
+                // }],
             };
         },
         mounted() {
             const applyList = [{
+                status: 1,
                 caseName: "学生管理システムの制作",         // 求人プロジェクト名
                 bonusMoney: 5,                    //　報酬
                 bonusMoneyNegotiable: true,       //　報酬相談可能
                 developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
                 description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
                 deadline: "2024年2月20日",        // 開発期限
-                bind: false,                      // 
+                bind: false,                      // この社員と契約していますか
+            }, {
+                status: 2,
+                caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                bonusMoney: 5,                    //　報酬
+                bonusMoneyNegotiable: true,       //　報酬相談可能
+                developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+                description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                deadline: "2024年2月20日",        // 開発期限
+                bind: true,                      // この社員と契約していますか
+            }, {
+                status: 2,
+                caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                bonusMoney: 5,                    //　報酬
+                bonusMoneyNegotiable: true,       //　報酬相談可能
+                developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+                description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                deadline: "2024年2月20日",        // 開発期限
+                bind: false,                      // この社員と契約していますか
+            }, {
+                status: 3,
+                caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                bonusMoney: 5,                    //　報酬
+                bonusMoneyNegotiable: true,       //　報酬相談可能
+                developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+                description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                deadline: "2024年2月20日",        // 開発期限
+                bind: true,                      // この社員と契約していますか
             }];
+            this.applyList = applyList.map((job = {}) => {
+                const { status, bind, ...others} = job;
+                if (status == 1) {
+                    job.applyStatus = 1;
+                    job.applyStatusText = "応募中";
+                    job.statusCls = "status status-1";
+                }
+                if (status == 2 && !bind) {
+                    job.applyStatus = 2;
+                    job.applyStatusText = "応募終了";
+                    job.statusCls = "status status-2";
+                }
+                if (status == 2 && bind) {
+                    job.applyStatus = 3;
+                    job.applyStatusText = "案件作業中";
+                    job.statusCls = "status status-3";
+                }
+                if (status == 3 && bind) {
+                    job.applyStatus = 4;
+                    job.applyStatusText = "案件作業終了";
+                    job.statusCls = "status status-4";
+                }
+                return job;
+            });
         },
         methods: {
             goJobCases,
