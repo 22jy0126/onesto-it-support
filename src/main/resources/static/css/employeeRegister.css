@@ -45,7 +45,12 @@ th,td{
 	background-color: #ddd;
 }
 
-.any{
+.any1{
+	color: rgb(128, 128, 128);
+	font-size: 14px;
+}
+
+.any2{
 	color: rgb(128, 128, 128);
 }
 

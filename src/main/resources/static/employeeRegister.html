@@ -51,27 +51,15 @@
                             placeholder="例：123456" 
                             @input="errClean('empnumber')"
                             @change="checkEN"
-                            v-bind:class="(errors.empnumber || errors.empnumberDuplicate) ? 'input-err' : ''"
+                            v-bind:class="errors.empnumber ? 'input-err' : ''"
                             v-model="employeeInfo.empnumber"></el-input>
                             <div class="desc">
-	                            (半角)
+	                            (半角、数字6桁)
 	                        </div>
-                        <div 
-                            v-bind:class="empnumberCheck ? 'opt-item-hidden' : 'desc user-check'"
-                            v-on:click="checkEmpnumber">
-                            使えるかどうかをチェックする
-                        </div>
-                        <div v-bind:class="empnumberCheck ? 'check-ok' : 'opt-item-hidden'">
-                            <i class="el-icon-success"></i>
-                        </div>
                     </div>
-                    <div v-bind:class="errors.username ? 'err-item' : 'opt-item-hidden'">
+                    <div v-bind:class="errors.empnumber ? 'err-item' : 'opt-item-hidden'">
                         <i class="el-icon-warning error-icon"></i>
                         社員番号を入力してください
-                    </div>
-                    <div v-bind:class="errors.usernameDuplicate ? 'err-item' : 'opt-item-hidden'">
-                        <i class="el-icon-warning error-icon"></i>
-                        社員番号はすでに存在しています
                     </div>
                 </div>
                 
@@ -91,6 +79,7 @@
                         氏名を入力してください
                     </div>
                 </div>
+                
                 <div class="form-item">
                     <label class="label" for="">
                         性&nbsp;&nbsp;別<span class="required">（必須）</span>
@@ -101,16 +90,18 @@
                         <el-radio :label="2">指定しない</el-radio>
                     </el-radio-group>
                 </div>
+                
                 <div class="form-item">
                     <label class="label" for="">
                         生年月日<span class="required">（必須）</span>
                     </label>
                     <el-date-picker
-                        v-model="value1"
+                        v-model="employeeInfo.birthday"
                         type="date"
                         placeholder="Pick a day">
                     </el-date-picker>
                 </div>
+                
                 <div class="edit-item-wrapper">
                     <div class="form-item">
                         <label class="label"  for="">
@@ -193,20 +184,13 @@
                 <div class="edit-item-wrapper">
                 	<div class="form-item">
                     	<label class="label" for="">
-                            経験開発言語<span class="required">（必須）</span>
+                            経験開発言語<span class="any1">（任意）</span>
                         </label>
-                        <el-select 
-                            v-model="employeeInfo.requiredTech" 
-                            multiple 
-                            placeholder="選択してください" 
-                            clearable>
-                            	<el-option 
-                                	v-for="tech in techs" 
-                                	:key="tech.value" 
-                                	:label="tech.label" 
-                                	:value="tech.value">
-                                </el-option>
-                            </el-select>
+                        <el-input 
+                            placeholder="例：Java,SQL" 
+                            @input="errClean('skill')"
+                            v-bind:class="errors.skill ? 'input-err' : ''"
+                            v-model="employeeInfo.skill"></el-input>
                 	</div>
             	</div>
             	
@@ -214,7 +198,7 @@
 				<div class="functions-container">
 	                    <div class="caption-wrapper">
 	                        <label class="label" for="">
-								職務経歴<span class="any">（任意）</span>
+								職務経歴<span class="any2">（任意）</span>
 							</label> 
 	                    </div> 
 	                    <div class="functions-edit-wrapper" 
@@ -383,11 +367,13 @@
                 employeeInfo: {
                     empnumber: "",    //社員番号
                     name: "",         //氏名
+                    gender: "",       //性別
+                    birthday: "",     //生年月日
                     password: "",     //パスワード
                     password2: "",    //パスワード確認
                     tel: "",          //電話番号
                     email: "",        //メールアドレス
-                    requiredTech: "", //経験開発言語
+                    skill: "", //経験開発言語
                     
                     workHistory: [],
                     /**
@@ -408,8 +394,9 @@
                 checkedUsername: "",
                 errors: {
                     empnumber: false,
-                    empnumberDuplicate: false,
                     name: false,
+                    gender: false,
+                    birthday: false, 
                     password: false,
                     passwordIncon: false, //二回のパスワード入力は一致しない
                     passwordFormat: false, //パスワードのフォーマットは正しくない
@@ -429,21 +416,6 @@
 				workHistory.splice(index, 1);
 			},
 			
-            checkEmpnumber() {
-                //TODO サーバに送って、使えるかどうかをチェックする
-                if (this.customerInfo.empnumber != "123456") {
-                    this.empnumberCheck = true;
-                    this.checkedUsername = this.customerInfo.username;
-                } else {
-                    this.errors.empnumberDuplicate = true;
-                    this.empnumberCheck = false;
-                }
-            },
-            checkEN() {
-                if (!this.empnumberCheck) return;
-                if (this.employeeInfo.empnumber == this.checkedEmpnumber) return;
-                this.empnumberCheck = false;
-            },
             errClean(itemName) {
                 if (itemName == "empnumber") {
                     this.errors.empnumber = false;
@@ -461,13 +433,16 @@
                 const {
                     empnumber = "",
                     name = "",
-                    password = "",
-                    password2 = "",
-                    tel = "",
-                    email = "",
-                } = this.customerInfo;
+                    gender= "",       
+                    birthday= "",     
+                    password= "",     
+                    password2= "",    
+                    tel= "",          
+                    email= "",        
+                    requiredTech= "",
+                } = this.employeeInfo;
                 let flag = true;
-                // ユーザネーム必須の検証
+                // 社員番号必須の検証
                 if (empnumber == "") {
                     this.errors.empnumber = true;
                     flag = false;
