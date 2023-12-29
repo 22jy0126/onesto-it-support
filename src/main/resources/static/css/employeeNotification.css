@@ -1,13 +1,11 @@
-.job-case-main {
 
-}
-.job-case-item {
+.notice-case-item {
     border: 1px solid #ddd;
     border-radius: 3px;
     padding: 20px;
     margin-bottom: 20px;
 }
-.job-case-item .case-name-line {
+.notice-case-item .case-name-line {
     display: flex;
     border-bottom: 1px solid #eee;
     justify-content: space-between;
@@ -16,7 +14,7 @@
     margin-bottom: 10px;
 }
 
-.job-case-item .label {
+.notice-case-item .label {
     display: inline-block;
     color: #4e4949;
     /* width: 100px; */
@@ -25,41 +23,10 @@
 .case-name {
     font-size: 20px;
 }
-.case-sub {
-    display: flex;
-    margin-bottom: 5px;
-}
-
-.case-sub .case-sub-day {
-    width: 400px;
-}
-.case-sub .case-sub-money {
-    width: 400px;
-}
 .go-detail {
     color: #6694e3;
     text-decoration: underline;
     cursor: pointer;
-}
-.job-case-search {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-bottom: 30px;
-}
-.job-case-search .search-item {
-    width: 30%;
-    margin-right: 2%;
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
-.job-case-search .search-item .search-label {
-    white-space: nowrap;
-    margin-right: 10px;
-}
-.job-case-search .search-item .mark {
-    margin-left: 10px;
 }
 .common-caption {
     /* font-weight: bold; */
@@ -74,13 +41,17 @@
     font-size: 24px;
     margin-right: 10px;
 }
-.em {
-    color: #000;
-    /* font-weight: bold; */
+.notice-case-item .date {
+    color: #999;
+    margin-bottom: 10px;
 }
-.job-case-search .search-item .el-select {
-    width: 100%;
+.msg-wrapper {
+    margin-bottom: 10px;
 }
+.msg-wrapper .name {
+    margin-bottom: 5px;
+}
+
 
 
 

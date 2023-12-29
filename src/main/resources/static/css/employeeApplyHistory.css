@@ -96,14 +96,14 @@
     margin-left: 10px;
 }
 .status-1 {
-    color: #ef89be;
-    border: 1px solid #ef89be;
-    background-color: #fff8fc;
+    color: #e08900;
+    border: 1px solid #e08900;
+    background-color: #fff1db;
 }
 .status-2 {
     color: #999;
     border: 1px solid #ccc;
-    background-color: #eaf3fb;
+    background-color: #f8f8f8;
 }
 .status-3 {
     color: #409eff;

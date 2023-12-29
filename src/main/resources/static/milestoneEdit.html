@@ -53,6 +53,10 @@
             <el-container>
                 <el-main>
                     <div class="milestone-edit-container">
+                        <div class="goback" @click="goback">
+                            <i class="el-icon-back"></i>
+                            案件詳細に戻る
+                        </div>
                         <div class="caption">
                             <i class="el-icon-s-order"></i>
                             {{jobCase.caseName}}
@@ -68,7 +72,7 @@
                               <div class="milestone-item">
                                 <div class="func-edit-wrapper">
                                     <div class="milestone-edit">
-                                        <div class="label">マイルストーン名<span class="required">（必須）</span></div>
+                                        <div class="label">タイトル<span class="required">（必須）</span></div>
                                         <el-input 
                                             draggable="false"
                                             v-bind:class="milestoneItem.nameErr ? 'input-err' : ''"
@@ -88,7 +92,7 @@
                                 </div>
                                 <div class="func-edit-wrapper">
                                     <div class="milestone-edit">
-                                        <div class="label">説明<span class="required">（必須）</span></div>
+                                        <div class="label">詳細<span class="required">（必須）</span></div>
                                         <el-input 
                                             draggable="false"
                                             v-bind:class="milestoneItem.descErr ? 'input-err' : ''"
@@ -198,6 +202,9 @@
         },
         methods: {
             goJobCases,
+            goback() {
+                window.history.back();
+            },
             onMilestonenDel(index) {
                 const {
                     milestones = [],

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="jp">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -18,7 +18,7 @@
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
     <script src="//cdn.jsdelivr.net/npm/@element-plus/icons-vue"></script>
-
+    <script src="js/utils.js"></script>
 </head>
 <body >
     <!-- ヘッドの部分 各々の画面は同じです -->
@@ -45,21 +45,23 @@
                         <label class="label" for="">
                             社員番号<span class="required">（必須）</span>
                         </label>
-                        <!-- v-modelはフォームのデータを収集するための属性です
-                                        new Vueの中のdataの同じ属性と同じ値を保存する -->
                         <el-input 
-                            placeholder="例：123456" 
-                            @input="errClean('empnumber')"
-                            @change="checkEN"
-                            v-bind:class="errors.empnumber ? 'input-err' : ''"
-                            v-model="employeeInfo.empnumber"></el-input>
-                            <div class="desc">
-	                            (半角、数字6桁)
-	                        </div>
+                            placeholder="半角、数字6桁、例：123456 " 
+                            @input="errClean('employeeId')"
+                            v-bind:class="errors.employeeId ? 'input-err' : ''"
+                            @blur="employeeIdForbiddenCheck"
+                            v-model="employeeInfo.employeeId"></el-input>
+                            <div v-bind:class="employeeIdCheck ? 'check-ok' : 'opt-item-hidden'">
+                                <i class="el-icon-success"></i>
+                            </div>
                     </div>
-                    <div v-bind:class="errors.empnumber ? 'err-item' : 'opt-item-hidden'">
+                    <div v-bind:class="errors.employeeId ? 'err-item' : 'opt-item-hidden'">
                         <i class="el-icon-warning error-icon"></i>
                         社員番号を入力してください
+                    </div>
+                    <div v-bind:class="errors.employeeIdForbidden ? 'err-item' : 'opt-item-hidden'">
+                        <i class="el-icon-warning error-icon"></i>
+                        {{ employeeIdErrMsg }}
                     </div>
                 </div>
                 
@@ -90,16 +92,24 @@
                         <el-radio :label="2">指定しない</el-radio>
                     </el-radio-group>
                 </div>
-                
-                <div class="form-item">
-                    <label class="label" for="">
-                        生年月日<span class="required">（必須）</span>
-                    </label>
-                    <el-date-picker
-                        v-model="employeeInfo.birthday"
-                        type="date"
-                        placeholder="Pick a day">
-                    </el-date-picker>
+                <div class="edit-item-wrapper">
+                    <div class="form-item">
+                        <label class="label" for="">
+                            生年月日<span class="required">（必須）</span>
+                        </label>
+                        <el-date-picker
+                            v-bind:class="errors.birthday ? 'input-err' : ''"
+                            v-model="employeeInfo.birthday"
+                            type="date"
+                            @change="errClean('birthday')"
+                            format="yyyy年MM月dd日"
+                            placeholder="生年月日を選択してください">
+                        </el-date-picker>
+                    </div>
+                    <div v-bind:class="errors.birthday ? 'err-item' : 'opt-item-hidden'">
+                        <i class="el-icon-warning error-icon"></i>
+                        生年月日を選択してください
+                    </div>
                 </div>
                 
                 <div class="edit-item-wrapper">
@@ -184,34 +194,33 @@
                 <div class="edit-item-wrapper">
                 	<div class="form-item">
                     	<label class="label" for="">
-                            経験開発言語<span class="any1">（任意）</span>
+                            経験開発ツール<span class="any1">（任意）</span>
                         </label>
                         <el-input 
                             placeholder="例：Java,SQL" 
-                            @input="errClean('skill')"
                             v-bind:class="errors.skill ? 'input-err' : ''"
                             v-model="employeeInfo.skill"></el-input>
                 	</div>
             	</div>
             	
             	
-				<div class="functions-container">
+				<div class="workHistory-container">
 	                    <div class="caption-wrapper">
 	                        <label class="label" for="">
 								職務経歴<span class="any2">（任意）</span>
 							</label> 
 	                    </div> 
-	                    <div class="functions-edit-wrapper" 
+	                    <div class="workHistory-edit-wrapper" 
 	                        v-for="(workItem, index) in employeeInfo.workHistory">
 	                        <div class="opts">
 	                            <div 
-	                                @click="onFunctionUp(index)"
+	                                @click="onWorkHistoryUp(index)"
 	                                v-bind:class="index==0 ? 'opt-item-hidden' : 'opt-item'">
 	                                <i class="el-icon-top"></i>
 	                                上に移動
 	                            </div>
 	                            <div 
-	                                @click="onFunctionDown(index)"
+	                                @click="onWorkHistoryDown(index)"
 	                                v-bind:class="index==(employeeInfo.workHistory.length-1) ? 'opt-item-hidden' : 'opt-item'">
 	                                <i class="el-icon-bottom"></i>
 	                                下に移動
@@ -222,7 +231,7 @@
 	                                icon="el-icon-info" 
 	                                icon-color="red"
 	                                
-	                                @confirm="workHistoryDel(index)"
+	                                @confirm="onWorkHistoryDel(index)"
 	                                
 	                                title="削除した機能は戻らない、よろしいですか?">
 	                                <el-button 
@@ -237,7 +246,7 @@
 							<div  class="history">
 							    <table>
 							        <tr>
-							            <th rowspan="7">
+							            <th rowspan="6">
 							                経歴の説明
 							            </th>
 							            <th class="title">
@@ -245,48 +254,54 @@
 							            </th>
 							            <td>
 							                <el-input 
+                                                v-bind:class="workItem.workNameErr ? 'input-err' : ''"
 							                	placeholder="例：業務管理システムのリニューアル" 
+                                                @input="errHistoryClean('workNameErr', index)"
 							                	v-model="workItem.workName">
 							                </el-input>
+                                            <div v-bind:class="workItem.workNameErr ? 'err-item err-item-history' : 'opt-item-hidden'">
+                                                <i class="el-icon-warning error-icon"></i>
+                                                経歴名を入力してください
+                                            </div>
 							            </td>
 							        </tr>
 							        <tr>
 							            <th class="title">
-							                開発期間<span class="required">（必須）</span>
-							            </th>
-							            <td>
-							                <el-input-number 
-							                	v-model="workItem.workPeriod" 
-							                	:min="1">
-							                </el-input-number> 日
-							            </td>
-							        </tr>
-							        <tr>
-							            <th class="title">
-							                開始時期
+							                開始時期<span class="required">（必須）
 							            </th>
 							            <td>
 							                <div class="block">
 							                    <span class="demonstration"></span>
 							                    <el-date-picker 
+                                                    v-bind:class="workItem.workStartErr ? 'input-err' : ''"
 							                    	v-model="workItem.workStart" 
 							                    	type="month" 
+                                                    @input="errHistoryClean('workStartErr', index)"
 							                    	placeholder="Pick a month">
 							                    </el-date-picker>
 							                </div>
+                                            <div v-bind:class="workItem.workStartErr ? 'err-item err-item-history' : 'opt-item-hidden'">
+                                                <i class="el-icon-warning error-icon"></i>
+                                                開始時期を選択してください
+                                            </div>
 							            </td>
 							        </tr>
-							        <tr>
-							            <th class="title">
-							                役職<span class="required">（必須）</span>
-							            </th>
-							            <td>
-							                <el-input 
-							                	placeholder="例：システムエンジニア" 
-							                	v-model="workItem.workPost">
-							                </el-input>
-							            </td>
-							        </tr>
+                                    <tr>
+                                        <th class="title">
+                                            開発期間<span class="required">（必須）</span>
+                                        </th>
+                                        <td>
+                                            <el-input-number 
+                                                v-bind:class="workItem.workPeriodErr ? 'input-err' : ''"
+                                                @input="errHistoryClean('workPeriodErr', index)"
+                                                v-model="workItem.workPeriod" :min="1">
+                                            </el-input-number> 日
+                                            <div v-bind:class="workItem.workPeriodErr ? 'err-item err-item-history' : 'opt-item-hidden'">
+                                                <i class="el-icon-warning error-icon"></i>
+                                                開発期間を入力してください
+                                            </div>
+                                        </td>
+                                    </tr>
 							        <tr>
 							            <th class="title">
 							                担当内容<span class="required">（必須）</span>
@@ -294,8 +309,14 @@
 							            <td>
 							                <el-input 
 							                	placeholder="例：設計、実装" 
+                                                @input="errHistoryClean('workChargeErr', index)"
+                                                v-bind:class="workItem.workChargeErr ? 'input-err' : ''"
 							                	v-model="workItem.workCharge">
 							                </el-input>
+                                            <div v-bind:class="workItem.workChargeErr ? 'err-item err-item-history' : 'opt-item-hidden'">
+                                                <i class="el-icon-warning error-icon"></i>
+                                                担当内容を入力してください
+                                            </div>
 							            </td>
 							        </tr>
 							        <tr>
@@ -306,26 +327,25 @@
 							                <el-input 
 							                	type="textarea" 
 							                	:rows="2" 
+                                                @input="errHistoryClean('workContentErr', index)"
+                                                v-bind:class="workItem.workContentErr ? 'input-err' : ''"
 							                	placeholder="例：企業内の業務管理を支援するためのシステムをリニューアル..." 
 							                	v-model="workItem.workContent">
 							                </el-input>
+                                            <div v-bind:class="workItem.workContentErr ? 'err-item err-item-history' : 'opt-item-hidden'">
+                                                <i class="el-icon-warning error-icon"></i>
+                                                概要を入力してください
+                                            </div>
 							            </td>
 							        </tr>
 							        <tr>
 							            <th class="title">
-							                使用言語<span class="required">（必須）</span>
+                                            経験開発ツール<span class="any1">（任意）</span>
 							            </th>
 							            <td>
-							                <el-select 
-							                	v-model="employeeInfo.requiredTech" 
-							                	multiple placeholder="選択してください" clearable>
-							                    <el-option 
-	                                                v-for="tech in techs"
-							                    	:key="tech.value" 
-							                    	:label="tech.label" 
-							                    	:value="tech.value">
-							                    </el-option>
-							                </el-select>
+                                            <el-input placeholder="例：Java,SQL" 
+                                                v-model="workItem.skill">
+                                            </el-input>
 							            </td>
 							        </tr>
 							    </table>
@@ -340,7 +360,7 @@
                     </el-button>
                             
                             
-                <div class="form-item btn-form-item">
+                <div class="register-btn-line">
                     <el-button 
                         @click="onCreate"
                         type="primary">登録する</el-button>
@@ -351,6 +371,7 @@
     </main>
 </body>
 </html>
+<script src="./js/pageJump.js"></script>
 <script src="./js/consts.js"></script>
 <script>
 	// elementの日本語対応
@@ -358,14 +379,13 @@
        
     let vm;
     vm = new Vue({
-
         // id はapp の属性の中の部分を管理する
         el: "#app",
         data(){
             return {
                 // html の中の　v-model　属性と同じ値
                 employeeInfo: {
-                    empnumber: "",    //社員番号
+                    employeeId: "",    //社員番号
                     name: "",         //氏名
                     gender: "",       //性別
                     birthday: "",     //生年月日
@@ -373,27 +393,17 @@
                     password2: "",    //パスワード確認
                     tel: "",          //電話番号
                     email: "",        //メールアドレス
-                    skill: "", //経験開発言語
-                    
+                    skill: "",        //経験開発言語
                     workHistory: [],
-                    /**
-                    * 職務経歴
-                    * workName: "",      	//経歴名
-					  workStart: "",		//開発開始時期
-					  workPeriod: "",		//開発期間
-					  workPost: "",		    //役職
-					  workCharge: "",		//担当内容
-					  workContent: "",	    //概要
-					  workTech: "",		    //使用言語
-                    */
 				},
 				techs,
                 // ドラッグドロップ管理
                 dragIndex: null,
-                usernameCheck: false,
-                checkedUsername: "",
+                employeeIdErrMsg: "",
+                employeeIdCheck: false,
                 errors: {
-                    empnumber: false,
+                    employeeId: false,
+                    employeeIdForbidden: false,
                     name: false,
                     gender: false,
                     birthday: false, 
@@ -405,21 +415,39 @@
                 }
             };
         },
+        mounted() {
+            const employeeInfoStr = localStorage.getItem("tempEmployeeInfo") || "";
+            if (employeeInfoStr != "") {
+                const employeeInfo = JSON.parse(employeeInfoStr);
+                this.employeeInfo = employeeInfo;
+            }
+        },
         methods: {
-			
-			workHistoryAdd() {
-				const workHistory = this.employeeInfo.workHistory;
-				workHistory.push({});
-			},
-			workHistoryDel(index) {
-				const workHistory = this.employeeInfo.workHistory;
-				workHistory.splice(index, 1);
-			},
-			
+            goEmployeeRegisterConfirm,
+			employeeIdForbiddenCheck() {
+                const {
+                    employeeId = "",
+                } = this.employeeInfo;
+                if (employeeId == "") {
+                    return;
+                }
+                // TODOサーバに使えるかどうかを検証する
+                if (employeeId == "111111") {
+                    this.errors.employeeIdForbidden = true;
+                    this.employeeIdErrMsg = "入力した社員番号は存在しません！";
+                    return;
+                } 
+                if (employeeId == "222222") {
+                    this.errors.employeeIdForbidden = true;
+                    this.employeeIdErrMsg = "入力した社員番号は既に登録しました、確認してください！";
+                    return;
+                }
+                this.employeeIdCheck = true;
+            },
             errClean(itemName) {
-                if (itemName == "empnumber") {
-                    this.errors.empnumber = false;
-                    this.errors.empnumberDuplicate = false;
+                if (itemName == "employeeId") {
+                    this.errors.employeeId = false;
+                    this.errors.employeeIdForbidden = false;
                     return;
                 }
                 if (itemName == "password") {
@@ -429,9 +457,14 @@
                 }
                 this.errors[itemName] = false;
             },
+            errHistoryClean(errType, index) {
+                const workHistory = [...this.employeeInfo.workHistory];
+                workHistory[index][errType] = false;
+                this.employeeInfo.workHistory = workHistory;
+            },
             onCreate() {
                 const {
-                    empnumber = "",
+                    employeeId = "",
                     name = "",
                     gender= "",       
                     birthday= "",     
@@ -440,11 +473,12 @@
                     tel= "",          
                     email= "",        
                     requiredTech= "",
+                    // workHistory = [],
                 } = this.employeeInfo;
                 let flag = true;
                 // 社員番号必須の検証
-                if (empnumber == "") {
-                    this.errors.empnumber = true;
+                if (employeeId == "") {
+                    this.errors.employeeId = true;
                     flag = false;
                 }
                 // 氏名必須の検証
@@ -463,6 +497,11 @@
                     this.errors.passwordIncon = true;
                     flag = false;
                 }
+                // 生年月日の検証
+                if (birthday == "") {
+                    this.errors.birthday = true;
+                    flag = false;
+                }   
                 // 電話番号フォーマットの検証
                 const telRegExp = /^0\d{9}$/;  //　固定電話
                 const mobileRegExp = /^0[789]0\d{8}$/; // 携帯電話
@@ -476,85 +515,92 @@
                     this.errors.email = true;
                     flag = false;
                 }
-                if (!this.empnumberCheck) {
+                if (!this.employeeIdCheck) {
                     this.$message.error('ユーザ名が使えるかどうか確認してください！');
-                    return;
+                    // return;
                 }
-                if (this.errors.usernameDuplicate) {
-                    flag = false;
-                }
+                const workHistory = [...this.employeeInfo.workHistory];
+                
+                workHistory.forEach((item = {}) => {
+                    const {
+                        workName = "",
+                        workStart = "",
+                        workPeriod = "",
+                        workCharge = "",
+                        workContent = "",
+                    } = item;
+                    if (workName == "") {
+                        item.workNameErr = true;
+                        flag = false;
+                    }
+                    if (workStart == "") {
+                        item.workStartErr = true;
+                        flag = false;
+                    }
+                    if (workPeriod == "") {
+                        item.workPeriodErr = true;
+                        flag = false;
+                    }
+                    if (workCharge == "") {
+                        item.workChargeErr = true;
+                        flag = false;
+                    }
+                    if (workContent == "") {
+                        item.workContentErr = true;
+                        flag = false;
+                    }
+                });
+                this.employeeInfo.workHistory = workHistory;
+
                 if (flag == false) {
                     this.$message.error('記入不備な項目があるので、もう一度チェックしてください！');
+                    return;
                 }
 
-                localStorage.removeItem("tempCustomerInfo");
-                const customerInfoStr = JSON.stringify(this.customerInfo);
-                localStorage.setItem("tempCustomerInfo", customerInfoStr);
+                localStorage.removeItem("tempEmployeeInfo");
+                const employeeInfoStr = JSON.stringify(this.employeeInfo);
+                localStorage.setItem("tempEmployeeInfo", employeeInfoStr);
+                goEmployeeRegisterConfirm();
             },
-            
-            
-            onFunctionDragStart(index, e) {
-                this.dragIndex = index;
-                const { 
-                    functions = [],
-                } = this.jobCase;
-                functions[index].isTarget = true;
-            },
-            onFunctionDragOver(index, e) {
-                const ev = e || window.event;
-                ev.dataTransfer.dropEffect = "grab";
-                ev.preventDefault();
-            },
-            onFunctionDrop(index, e) {
-                let targetIndex;
-                let target;
+            workHistoryDel(index) {
                 const {
-                    functions = [],
-                } = this.jobCase;
-                functions.forEach(({ isTarget }, i) => {
-                    if (!isTarget) return;
-                    targetIndex = i;
-                    functions[i].isTarget = undefined;
-                    target = functions[i];
+                    workHistory = [],
+                } = this.employeeInfo;
+                workHistory.splice(index, 1);
+            },
+            workHistoryAdd() {
+                const {
+                    workHistory = [],
+                } = this.employeeInfo;
+                // 職務経歴
+                workHistory.push({
+                    workName: "",           //経歴名
+                    workNameErr: false,
+                    workStart: "",          //開発開始時期
+                    workStartErr: false,
+                    workPeriod: "",         //開発期間
+                    workPeriodErr: false,
+                    workCharge: "",         //担当内容
+                    workChargeErr: false,
+                    workContent: "",        //概要
+                    workContentErr: false,
                 });
-                functions.splice(targetIndex, 1);
-                functions.splice(index, 0, target);
             },
-            onFunctionDel(index) {
+            workHistoryUp(index) {
                 const {
-                    functions = [],
-                    functionIdCnt,
-                } = this.jobCase;
-                functions.splice(index, 1);
+                    workHistory = [],
+                } = this.employeeInfo;
+                const target = workHistory[index];
+                workHistory.splice(index, 1);
+                workHistory.splice(index - 1, 0, target);
             },
-            onFunctionAdd() {
+            workHistoryDown(index) {
                 const {
-                    functions = [],
-                    functionIdCnt,
-                } = this.jobCase;
-                functions.push({
-                    id: functionIdCnt,
-                    functionDesc: "",
-                });
-                this.functionIdCnt = functionIdCnt + 1;
-            },
-            onFunctionUp(index) {
-                const {
-                    functions = [],
-                    functionIdCnt,
-                } = this.jobCase;
-                const target = functions[index];
-                functions.splice(index, 1);
-                functions.splice(index - 1, 0, target);
-            },
-            onFunctionDown(index) {
-                const {
-                    functions = [],
-                    functionIdCnt,
-                } = this.jobCase;
-                const target = functions[index];
-                functions.splice(index, 1);
-                functions.splice(index + 1, 0, target);
+                    workHistory = [],
+                } = this.employeeInfo;
+                const target = workHistory[index];
+                workHistory.splice(index, 1);
+                workHistory.splice(index + 1, 0, target);
             },
         },
     });

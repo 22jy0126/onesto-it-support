@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="jp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お客様の情報登録確認ページ</title>
+    <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
+    <!-- vue と elementUIの依存css -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <link href="./css/common.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/employeeInfo.css">
+    <!-- vue と elementUIの依存javascript -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
+    <script src="js/utils.js"></script>
+</head>
+
+<body>
+    <!-- ヘッドの部分 各々の画面は同じです -->
+    <header class="common-header">
+        <div class="logo">
+            ブリッジ
+        </div>
+        <div class="login-info">
+            未登録
+        </div>
+    </header>
+
+    <!-- メインの部分 -->
+    <main class="common-mian common-mian-nologin" id="app" v-cloak>
+        <!-- お客様の登録 -->
+        <section class="login-form-container">
+            <div class="caption">
+                社員の情報登録確認
+            </div>
+            <div class="login-infos-wrapper employee-login-infos-wrapper">
+                <section>
+                    <div class="common-caption">
+                        <i class="el-icon-notebook-1 icon"></i>
+                        プロフィール
+                    </div>
+                
+                    <el-card class="box-card">
+                        <div class="profile">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <i class="el-icon-user icon"></i>
+                                        {{employeeInfo.name}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i class="el-icon-s-opportunity icon"></i>
+                                        {{employeeInfo.birthday}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i class="el-icon-message icon"></i>
+                                        {{employeeInfo.email}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i class="el-icon-phone icon"></i>
+                                        {{employeeInfo.tel}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i class="el-icon-setting icon"></i>
+                                        {{employeeInfo.skill}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </el-card>
+                </section>
+                <section>
+                    <div class="common-caption">
+                        <i class="el-icon-notebook-1 icon"></i>
+                        職務経歴
+                    </div>
+                    <el-timeline>
+                        <el-timeline-item v-for="history in employeeInfo.workHistory" :timestamp=`${history.workStartVal}～`
+                            placement="top">
+                            <el-card>
+                                <h4>{{history.workName}}</h4>
+                                <table class="history">
+                                    <tr>
+                                        <th>
+                                            開発期間
+                                        </th>
+                                        <td>
+                                            {{history.workPeriod}}日
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            担当内容
+                                        </th>
+                                        <td>
+                                            {{history.workCharge}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            概要
+                                        </th>
+                                        <td>
+                                            {{history.workContent}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            経験開発ツール
+                                        </th>
+                                        <td>
+                                            {{history.skill}}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </el-card>
+                        </el-timeline-item>
+                    </el-timeline>
+                </section>
+                <div class="confirm-btn-item">
+                    <el-button @click="onBackPage" type="info">編集に戻る</el-button>
+                    <el-button @click="onCreate" type="primary">登録する</el-button>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>
+
+<script src="./js/pageJump.js"></script>
+<script>
+    // elementの日本語対応
+    ELEMENT.locale(ELEMENT.lang.ja);
+
+    let vm;
+    vm = new Vue({
+
+        // id はapp の属性の中の部分を管理する
+        el: "#app",
+        data() {
+            return {
+                // html の中の　v-model　属性と同じ値
+                customerInfo: {
+                    username: "",
+                    name: "",
+                    tel: "",
+                    email: "",
+                },
+                employeeInfo: {}
+            };
+        },
+        mounted() {
+            const employeeInfoStr = localStorage.getItem("tempEmployeeInfo") || "";
+            if (employeeInfoStr != "") {
+                const employeeInfo = JSON.parse(employeeInfoStr);
+
+                // 日付のフォーマット処理
+                const {
+                    birthday,
+                    workHistory = [],
+                } = employeeInfo;
+                const birthdayVal = dateFormat(birthday);
+                employeeInfo.birthdayVal = birthdayVal;
+
+                workHistory.forEach((item = {}) => {
+                    const {
+                        workStart,
+                    } = item;
+                    const workStartVal = dateFormat2(workStart);
+                    item.workStartVal = workStartVal;
+                });
+
+                this.employeeInfo = employeeInfo;
+            }
+        },
+        methods: {
+            onRegister() {
+                // TODO サーバーにユーザデータを送る
+
+                window.location.href = "customerRegisterComplete.html";
+            },
+            onBackPage() {
+                window.history.back();
+            },
+            onCreate() {
+                goEmployeeRegisterComplete();
+            },
+        }
+    });
+</script>

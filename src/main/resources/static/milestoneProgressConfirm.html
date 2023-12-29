@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 
 <head>
     <meta charset="UTF-8">
@@ -52,7 +52,7 @@
             <el-container>
                 <el-main>
                     <div class="milestone-detail-container">
-                        <div class="goback">
+                        <div class="goback" @click="goback">
                             <i class="el-icon-back"></i>
                             案件詳細に戻る
                         </div>
@@ -157,6 +157,9 @@
                 this.getMilestoneData();
             },
             goCustomerCaseEdit,
+            goback() {
+                window.history.back();
+            },
             /**
              * 案件のデータをゲット
             */

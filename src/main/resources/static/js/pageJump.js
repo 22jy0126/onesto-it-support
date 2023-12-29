@@ -13,8 +13,9 @@ const goJobCases = () => {
 };
 
 // 社員、お客様、管理者・ログイン
-const goLogin = () => {
-    goTo("/login.html");
+const goLogin = (emp) => {
+    const url = emp == "1" ? "/login.html?emp=1" : "/login.html";
+    goTo(url);
 };
 
 // 社員・社員の登録
@@ -23,12 +24,18 @@ const goEmployeeRegister = () => {
 };
 
 // 社員・社員の登録確認
+const goEmployeeRegisterConfirm = () => {
+    goTo("/employeeregisterconfirm.html");
+};
 
 // 社員・社員の登録完了
+const goEmployeeRegisterComplete = () => {
+    goTo("/employeeregistercomplete.html");
+};
 
 // 社員・社員の詳細
-const goEmployeeInfo = () => {
-    goTo("/employeeinfo.html");
+const goEmployeeInfo = (employeeId) => {
+    goTo(`/employeeinfo.html?employeeId=${employeeId}`);
 };
 
 // 社員・社員の応募歴史
@@ -38,25 +45,20 @@ const goEmployeeApplyHistory = () => {
 
 // 社員・案件の詳細
 /**
- * @Param applystatus
- * 0 未応募
- * 1 既に応募した、結果出てこない
- * 2 既に応募した、不採用した
- * 3 既に応募した、案件開始中
- * 4 既に応募した、案件終わり
- **
  * @Param from
  * 1 案件一覧
  * 2 応募歴史
+ * 
+ * @Param caseId
  */
 //
-const goCaseDetail = (applystatus, from) => {
-    goTo(`/casedetail.html?applystatus=${applystatus}&from=${from}`);
+const goCaseDetail = (caseId) => {
+    goTo(`/casedetail.html?caseId=${caseId}`);
 };
 
 // 社員・案件のマイルストーン編集
-const goMilestoneEdit = () => {
-    goTo("/milestoneedit.html");
+const goMilestoneEdit = (caseId) => {
+    goTo(`/milestoneedit.html?caseId=${caseId}`);
 };
 
 // 社員・案件のマイルストー進捗更新

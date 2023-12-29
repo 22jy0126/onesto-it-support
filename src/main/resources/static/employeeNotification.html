@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 
 <head>
     <meta charset="UTF-8">
@@ -13,7 +13,7 @@
 
     <!-- システム共用のスタイルはこのファイルに追加する -->
     <link href="./css/common.css" rel="stylesheet" />
-    <link rel="stylesheet" href="./css/jobCase.css">
+    <link rel="stylesheet" href="./css/employeeNotification.css">
     <!-- TODO: 作るHTMLとペアでCSSファイルを作り、なるべく同じファイル名にする -->
 
     <!-- vue と elementUIの依存javascript -->
@@ -39,14 +39,14 @@
         </header>
 
         <!-- メインの部分 -->
-        <el-container class="common-mian job-case-main">
+        <el-container class="common-mian notice-case-main">
             <!-- サイドメニュー -->
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="4" class="el-menu-vertical-demo">
                     <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
                     <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
-                    <el-menu-item index="3">応募履歴</el-menu-item>
+                    <el-menu-item index="3" @click="goEmployeeApplyHistory">応募履歴</el-menu-item>
                     <el-menu-item index="4">通知</el-menu-item>
                 </el-menu>
             </el-aside>
@@ -56,18 +56,19 @@
                     <!-- TODO: 内容はここに書く -->
                     <section class="employee-Notification">
                         <div class="common-caption">
-                            <i class="el-icon-document icon"></i>
+                            <i class="el-icon-message-solid icon"></i>
                             <span class="em">通知一覧</span>
                         </div>
-                        <div class="job-case-item" v-for="job in noticeMessage">
-                            <div class="case-sub">
-                                <span>{{job.dateSent}}</span>
+                        <div class="notice-case-item" v-for="notice in notices">
+                            <div class="date">
+                                <span>{{notice.date}}</span>
                             </div>
-                            <div class="case-sub">
-                                <span>{{job.customerName}}さんが{{job.message}}</span>
+                            <div class="msg-wrapper">
+                                <div class="name">案件名：{{notice.caseName}}</div>
+                                <div>メッセージ：{{notice.msg}}</div>
                             </div>
                             <div class="go-detail"
-                                @click="goCaseDetail(1,1)"
+                                @click="notice.goMethod(notice.caseId)"
                             >
                                 詳細>>
                             </div>
@@ -81,6 +82,7 @@
 </body>
 
 </html>
+<script src="./js/pageJump.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -97,16 +99,64 @@
                     username: "鈴木　奈々", // ユーザー名
                     noticeCount: 2, // 通知数
                 },
-                noticeMessage: [{
-                    customerName: "小林　七海",　　　　　       // クライアント氏名
-                    message: "マイルストーンに同意しました。",   // 通知内容
-                    dateSent: "2024年2月20日",                // 送信日時
+                notices: [],
+                linkTypeMap: [{
+                    /* 案件開始 */
+                    type: 1,
+                    goMethod: goCaseDetail,
+                    msg: "おめでとうございます！あなたは応募した案件が開始されました、",
                 }, {
-                    customerName: "小林　七海",　　　　　       // クライアント氏名
-                    message: "あなたと契約を結びました。詳細を確認してください。",   // 通知内容
-                    dateSent: "2024年2月10日",                // 送信日時
+                    /* マイルストーンのチェック返信 */
+                    type: 2,
+                    goMethod: goMilestoneEdit,
+                    msg: "クライアントからマイルストーンの編集について返信があります、",
+                }, {
+                    /* マイルストーンの編集確認完了 */
+                    type: 3,
+                    goMethod: goMilestoneProgressUpdate,
+                    msg: "クライアントからマイルストーンの編集に確認しました、",
+                }, {
+                    /* マイルストーンの更新チェック返信 */
+                    type: 4,
+                    goMethod: goMilestoneProgressUpdate,
+                    msg: "クライアントからマイルストーンの更新について返信があります、",
+                }, {
+                    /* マイルストーンの更新確認完了 */
+                    type: 5,
+                    goMethod: goMilestoneProgressUpdate,
+                    msg: "クライアントからマイルストーンの更新に確認しました、",
+                }, {
+                    /* 案件完了確認 */
+                    type: 6,
+                    goMethod: goCaseDetail,
+                    msg: "お疲れ様でした！クライアントから案件作業完了が確認されました、"
                 }],
             };
+        },
+        mounted() {
+            const notices = [{
+                date: "2024年2月20日",                   // 送信日付
+                caseId: 1,                              // 案件Id
+                type: 1,                                // 通知タイプ
+                caseName: "学生管理システムの制作",         // 案件名
+            }, {
+                date: "2024年1月20日",                   // 送信日付
+                caseId: 1,                              // 案件Id
+                type: 2,                                // 通知タイプ
+                caseName: "学生管理システムの制作2",        // 案件名
+            }];
+            this.notices = notices.map((n = {}) => {
+                const { type } = n;
+                const nt = this.linkTypeMap.find(({ type: ty }) => ty == type);
+                n.goMethod = nt.goMethod;
+                n.msg = `${nt.msg}詳細を確認してください！`;
+                return n;
+            });
+        },
+        methods: {
+            goJobCases,
+            goEmployeeInfo,
+            goEmployeeApplyHistory
         },
     });
 </script>

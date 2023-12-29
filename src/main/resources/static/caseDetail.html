@@ -54,16 +54,19 @@
 
             <el-container class="customer-case-detail-container">
                 <el-main>
-                    <div v-bind:class="this.from == 1 ? 'goback' : 'hidden'">
-                        <span @click="goJobCases" class="back">
+                    <div class="goback">
+                        <span @click="goBack" class="back">
                             <i class="el-icon-back"></i>
-                            案件一覧に戻る
+                            戻る
                         </span>
                     </div>
                     <section>
                         <div class="caption-wrapper">
                             <i class="el-icon-s-order"></i>
                             <div class="caption">案件の基本情報</div>
+                            <div v-bind:class="jobCase.statusCls">
+                                {{jobCase.applyStatusText}}
+                            </div>
                         </div>
                         <section class="base-infos">
                             <div class="info-item">
@@ -112,8 +115,14 @@
                             </div>
                         </section>
                         <div class="save-btns">
-                            <el-button @click="onApply" v-bind:class="this.applyStatus != 1 ? 'hidden' : ''" type="primary">
+                            <el-button @click="onApply" v-bind:class="this.jobCase.applyStatus != 0 ? 'hidden' : ''" type="primary">
                                 応募する
+                            </el-button>
+                            <el-button @click="goMilestoneEdit" v-bind:class="this.jobCase.milestoneStatus != 1 ? 'hidden' : ''" type="primary">
+                                マイルストーン編集
+                            </el-button>
+                            <el-button @click="goMilestoneProgressUpdate" v-bind:class="this.jobCase.milestoneStatus != 2 ? 'hidden' : ''" type="primary">
+                                マイルストーン詳細
                             </el-button>
                         </div>
                     </section>
@@ -150,8 +159,8 @@
                  * 3 既に応募した、案件開始中
                  * 4 既に応募した、案件終わり
                  */
-                applyStatus: 0,
-                from: 0,
+                // applyStatus: 0,
+                
             };
         },
         mounted() {
@@ -173,30 +182,83 @@
                     id: 3,
                     functionDesc: "システムを通じて保護者に連絡ができる, システムを通じて保護者に連絡ができる,システムを通じて保護者に連絡ができる"
                 }],
+                status: 2,
+                entry: true,
+                bind: true, 
+                milestoneStatus: 2,   // 1 編集中　2 更新中
             };
 
             // 日付のフォーマット処理
             const {
-                deadline
+                deadline,
+                status,
+                bind,
+                entry,
             } = jobCase;
             const deadlineVal = dateFormat(deadline);
             jobCase.deadlineVal = deadlineVal;
             this.jobCase = jobCase;
 
             // 応募状況
-            this.applyStatus = getURLParam("applystatus");
+            if (status == 1 && !entry) {
+                jobCase.applyStatus = 0;
+                // jobCase.applyStatusText = "応募中";
+                jobCase.statusCls = "hidden";
+            }
+            if (status == 1 && entry) {
+                jobCase.applyStatus = 1;
+                jobCase.applyStatusText = "応募中";
+                jobCase.statusCls = "status status-1";
+            }
+            if (status == 2 && !bind) {
+                jobCase.applyStatus = 2;
+                jobCase.applyStatusText = "応募終了";
+                jobCase.statusCls = "status status-2";
+            }
+            if (status == 2 && bind) {
+                jobCase.applyStatus = 3;
+                jobCase.applyStatusText = "案件作業中";
+                jobCase.statusCls = "status status-3";
+            }
+            if (status == 3 && bind) {
+                jobCase.applyStatus = 4;
+                jobCase.applyStatusText = "案件作業終了";
+                jobCase.statusCls = "status status-4";
+            }
+
             // どんなページから来た
-            this.from = getURLParam("from");
+            // this.from = getURLParam("from");
         },
         methods: {
             goEmployeeInfo,
             goEmployeeApplyHistory,
             goJobCases,
-            onBackPage() {
+            goMilestoneEdit,
+            goMilestoneProgressUpdate,
+            goBack() {
                 window.history.back();
             },
             onApply() {
+                this.$confirm(`応募すると${this.user.username}さんの個人履歴をクライアントに送ります、よろしいですか?`, '確認', {
+                    confirmButtonText: '応募する',
+                    cancelButtonText: "キャンセル",
+                    type: 'warning',
+                    center: false,
+                })
+                    .then(() => {
+                        this.$confirm('クライアントが確認するまでしばらくお待ちください', '応募が完了しました', {
+                            confirmButtonText: '分かりました',
+                            type: 'success',
+                            center: true,
+                            showCancelButton: false,
+                        });
 
+                        const jobCase = { ...this.jobCase };
+                        jobCase.applyStatus = 1;
+                        jobCase.applyStatusText = "応募中";
+                        jobCase.statusCls = "status status-1";
+                        this.jobCase = jobCase;
+                    });
             }
         }
     });

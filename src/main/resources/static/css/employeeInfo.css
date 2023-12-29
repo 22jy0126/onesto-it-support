@@ -81,6 +81,13 @@ h4{
 .history td:nth-child(2) {
   	width: 70%;
 }
+.hidden {
+	display: none;
+}
+.employee-login-infos-wrapper {
+	font-size: 14px;
+}
+
 
 
 
