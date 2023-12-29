@@ -34,8 +34,8 @@ const goEmployeeRegisterComplete = () => {
 };
 
 // 社員・社員の詳細
-const goEmployeeInfo = (employeeId) => {
-    goTo(`/employeeinfo.html?employeeId=${employeeId}`);
+const goEmployeeInfo = () => {
+    goTo(`/employeeinfo.html`);
 };
 
 // 社員・社員の応募歴史
