@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class EmployeeBase {
 	// 社員番号
-	private Integer employeeId;
+	private String employeeId;
 	// 氏名
 	private String name;
 	// 性別
@@ -20,7 +20,7 @@ public class EmployeeBase {
 	// 経験開発言語
 	private String skill;
 	
-	public EmployeeBase(Integer employeeId, String name, Integer gender, Date birthday, String password, String tel,
+	public EmployeeBase(String employeeId, String name, Integer gender, Date birthday, String password, String tel,
 			String email, String skill) {
 		super();
 		this.employeeId = employeeId;
@@ -35,10 +35,10 @@ public class EmployeeBase {
 	public EmployeeBase() {
 		super();
 	}
-	public Integer getEmployeeId() {
+	public String getEmployeeId() {
 		return employeeId;
 	}
-	public void setEmployeeId(Integer employeeId) {
+	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId;
 	}
 	public String getName() {

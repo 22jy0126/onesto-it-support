@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.onestoit.mapper.WorkHistoryMapper">
+	<insert id="save">
+		INSERT INTO onestoit_work_history (
+			id,
+			employee_id,
+			work_name,
+			work_start,
+			work_period,
+			work_charge,
+			work_content
+		) VALUES (
+			#{id},
+			#{employeeId},
+			#{workName},
+			#{workStart},
+			#{workPeriod},
+			#{workCharge},
+			#{workContent}
+		);
+	</insert>
+	<insert id="batchSave">
+		INSERT INTO onestoit_work_history (
+			employee_id,
+			work_name,
+			work_start,
+			work_period,
+			work_charge,
+			work_content
+		) VALUES 
+		<foreach collection="list" separator="," item="item">
+			(
+				#{item.employeeId},
+				#{item.workName},
+				#{item.workStart},
+				#{item.workPeriod},
+				#{item.workCharge},
+				#{item.workContent}
+			)
+		</foreach>
+	</insert>
+</mapper>

@@ -18,6 +18,7 @@
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
     <script src="//cdn.jsdelivr.net/npm/@element-plus/icons-vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="js/utils.js"></script>
 </head>
 <body >
@@ -211,17 +212,17 @@
 							</label> 
 	                    </div> 
 	                    <div class="workHistory-edit-wrapper" 
-	                        v-for="(workItem, index) in employeeInfo.workHistory">
+	                        v-for="(workItem, index) in employeeInfo.workHistorys">
 	                        <div class="opts">
 	                            <div 
-	                                @click="onWorkHistoryUp(index)"
+	                                @click="workHistorysUp(index)"
 	                                v-bind:class="index==0 ? 'opt-item-hidden' : 'opt-item'">
 	                                <i class="el-icon-top"></i>
 	                                上に移動
 	                            </div>
 	                            <div 
-	                                @click="onWorkHistoryDown(index)"
-	                                v-bind:class="index==(employeeInfo.workHistory.length-1) ? 'opt-item-hidden' : 'opt-item'">
+	                                @click="workHistorysDown(index)"
+	                                v-bind:class="index==(employeeInfo.workHistorys.length-1) ? 'opt-item-hidden' : 'opt-item'">
 	                                <i class="el-icon-bottom"></i>
 	                                下に移動
 	                            </div>
@@ -231,7 +232,7 @@
 	                                icon="el-icon-info" 
 	                                icon-color="red"
 	                                
-	                                @confirm="onWorkHistoryDel(index)"
+	                                @confirm="workHistorysDel(index)"
 	                                
 	                                title="削除した機能は戻らない、よろしいですか?">
 	                                <el-button 
@@ -355,7 +356,7 @@
 					</div>
                     <el-button 
                         icon="el-icon-plus" 
-                        @click="workHistoryAdd">
+                        @click="workHistorysAdd">
                         職務履歴を追加
                     </el-button>
                             
@@ -394,7 +395,7 @@
                     tel: "",          //電話番号
                     email: "",        //メールアドレス
                     skill: "",        //経験開発言語
-                    workHistory: [],
+                    workHistorys: [],
 				},
 				techs,
                 // ドラッグドロップ管理
@@ -458,9 +459,9 @@
                 this.errors[itemName] = false;
             },
             errHistoryClean(errType, index) {
-                const workHistory = [...this.employeeInfo.workHistory];
-                workHistory[index][errType] = false;
-                this.employeeInfo.workHistory = workHistory;
+                const workHistorys = [...this.employeeInfo.workHistorys];
+                workHistorys[index][errType] = false;
+                this.employeeInfo.workHistorys = workHistorys;
             },
             onCreate() {
                 const {
@@ -473,7 +474,7 @@
                     tel= "",          
                     email= "",        
                     requiredTech= "",
-                    // workHistory = [],
+                    // workHistorys = [],
                 } = this.employeeInfo;
                 let flag = true;
                 // 社員番号必須の検証
@@ -519,9 +520,9 @@
                     this.$message.error('ユーザ名が使えるかどうか確認してください！');
                     // return;
                 }
-                const workHistory = [...this.employeeInfo.workHistory];
+                const workHistorys = [...(this.employeeInfo.workHistorys || [])];
                 
-                workHistory.forEach((item = {}) => {
+                workHistorys.forEach((item = {}) => {
                     const {
                         workName = "",
                         workStart = "",
@@ -529,6 +530,7 @@
                         workCharge = "",
                         workContent = "",
                     } = item;
+                    item.employeeId = employeeId;
                     if (workName == "") {
                         item.workNameErr = true;
                         flag = false;
@@ -550,7 +552,7 @@
                         flag = false;
                     }
                 });
-                this.employeeInfo.workHistory = workHistory;
+                this.employeeInfo.workHistorys = workHistorys;
 
                 if (flag == false) {
                     this.$message.error('記入不備な項目があるので、もう一度チェックしてください！');
@@ -562,18 +564,19 @@
                 localStorage.setItem("tempEmployeeInfo", employeeInfoStr);
                 goEmployeeRegisterConfirm();
             },
-            workHistoryDel(index) {
+            workHistorysDel(index) {
                 const {
-                    workHistory = [],
+                    workHistorys = [],
                 } = this.employeeInfo;
-                workHistory.splice(index, 1);
+                workHistorys.splice(index, 1);
             },
-            workHistoryAdd() {
+            workHistorysAdd() {
+                console.log("workHistorysAdd");
                 const {
-                    workHistory = [],
+                    workHistorys = [],
                 } = this.employeeInfo;
                 // 職務経歴
-                workHistory.push({
+                workHistorys.push({
                     workName: "",           //経歴名
                     workNameErr: false,
                     workStart: "",          //開発開始時期
@@ -586,21 +589,21 @@
                     workContentErr: false,
                 });
             },
-            workHistoryUp(index) {
+            workHistorysUp(index) {
                 const {
-                    workHistory = [],
+                    workHistorys = [],
                 } = this.employeeInfo;
-                const target = workHistory[index];
-                workHistory.splice(index, 1);
-                workHistory.splice(index - 1, 0, target);
+                const target = workHistorys[index];
+                workHistorys.splice(index, 1);
+                workHistorys.splice(index - 1, 0, target);
             },
-            workHistoryDown(index) {
+            workHistorysDown(index) {
                 const {
-                    workHistory = [],
+                    workHistorys = [],
                 } = this.employeeInfo;
-                const target = workHistory[index];
-                workHistory.splice(index, 1);
-                workHistory.splice(index + 1, 0, target);
+                const target = workHistorys[index];
+                workHistorys.splice(index, 1);
+                workHistorys.splice(index + 1, 0, target);
             },
         },
     });

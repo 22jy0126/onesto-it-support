@@ -106,7 +106,7 @@
 							職務経歴
 						</div>
 						<el-timeline>
-							<el-timeline-item v-for="history in employeeInfo.workHistory" :timestamp=`${history.workStartVal}～` placement="top">
+							<el-timeline-item v-for="history in employeeInfo.workHistorys" :timestamp=`${history.workStartVal}～` placement="top">
 								<el-card>
 									<h4>{{history.workName}}</h4>
 									<table class="history">
@@ -181,7 +181,7 @@
 					// mail: "xxxxxxxx@jec.ac.jp",
 					// tell: "090-4564-xxxx",
 					// skill: "VBA,java",
-					// workHistory:[{
+					// workHistorys:[{
 					// 	project: "業務管理システムのリニューアル",
 					// 	startMonth:"2018/4",//開発開始月
 					// 	dperiod: "115日",//開発期間
@@ -213,7 +213,7 @@
 				const birthdayVal = dateFormat(birthday);
 				employeeInfo.birthdayVal = birthdayVal;
 
-				const workHistory = [...this.employeeInfo.workHistory];
+				const workHistorys = [...this.employeeInfo.workHistorys];
 
 				this.employeeInfo = employeeInfo;
 			}

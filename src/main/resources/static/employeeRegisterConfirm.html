@@ -16,6 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="js/utils.js"></script>
 </head>
 
@@ -87,7 +88,7 @@
                         職務経歴
                     </div>
                     <el-timeline>
-                        <el-timeline-item v-for="history in employeeInfo.workHistory" :timestamp=`${history.workStartVal}～`
+                        <el-timeline-item v-for="history in employeeInfo.workHistorys" :timestamp=`${history.workStartVal}～`
                             placement="top">
                             <el-card>
                                 <h4>{{history.workName}}</h4>
@@ -170,12 +171,12 @@
                 // 日付のフォーマット処理
                 const {
                     birthday,
-                    workHistory = [],
+                    workHistorys = [],
                 } = employeeInfo;
                 const birthdayVal = dateFormat(birthday);
                 employeeInfo.birthdayVal = birthdayVal;
 
-                workHistory.forEach((item = {}) => {
+                workHistorys.forEach((item = {}) => {
                     const {
                         workStart,
                     } = item;
@@ -196,7 +197,17 @@
                 window.history.back();
             },
             onCreate() {
-                goEmployeeRegisterComplete();
+                axios({
+                    method: "POST",
+                    url: "/register/emp/save",
+                    data: this.employeeInfo,
+                    withCredentials: true
+                })
+                    .then(() => {
+
+                    })
+
+                // goEmployeeRegisterComplete();
             },
         }
     });

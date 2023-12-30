@@ -5,6 +5,8 @@ import java.util.Date;
 public class WorkHistory {
 	// 経歴Id
 	private Integer id;
+	// 社員番号
+	private Integer employeeId;
 	// 経歴名
 	private String workName;
 	// 開発開始時期
@@ -15,20 +17,20 @@ public class WorkHistory {
 	private String workCharge;
 	// 概要
 	private String workContent;
+
+	public WorkHistory() {
+		super();
+	}
 	
-	public WorkHistory(Integer id, String workName, Date workStart, Integer workPeriod, String workCharge,
+	public WorkHistory(Integer employeeId, String workName, Date workStart, Integer workPeriod, String workCharge,
 			String workContent) {
 		super();
-		this.id = id;
+		this.employeeId = employeeId;
 		this.workName = workName;
 		this.workStart = workStart;
 		this.workPeriod = workPeriod;
 		this.workCharge = workCharge;
 		this.workContent = workContent;
-	}
-
-	public WorkHistory() {
-		super();
 	}
 
 	public Integer getId() {
@@ -37,6 +39,14 @@ public class WorkHistory {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Integer getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(Integer employeeId) {
+		this.employeeId = employeeId;
 	}
 
 	public String getWorkName() {
@@ -77,12 +87,6 @@ public class WorkHistory {
 
 	public void setWorkContent(String workContent) {
 		this.workContent = workContent;
-	}
-
-	@Override
-	public String toString() {
-		return "WorkHistory [id=" + id + ", workName=" + workName + ", workStart=" + workStart + ", workPeriod="
-				+ workPeriod + ", workCharge=" + workCharge + ", workContent=" + workContent + "]";
 	}
 	
 	
