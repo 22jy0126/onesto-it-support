@@ -51,30 +51,37 @@
                                 <tr>
                                     <td>
                                         <i class="el-icon-user icon"></i>
+                                        <span class="pro-label">氏名</span>
                                         {{employeeInfo.name}}
+                                        <span>（{{employeeInfo.genderVal}}）</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <i class="el-icon-s-opportunity icon"></i>
-                                        {{employeeInfo.birthday}}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i class="el-icon-message icon"></i>
-                                        {{employeeInfo.email}}
+                                        <span class="pro-label">生年月日</span>
+                                        {{employeeInfo.birthdayVal}}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <i class="el-icon-phone icon"></i>
+                                        <span class="pro-label">TEL</span>
                                         {{employeeInfo.tel}}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
+                                        <i class="el-icon-message icon"></i>
+                                        <span class="pro-label">Email</span>
+                                        {{employeeInfo.email}}
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
                                         <i class="el-icon-setting icon"></i>
+                                        <span class="pro-label">経験開発ツール</span>
                                         {{employeeInfo.skill}}
                                     </td>
                                 </tr>
@@ -88,7 +95,8 @@
                         職務経歴
                     </div>
                     <el-timeline>
-                        <el-timeline-item v-for="history in employeeInfo.workHistorys" :timestamp=`${history.workStartVal}～`
+                        <el-timeline-item v-for="history in employeeInfo.workHistorys" 
+                            :timestamp=`${history.workStartVal}～${history.workEndVal}`
                             placement="top">
                             <el-card>
                                 <h4>{{history.workName}}</h4>
@@ -98,7 +106,7 @@
                                             開発期間
                                         </th>
                                         <td>
-                                            {{history.workPeriod}}日
+                                            {{history.workPeriod}}日 （ {{history.workPeriodVal}} ）
                                         </td>
                                     </tr>
                                     <tr>
@@ -114,7 +122,9 @@
                                             概要
                                         </th>
                                         <td>
-                                            {{history.workContent}}
+                                            <div class="long-text">
+                                                {{history.workContent}}
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr>
@@ -171,17 +181,36 @@
                 // 日付のフォーマット処理
                 const {
                     birthday,
+                    gender,
                     workHistorys = [],
                 } = employeeInfo;
                 const birthdayVal = dateFormat(birthday);
                 employeeInfo.birthdayVal = birthdayVal;
-
+                let genderVal;
+                switch(gender) {
+                    case 0:
+                        genderVal = "男性";
+                        break;
+                    case 1:
+                        genderVal = "女性";
+                        break;
+                    case 2:
+                        genderVal = "指定しない";
+                        break;
+                }
+                employeeInfo.genderVal = genderVal;
                 workHistorys.forEach((item = {}) => {
                     const {
                         workStart,
+                        workPeriod = 0,
                     } = item;
                     const workStartVal = dateFormat2(workStart);
+                    const workEndVal = dateFormat2(new Date(workStart).setDate(workPeriod));
                     item.workStartVal = workStartVal;
+                    item.workEndVal = workEndVal;
+                    const period = workPeriod % 30 == 0 ? Math.round(workPeriod / 30) : (workPeriod / 30).toFixed(1);
+                    const workPeriodVal = `約${period}ヶ月`;
+                    item.workPeriodVal = workPeriodVal;
                 });
 
                 this.employeeInfo = employeeInfo;
@@ -197,17 +226,30 @@
                 window.history.back();
             },
             onCreate() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
                 axios({
                     method: "POST",
                     url: "/register/emp/save",
                     data: this.employeeInfo,
                     withCredentials: true
                 })
-                    .then(() => {
-
-                    })
-
-                // goEmployeeRegisterComplete();
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: { code } = {} } = res;
+                        if (code == 90010) {
+                            this.$message.error('只今、保存できません、少し後でもう一度お試してください');
+                        } else {
+                            this.$message.success('登録しました');
+                            setTimeout(() => {
+                                goEmployeeRegisterComplete();
+                            }, 200);
+                        }
+                    });
             },
         }
     });

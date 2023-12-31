@@ -87,7 +87,16 @@ h4{
 .employee-login-infos-wrapper {
 	font-size: 14px;
 }
-
+.pro-label {
+	width: 110px;
+	display: inline-block;
+}
+.long-text {
+	white-space: pre-line;
+}
+.history {
+	width: 100%;
+}
 
 
 

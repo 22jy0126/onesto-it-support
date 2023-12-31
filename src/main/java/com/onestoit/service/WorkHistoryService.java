@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.onestoit.controller.Result;
 import com.onestoit.model.WorkHistory;
 
 @Transactional
@@ -13,5 +14,5 @@ public interface WorkHistoryService {
 	 * @param workHistorys
 	 * @return
 	 */
-	int batchSave(ArrayList<WorkHistory> workHistorys);
+	Result batchSave(ArrayList<WorkHistory> workHistorys);
 }

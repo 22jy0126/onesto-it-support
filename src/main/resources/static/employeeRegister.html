@@ -430,20 +430,39 @@
                     employeeId = "",
                 } = this.employeeInfo;
                 if (employeeId == "") {
+                    this.employeeIdCheck = false;
                     return;
                 }
-                // TODOサーバに使えるかどうかを検証する
-                if (employeeId == "111111") {
+                if (employeeId.length != 6) {
                     this.errors.employeeIdForbidden = true;
+                    this.employeeIdCheck = false;
                     this.employeeIdErrMsg = "入力した社員番号は存在しません！";
                     return;
-                } 
-                if (employeeId == "222222") {
-                    this.errors.employeeIdForbidden = true;
-                    this.employeeIdErrMsg = "入力した社員番号は既に登録しました、確認してください！";
-                    return;
                 }
-                this.employeeIdCheck = true;
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: `/register/emp/alreadyExists/${employeeId}`,
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: { data } = {} } = res;
+                        
+                        if (data > 0) {
+                            this.errors.employeeIdForbidden = true;
+                            this.employeeIdCheck = false;
+                            this.employeeIdErrMsg = "入力した社員番号は既に登録しました、確認してください！";
+                        } else {
+                            this.employeeIdCheck = true;
+                        }
+                    });
+                
             },
             errClean(itemName) {
                 if (itemName == "employeeId") {

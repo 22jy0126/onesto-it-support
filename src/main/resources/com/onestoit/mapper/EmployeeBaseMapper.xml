@@ -24,4 +24,8 @@
 			#{skill}
 		);
 	</insert>
+	
+	<select id="alreadyExists">
+		select count(*) from onestoit_employee_base where employee_id = #{employeeId}
+	</select>
 </mapper>

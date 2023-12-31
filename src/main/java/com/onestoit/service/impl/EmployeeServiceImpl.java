@@ -6,6 +6,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.onestoit.controller.Code;
+import com.onestoit.controller.Result;
 import com.onestoit.model.Employee;
 import com.onestoit.model.EmployeeBase;
 import com.onestoit.model.WorkHistory;
@@ -22,7 +24,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	WorkHistoryService workHistoryService;
 	
 	@Override
-	public boolean save(Employee e) {
+	public Result save(Employee e) {
 		EmployeeBase eb = (EmployeeBase)e;
 		
 		//　パスワード暗号化
@@ -32,16 +34,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 		
 		ArrayList<WorkHistory> whs = e.getWorkHistorys();
 		
-		int re1 = employeeBaseService.save(eb);
+		Result re1 = employeeBaseService.save(eb);
 		
-		if (re1 == 0) {
-			return false;
+		if (re1.getCode() == Code.SAVE_ERROR || whs.size() == 0) {
+			return re1;
 		}
-		if (whs.size() == 0) {
-			return true;
-		} 
-		int re2 = workHistoryService.batchSave(whs);
-		return re2 == whs.size();
+		return workHistoryService.batchSave(whs);
 	}
 
 }

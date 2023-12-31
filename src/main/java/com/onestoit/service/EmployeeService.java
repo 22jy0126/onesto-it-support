@@ -2,6 +2,7 @@ package com.onestoit.service;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.onestoit.controller.Result;
 import com.onestoit.model.Employee;
 
 @Transactional
@@ -11,5 +12,5 @@ public interface EmployeeService {
 	 * @param e
 	 * @return
 	 */
-	boolean save(Employee e);
+	Result save(Employee e);
 }

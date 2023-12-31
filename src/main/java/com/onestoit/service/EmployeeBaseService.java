@@ -2,6 +2,7 @@ package com.onestoit.service;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.onestoit.controller.Result;
 import com.onestoit.model.EmployeeBase;
 
 @Transactional
@@ -11,5 +12,12 @@ public interface EmployeeBaseService {
 	 * @param eb
 	 * @return
 	 */
-	int save(EmployeeBase eb);
+	Result save(EmployeeBase eb);
+	
+	/**
+	 * 社員Id既に登録したかどうか調べる
+	 * @param EmployeeId
+	 * @return
+	 */
+	Result alreadyExists(String EmployeeId);
 }
