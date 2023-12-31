@@ -24,6 +24,7 @@ dependencies {
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.2'
 	implementation 'org.apache.commons:commons-lang3:3.0'
 	implementation 'commons-codec:commons-codec:1.16.0'
+	implementation 'com.google.code.gson:gson:2.8.9'
 }
 
 tasks.named('test') {
