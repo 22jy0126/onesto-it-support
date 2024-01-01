@@ -3,6 +3,7 @@ package com.onestoit.mapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.onestoit.model.Customer;
+import com.onestoit.model.User;
 
 @Mapper
 public interface CustomerMapper {
@@ -19,4 +20,10 @@ public interface CustomerMapper {
 	 * @return
 	 */
 	int alreadyExists(String username);
+	
+	/**
+	 * 顧客ログイン
+	 * @return
+	 */
+	Customer login(User u);
 }

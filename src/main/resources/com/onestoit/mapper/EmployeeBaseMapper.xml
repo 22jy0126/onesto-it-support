@@ -6,6 +6,8 @@
 	<insert id="save">
 		INSERT INTO onestoit_employee_base (
 			employee_id,
+			username,
+			type,
 			name,
 			gender,
 			birthday,
@@ -15,6 +17,8 @@
 			skill
 		) VALUES (
 			#{employeeId},
+			#{username},
+			#{type},
 			#{name},
 			#{gender},
 			#{birthday},
@@ -27,5 +31,10 @@
 	
 	<select id="alreadyExists">
 		select count(*) from onestoit_employee_base where employee_id = #{employeeId}
+	</select>
+	
+	<!-- 社員ログイン -->
+	<select id="login">
+		select * from onestoit_employee_base where employee_id = #{username} and password = #{password};
 	</select>
 </mapper>

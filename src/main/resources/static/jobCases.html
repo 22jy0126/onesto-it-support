@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
-
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
 <el-container id="app" v-cloak>
@@ -24,10 +24,7 @@
             ブリッジ
         </div>
         <div class="login-info">
-            <el-badge :value="user.noticeCount" class="item">
-                <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-            </el-badge>
-            {{user.username}}さん、こんにちは！
+            {{user.name}}さん、こんにちは！
         </div>
     </header>
 
@@ -64,15 +61,6 @@
                                     v-model="searchJobCase.caseName">
                             </el-input>
                         </div>
-                        <!-- <div class="search-item">
-                            <div class="search-label">
-                                予定期間
-                            </div>
-                            <el-input-number
-                                    v-model="searchJobCase.maxDays" :min="1" :max="999">
-                            </el-input-number>
-                            <div class="mark">以内</div>
-                        </div> -->
                         <div class="search-item">
                             <div class="search-label">
                                 報酬
@@ -138,6 +126,7 @@
 </body>
 </html>
 <script src="./js/pageJump.js"></script>
+<script src="./js/utils.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -150,7 +139,7 @@
             return {
                 // ログインしたユーザー情報
                 user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
+                    // avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
                     username: "鈴木　奈々", // ユーザー名
                     noticeCount: 2, // 通知数
                 },
@@ -203,6 +192,31 @@
                 },
                 
             };
+        },
+        mounted() {
+            const loading = this.$loading({
+                lock: true,
+                text: 'Loading',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.1)'
+            });
+            axios({
+                method: "GET",
+                url: "/login/info",
+                withCredentials: true,
+            })
+                .then((res) => {
+                    loading.close();
+                    const { data: {
+                        code,
+                        data: user = {},
+                    } = {} } = res;
+                    if (code != 80011) {
+                        goLogin(1);
+                    } else {
+                        this.user = user;
+                    }
+                })
         },
         methods: {
             goEmployeeInfo,

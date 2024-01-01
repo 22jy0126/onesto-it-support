@@ -2,7 +2,7 @@ package com.onestoit.model;
 
 import java.util.Date;
 
-public class EmployeeBase {
+public class EmployeeBase extends User {
 	// 社員番号
 	private String employeeId;
 	// 氏名
@@ -11,27 +11,15 @@ public class EmployeeBase {
 	private Integer gender;
 	// 生年月日
 	private Date birthday;
-	// パスワード
-	private String password;
 	// 電話番号
 	private String tel;
 	// メールアドレス
 	private String email;
 	// 経験開発言語
 	private String skill;
+	// 通知数
+	private Integer noticeCount;  
 	
-	public EmployeeBase(String employeeId, String name, Integer gender, Date birthday, String password, String tel,
-			String email, String skill) {
-		super();
-		this.employeeId = employeeId;
-		this.name = name;
-		this.gender = gender;
-		this.birthday = birthday;
-		this.password = password;
-		this.tel = tel;
-		this.email = email;
-		this.skill = skill;
-	}
 	public EmployeeBase() {
 		super();
 	}
@@ -59,12 +47,6 @@ public class EmployeeBase {
 	public void setBirthday(Date birthday) {
 		this.birthday = birthday;
 	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
 	public String getTel() {
 		return tel;
 	}
@@ -83,11 +65,5 @@ public class EmployeeBase {
 	public void setSkill(String skill) {
 		this.skill = skill;
 	}
-	@Override
-	public String toString() {
-		return "EmployeeBase [employeeId=" + employeeId + ", name=" + name + ", gender=" + gender + ", birthday="
-				+ birthday + ", password=" + password + ", tel=" + tel + ", email=" + email + ", skill=" + skill + "]";
-	}
-	
 	
 }

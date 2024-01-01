@@ -125,7 +125,10 @@
                 axios({
                     method: "POST",
                     url: "/register/cst/save",
-                    data: this.customerInfo,
+                    data: {
+                        type: 1,
+                        ...this.customerInfo
+                    },
                     withCredentials: true
                 })
                     .then((res = {}) => {
@@ -135,6 +138,7 @@
                             this.$message.error('只今、登録できません、少し後でもう一度お試してください');
                         } else {
                             this.$message.success('登録しました');
+                            localStorage.removeItem("tempCustomerInfo");
                             setTimeout(() => {
                                 goCustomerRegisterComplete();
                             }, 1000);

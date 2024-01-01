@@ -3,6 +3,7 @@ package com.onestoit.mapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.onestoit.model.EmployeeBase;
+import com.onestoit.model.User;
 
 @Mapper
 public interface EmployeeBaseMapper {
@@ -19,4 +20,11 @@ public interface EmployeeBaseMapper {
 	 * @return
 	 */
 	int alreadyExists(String employeeId);
+	
+	/**
+	 * 社員ログイン
+	 * @param eb
+	 * @return
+	 */
+	EmployeeBase login(User u);
 }

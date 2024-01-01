@@ -235,7 +235,11 @@
                 axios({
                     method: "POST",
                     url: "/register/emp/save",
-                    data: this.employeeInfo,
+                    data: {
+                        username: this.employeeInfo.employeeId,
+                        type: 2,
+                        ...this.employeeInfo,
+                    },
                     withCredentials: true
                 })
                     .then((res = {}) => {

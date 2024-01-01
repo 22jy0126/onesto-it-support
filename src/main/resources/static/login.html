@@ -44,11 +44,11 @@
                     <div class="edit-item-wrapper">
                         <div class="form-item">
                             <label class="label" for="">
-                                ユーザ名：
+                                ユーザ名：<br />（社員番号）
                             </label>
                             <el-input 
                                 clearable
-                                placeholder="ユーザ名を入力してください"
+                                placeholder="ユーザ名・社員番号を入力してください"
                                 @input="errClean('username')"
                                 v-bind:class="errors.username  ? 'input-err' : ''"
                                 v-model="loginInfo.username"></el-input>
@@ -81,7 +81,7 @@
                             <label class="label radio-label"  for="">
                                 あなたは：
                             </label>
-                            <el-radio-group v-model="loginInfo.role">
+                            <el-radio-group v-model="loginInfo.type">
                                 <el-radio :label="1">お客様</el-radio>
                                 <el-radio :label="2">社員</el-radio>
                                 <el-radio :label="3">管理者</el-radio>
@@ -113,6 +113,7 @@
     </main>
 </body>
 </html>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="./js/pageJump.js"></script>
 <script>
 	// elementの日本語対応
@@ -129,7 +130,7 @@
                 loginInfo: {
                     username: "",
                     password: "",
-                    role: 1,
+                    type: 1,
 				},
                 errors: {
                     username: false,
@@ -140,7 +141,7 @@
         mounted() {
             const emp = getURLParam("emp");
             if (emp == "1") {
-                this.loginInfo.role = 2;
+                this.loginInfo.type = 2;
             }
         },
         methods: {
@@ -164,7 +165,7 @@
                 const {
                     username = "",
                     password = "",
-                    role,
+                    type,
                 } = this.loginInfo;
                 let flag = true;
                 if (username == "") {
@@ -178,14 +179,43 @@
                 if (!flag) {
                     return;
                 }
+
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+
+                axios({
+                    method: "POST",
+                    url: "/login",
+                    data: this.loginInfo,
+                    withCredentials: true
+                })
+                    .then((res) => {
+                        const { data: {
+                            code,
+                            msg,
+                        } = {} } = res;
+                        if (code == 90050) {
+                            this.$message.error(msg);
+                        } else {
+                            this.$message.success("ログインしました！");
+                            setTimeout(() => {
+                                if (type == 1) {
+                                    goCustomerCaseEdit();
+                                }
+                                if (type == 2) {
+                                    goJobCases();
+                                }
+                            }, 1000);
+                        }
+                    })
+
                 //TODO: サーバーに送る
                 
-                if (role == 1) {
-                    goCustomerCaseEdit();
-                }
-                if (role == 2) {
-                    goJobCases();
-                }
+                
             }
         },
     });

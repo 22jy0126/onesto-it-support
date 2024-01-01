@@ -7,6 +7,7 @@
 	<insert id="save">
 		INSERT INTO onestoit_customer (
 			username,
+			type,
 			name,
 			password,
 			tel,
@@ -18,6 +19,7 @@
 			addr4
 		) VALUES (
 			#{username},
+			#{type},
 			#{name},
 			#{password},
 			#{tel},
@@ -32,6 +34,11 @@
 	
 	<!-- 新規顧客のユーザ名名既にあるかどうかを調べる -->
 	<select id="alreadyExists">
-		select count(*) from onestoit_customer where username = #{username}
+		select count(*) from onestoit_customer where username = #{username};
+	</select>
+	
+	<!-- 顧客ログイン -->
+	<select id="login">
+		select * from onestoit_customer where username = #{username} and password = #{password};
 	</select>
 </mapper>

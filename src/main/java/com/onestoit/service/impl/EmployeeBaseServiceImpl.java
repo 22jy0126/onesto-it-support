@@ -9,6 +9,7 @@ import com.onestoit.controller.Code;
 import com.onestoit.controller.Result;
 import com.onestoit.mapper.EmployeeBaseMapper;
 import com.onestoit.model.EmployeeBase;
+import com.onestoit.model.User;
 import com.onestoit.service.EmployeeBaseService;
 
 @Service
@@ -37,4 +38,9 @@ public class EmployeeBaseServiceImpl implements EmployeeBaseService {
 		return new Result(Code.GET_OK, res);
 	}
 
+	@Override
+	public Result login(User u) {
+		EmployeeBase res = mapper.login(u);
+		return new Result(Code.LOGIN_OK, res);
+	}
 }

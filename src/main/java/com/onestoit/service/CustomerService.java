@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.onestoit.controller.Result;
 import com.onestoit.model.Customer;
+import com.onestoit.model.User;
 
 @Transactional
 public interface CustomerService {
@@ -20,4 +21,11 @@ public interface CustomerService {
 	 * @return
 	 */
 	Result alreadyExists(String username);
+	
+	/**
+	 * 顧客ログイン
+	 * @param c
+	 * @return
+	 */
+	Result login(User u);
 }

@@ -259,7 +259,7 @@
                         </div>
                     </div>      
                 </div>
-                <div class="form-item btn-form-item">
+                <div class="register-btn-line customer-register">
                     <el-button 
                         @click="onCreate"
                         type="primary">登録する</el-button>
@@ -298,7 +298,7 @@
                     addr4: "",     // 建物名・部屋番号
 				},
                 usernameCheck: false,
-                checkedUsername: "",
+                // checkedUsername: "",
                 errors: {
                     username: false,
                     usernameDuplicate: false,
@@ -321,7 +321,9 @@
             if (customerInfoStr != "") {
                 const customerInfo = JSON.parse(customerInfoStr);
                 this.customerInfo = customerInfo;
+                this.usernameCheck = true;
             }
+            
         },
         methods: {
             checkUsername() {
@@ -346,7 +348,7 @@
                             this.usernameCheck = false;
                         } else {
                             this.usernameCheck = true;
-                            this.checkedUsername = this.customerInfo.username;
+                            // this.checkedUsername = this.customerInfo.username;
                         }
                     });
             },

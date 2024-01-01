@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.onestoit.controller.Result;
 import com.onestoit.model.EmployeeBase;
+import com.onestoit.model.User;
 
 @Transactional
 public interface EmployeeBaseService {
@@ -20,4 +21,11 @@ public interface EmployeeBaseService {
 	 * @return
 	 */
 	Result alreadyExists(String EmployeeId);
+	
+	/**
+	 * 社員ログイン
+	 * @param eb
+	 * @return
+	 */
+	Result login(User u);
 }
