@@ -22,6 +22,7 @@
 			#{workContent}
 		);
 	</insert>
+	
 	<insert id="batchSave">
 		INSERT INTO onestoit_work_history (
 			employee_id,
@@ -42,4 +43,9 @@
 			)
 		</foreach>
 	</insert>
+	
+	<!-- 社員番号で職歴を検索する -->
+	<select id="getByEmployeeId">
+		select * from onestoit_work_history where employee_id = #{item.employeeId};
+	</select>
 </mapper>

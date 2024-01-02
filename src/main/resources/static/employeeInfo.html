@@ -31,9 +31,6 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <el-badge :value="user.noticeCount" class="item">
-                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge>
                 {{user.username}}さん、こんにちは！
             </div>
         </header>
@@ -56,47 +53,54 @@
                     <!-- TODO: 内容はここに書く -->
                     
                     <!--プロフィール-->
-                    <section>
+					<section>
 						<div class="common-caption">
-	                        <i class="el-icon-notebook-1 icon"></i>
-	                        プロフィール
-                    	</div>
-                    	
-                    	<el-card class="box-card">
-							 <div class="profile">
+							<i class="el-icon-notebook-1 icon"></i>
+							プロフィール
+						</div>
+					
+						<el-card class="box-card">
+							<div class="profile">
 								<table>
-								<tr>
-									<td>
-										<i class="el-icon-user icon"></i>
-										{{employeeInfo.name}}
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<i class="el-icon-s-opportunity icon"></i>
-										{{employeeInfo.birthday}}	
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<i class="el-icon-message icon"></i>
-										{{employeeInfo.email}}	
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<i class="el-icon-phone icon"></i>
-										{{employeeInfo.tel}}	
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<i class="el-icon-setting icon"></i>
-										{{employeeInfo.skill}}
-									</td>
-								</tr>
-							</table>
-							 </div>
+									<tr>
+										<td>
+											<i class="el-icon-user icon"></i>
+											<span class="pro-label">氏名</span>
+											{{employeeInfo.name}}
+											<span>（{{employeeInfo.genderVal}}）</span>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="el-icon-s-opportunity icon"></i>
+											<span class="pro-label">生年月日</span>
+											{{employeeInfo.birthdayVal}}
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="el-icon-phone icon"></i>
+											<span class="pro-label">TEL</span>
+											{{employeeInfo.tel}}
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="el-icon-message icon"></i>
+											<span class="pro-label">Email</span>
+											{{employeeInfo.email}}
+										</td>
+									</tr>
+					
+									<tr>
+										<td>
+											<i class="el-icon-setting icon"></i>
+											<span class="pro-label">経験開発ツール</span>
+											{{employeeInfo.skill}}
+										</td>
+									</tr>
+								</table>
+							</div>
 						</el-card>
 					</section>
 					<!--職務経歴-->
@@ -106,7 +110,8 @@
 							職務経歴
 						</div>
 						<el-timeline>
-							<el-timeline-item v-for="history in employeeInfo.workHistorys" :timestamp=`${history.workStartVal}～` placement="top">
+							<el-timeline-item v-for="history in employeeInfo.workHistorys"
+								:timestamp=`${history.workStartVal}～${history.workEndVal}` placement="top">
 								<el-card>
 									<h4>{{history.workName}}</h4>
 									<table class="history">
@@ -115,7 +120,7 @@
 												開発期間
 											</th>
 											<td>
-												{{history.workPeriod}}日
+												{{history.workPeriod}}日 （ {{history.workPeriodVal}} ）
 											</td>
 										</tr>
 										<tr>
@@ -131,7 +136,9 @@
 												概要
 											</th>
 											<td>
-												{{history.workContent}}
+												<div class="long-text">
+													{{history.workContent}}
+												</div>
 											</td>
 										</tr>
 										<tr>

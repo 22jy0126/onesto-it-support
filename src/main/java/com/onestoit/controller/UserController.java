@@ -3,16 +3,19 @@ package com.onestoit.controller;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.onestoit.model.Customer;
+import com.onestoit.model.Employee;
 import com.onestoit.model.EmployeeBase;
 import com.onestoit.model.User;
 import com.onestoit.service.CustomerService;
 import com.onestoit.service.EmployeeBaseService;
+import com.onestoit.service.EmployeeService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -23,7 +26,30 @@ public class UserController {
 	EmployeeBaseService employeeBaseService;
 	
 	@Autowired
+	EmployeeService employeeService;
+	
+	@Autowired
 	CustomerService customerService;
+	
+	@PostMapping("/register/emp/save")
+	Result save(@RequestBody Employee e) {
+		return employeeService.save(e);
+	}
+	
+	@GetMapping("/register/emp/alreadyExists/{employeeId}")
+	Result alreadyExists(@PathVariable String employeeId) {
+		return employeeBaseService.alreadyExists(employeeId);
+	}
+	
+	@PostMapping("/register/cst/save")
+	Result save(@RequestBody Customer c) {
+		return customerService.save(c);
+	}
+	
+	@PostMapping("/register/cst/exists")
+	Result alreadyExists(@RequestBody Customer c) {
+		return customerService.alreadyExists(c.getUsername());
+	}
 	
 	@PostMapping("/login")
 	Result login(@RequestBody User u, HttpSession session) {
