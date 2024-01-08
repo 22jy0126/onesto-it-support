@@ -67,6 +67,9 @@ const goMilestoneProgressUpdate = () => {
 };
 
 // 社員・通知
+const goEmployeeNotification = () => {
+    goTo("employeenotification.html");
+}
 
 // お客様・お客様の登録
 const goCustomerRegister = () => {

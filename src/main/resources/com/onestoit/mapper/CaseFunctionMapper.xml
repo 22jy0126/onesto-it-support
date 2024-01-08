@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.onestoit.mapper.CaseFunctionMapper">
+	<insert id="batchSave">
+		INSERT INTO onestoit_case_function (
+			id,
+			case_id,
+			function_desc
+		) VALUES 
+		<foreach collection="list" separator="," item="item">
+			(
+				#{item.id},
+				#{item.caseId},
+				#{item.functionDesc}
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 案件削除 -->
+	<delete id="deleteByCaseId">	
+		delete from onestoit_case_function where case_id = #{caseId};
+	</delete>
+	
+	<!-- 案件検索 -->
+	<select id="findByCaseId">
+		select * from onestoit_case_function where case_id = #{caseId};
+	</select>
+</mapper>

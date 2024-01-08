@@ -46,6 +46,6 @@
 	
 	<!-- 社員番号で職歴を検索する -->
 	<select id="getByEmployeeId">
-		select * from onestoit_work_history where employee_id = #{item.employeeId};
+		select * from onestoit_work_history where employee_id = #{employeeId};
 	</select>
 </mapper>

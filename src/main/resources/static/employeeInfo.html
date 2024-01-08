@@ -31,7 +31,8 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                {{user.username}}さん、こんにちは！
+                {{employeeInfo.name}}さん、こんにちは！
+				<span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
 
@@ -163,7 +164,8 @@
 </body>
 
 </html>
-<script src="./js/utils.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="js/utils.js"></script>
 <script src="./js/pageJump.js"></script>
 <script>
     // elementの日本語対応
@@ -175,59 +177,94 @@
         el: "#app",
         data() {
             return {
-                // ログインしたユーザー情報
-                user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    username: "鈴木　奈々", // ユーザー名
-                    noticeCount: 2, // 通知数
-                },
-                // 求人票のデータ
-                employeeInfo: {
-					// name: "鈴木　奈々",
-					// birthday: "2000年1月1日",
-					// mail: "xxxxxxxx@jec.ac.jp",
-					// tell: "090-4564-xxxx",
-					// skill: "VBA,java",
-					// workHistorys:[{
-					// 	project: "業務管理システムのリニューアル",
-					// 	startMonth:"2018/4",//開発開始月
-					// 	dperiod: "115日",//開発期間
-					// 	post:"エンジニア",//役職
-					// 	responsible:"設計、実装、テスト",//担当内容
-					// 	dlanguage:"java",//使用言語
-					// 	desc: "企業内の業務管理を支援するためのシステムをリニューアル。新機能の追加、既存機能の最適化、ユーザビリティの向上を図り、効率的で使いやすいシステムの構築。",
-					// }, {
-					// 	project: " ヘルプデスクの効率化",
-					// 	startMonth:"2019/6",//開発開始月
-					// 	dperiod: "80日",//開発期間
-					// 	post:"システムエンジニア",//役職
-					// 	responsible:"自動化ツールの導入、タスクの優先度付けの見直し",//担当内容
-					// 	dlanguage:"java",//使用言語
-					// 	desc: "ユーザーサポートプロセスの改善を目的としたプロジェクト。自動化ツールの導入、タスクの優先度付けの見直し、ユーザートレーニングの強化などを通じて、ヘルプデスクの効率を向上させる。",
-					// }],
-				},
+                employeeInfo: {},
             };
         },
 		mounted() {
-			const employeeInfoStr = localStorage.getItem("tempEmployeeInfo") || "";
-			if (employeeInfoStr != "") {
-				const employeeInfo = JSON.parse(employeeInfoStr);
+			const loading = this.$loading({
+				lock: true,
+				text: 'Loading',
+				spinner: 'el-icon-loading',
+				background: 'rgba(0, 0, 0, 0.1)'
+			});
+			axios({
+				method: "GET",
+				url: "/logged/emp/info",
+				withCredentials: true,
+			})
+				.then((res) => {
+					loading.close();
+					const { data: {
+						code,
+						data: employeeInfo = {},
+					} = {} } = res;
+					if (code == 80000) {
+						goLogin(1);
+					} else {
+						const {
+							birthday,
+							gender,
+							workHistorys = [],
+						} = employeeInfo;
+						const birthdayVal = dateFormat(birthday);
+						employeeInfo.birthdayVal = birthdayVal;
+						let genderVal;
+						switch (gender) {
+							case 0:
+								genderVal = "男性";
+								break;
+							case 1:
+								genderVal = "女性";
+								break;
+							case 2:
+								genderVal = "指定しない";
+								break;
+						}
+						employeeInfo.genderVal = genderVal;
+						workHistorys.forEach((item = {}) => {
+							const {
+								workStart,
+								workPeriod = 0,
+							} = item;
+							const workStartVal = dateFormat2(workStart);
+							const workEndVal = dateFormat2(new Date(workStart).setDate(workPeriod));
+							item.workStartVal = workStartVal;
+							item.workEndVal = workEndVal;
+							const period = workPeriod % 30 == 0 ? Math.round(workPeriod / 30) : (workPeriod / 30).toFixed(1);
+							const workPeriodVal = `約${period}ヶ月`;
+							item.workPeriodVal = workPeriodVal;
+						});
 
-				// 日付のフォーマット処理
-				const {
-					birthday,
-				} = employeeInfo;
-				const birthdayVal = dateFormat(birthday);
-				employeeInfo.birthdayVal = birthdayVal;
-
-				const workHistorys = [...this.employeeInfo.workHistorys];
-
-				this.employeeInfo = employeeInfo;
-			}
+						this.employeeInfo = employeeInfo;
+					}
+				})
 		},
 		methods: {
 			goJobCases,
 			goEmployeeApplyHistory,
+			logout() {
+				const loading = this.$loading({
+					lock: true,
+					text: 'Loading',
+					spinner: 'el-icon-loading',
+					background: 'rgba(0, 0, 0, 0.1)'
+				});
+				axios({
+					method: "GET",
+					url: "/logout",
+					withCredentials: true,
+				})
+					.then((res = {}) => {
+						loading.close();
+						const { data: {
+							code,
+							msg = "",
+						} = {} } = res;
+						this.$message.success(msg);
+						sessionStorage.removeItem("userinfo");
+						setTimeout(() => goLogin(1), 1000);
+					});
+			}
 		}
     });
 </script>

@@ -25,6 +25,7 @@
         </div>
         <div class="login-info">
             {{user.name}}さん、こんにちは！
+            <span class="logout" @click="logout">ログアウト</span>
         </div>
     </header>
 
@@ -38,7 +39,12 @@
                 <el-menu-item index="1">求人一覧</el-menu-item>
                 <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
                 <el-menu-item index="3" @click="goEmployeeApplyHistory">応募歴史</el-menu-item>
-                <el-menu-item index="4">通知</el-menu-item>
+                <el-menu-item index="4" @click="goEmployeeNotification">
+                    <el-badge v-if="true" value="2" class="notice-badge">
+                        <div>通知</div>
+                    </el-badge>
+                    <div v-if="false">通知</div>
+                </el-menu-item>
             </el-menu>
         </el-aside>
 
@@ -58,20 +64,20 @@
                             <el-input
                                     clearable
                                     placeholder="求人名を入力して検索"
-                                    v-model="searchJobCase.caseName">
+                                    v-model="search.caseName">
                             </el-input>
                         </div>
                         <div class="search-item">
                             <div class="search-label">
                                 報酬
                             </div>
-                            <el-input-number v-model="searchJobCase.minMoney" :min="0.1" :max="99999">
+                            <el-input-number v-model="search.bonusMoney" :min="0.1" :max="99999">
                             </el-input-number>
                             <div class="mark">万円以上</div>
                         </div>
                         <div class="search-item">
-                            <el-button type="primary">検索</el-button>
-                            <el-button type="info">リセット</el-button>
+                            <el-button type="primary" @click="searchCases">検索</el-button>
+                            <el-button type="info" @click="searchReset">リセット</el-button>
                         </div>
                     </div>
                 </section>
@@ -80,14 +86,14 @@
                 <section>
                     <div class="common-caption">
                         <i class="el-icon-document icon"></i>
-                        合計<span class="em">15件</span>の求人案件を見つかりました
+                        合計<span class="em">{{totalCount}}件</span>の求人案件を見つかりました
                     </div>
                     <div class="job-case-item" v-for="job in jobList">
                         <div class="case-name-line">
                             <div class="case-name">{{job.caseName}}</div>
                             <div>
                                 <span>開発期限:</span>
-                                <span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
+                                <span>{{job.deadlineVal}}</span>
                             </div>
                         </div>
                         <div class="case-sub">
@@ -115,7 +121,11 @@
                 </section>
                 <!-- ページ -->
                 <section>
-                    <el-pagination layout="prev, pager, next" :total="50">
+                    <el-pagination 
+                        layout="prev, pager, next" 
+                        :page-size="10"
+                        :current-page="search.pageNum"
+                        :total="totalCount">
                     </el-pagination>
                 </section>
             </el-main>
@@ -181,16 +191,11 @@
                     deadline: "2024年2月20日"                // 開発期限
                 }],
                 // 求人票の検索
-                searchJobCase: {
-                    maxDays: 10,
-                    minMoney: 1,
+                search: {
+                    pageSize: 10,
                 },
-                // 求人票の検索
-                searchJobCase: {
-                    maxDays: 10,
-                    minMoney: 1,
-                },
-                
+                pageNum: 1,
+                totalCount: 0,
             };
         },
         mounted() {
@@ -218,10 +223,118 @@
                     }
                 })
         },
+        mounted() {
+            // ユーザー情報をゲット
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 2) {
+                    goLogin(1);
+                } else {
+                    this.user = user;
+                }
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 2) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.jobCase.customerId = user.customerId;
+                            sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        }
+                    })
+            }
+            this.searchCases();
+        },
         methods: {
             goEmployeeInfo,
             goEmployeeApplyHistory,
             goCaseDetail,
+            goEmployeeNotification,
+            searchCases() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "POST",
+                    url: "/logged/case/getByPage",
+                    data: {
+                        ...this.search,
+                        fromNum: (this.pageNum - 1) * 10,
+                        status: 1,
+                    },
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data = {},
+                        } = {} } = res;
+                        if (code == 20041) {
+                            const {
+                                list = [],
+                                totalCount,
+                            } = data;
+                            this.totalCount = totalCount;
+                            list.forEach((item = {}) => {
+                                const { deadline } = item;
+                                const deadlineVal = dateFormat(deadline);
+                                item.deadlineVal = deadlineVal;
+                            });
+                            this.jobList = list;
+                        }
+                    })
+            },
+            logout() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/logout",
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            msg = "",
+                        } = {} } = res;
+                        this.$message.success(msg);
+                        sessionStorage.removeItem("userinfo");
+                        setTimeout(() => goLogin(1), 1000);
+                    });
+            },
+            searchReset() {
+                this.search = {
+                    pageSize: 10,
+                };
+                this.pageNum = 1;
+                this.searchCases();
+            }
         }
     });
 </script>

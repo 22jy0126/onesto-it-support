@@ -21,6 +21,8 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="./js/pageJump.js"></script>
     <script src="js/utils.js"></script>
 </head>
 
@@ -32,10 +34,8 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <el-badge :value="user.noticeCount" class="item">
-                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge>
-                {{user.username}}さん、こんにちは！
+                {{user.name}}さん、こんにちは！
+                <span class="logout">ログアウト</span>
             </div>
         </header>
 
@@ -46,7 +46,7 @@
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="1" class="el-menu-vertical-demo">
                     <el-menu-item index="1">新規案件登録</el-menu-item>
-                    <el-menu-item index="2">私の案件</el-menu-item>
+                    <el-menu-item index="2" @click="goCustomerCaseView">私の案件</el-menu-item>
                     <el-menu-item index="3">通知</el-menu-item>
                 </el-menu>
             </el-aside>
@@ -138,38 +138,51 @@
             return {
                 // ログインしたユーザー情報
                 user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    username: "鈴木　奈々", // ユーザー名
-                    noticeCount: 2, // 通知数
+                    // avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
+                    // username: "鈴木　奈々", // ユーザー名
+                    // noticeCount: 2, // 通知数
                 },
-                jobCase: {
-                    caseName: "",         // 案件名
-                    requiredTech:  "",    // 必須技術条件
-                    // pulsTech:  "",        // プラス技術条件
-                    // number: 3,            // 募集人数
-                    // workDays: 15,         // 仕事予定期間
-                    bonusMoney: undefined,   //　報酬
-                    bonusMoneyNegotiable: false,       //　報酬相談可能
-                    description: "",        // 案件の説明
-                    deadline: "",   // 開発期限
-                    functions: [{
-                        id: 0,
-                        // functionName: "1",  // 機能名
-                        functionDesc: "機能1",  // 機能説明
-                        // err: true,
-                    }, {
-                        id: 1,
-                        // functionName: "2",  // 機能名
-                        functionDesc: "機能2",  // 機能説明
-                    }, {
-                        id: 2,
-                        // functionName: "3",  // 機能名
-                        functionDesc: "機能3",  // 機能説明
-                    }],
-                },
+                jobCase: {},
             };
         },
         mounted() {
+            // ユーザー情報をゲット
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 1) {
+                    goLogin();
+                } else {
+                    this.user = user;
+                }
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 1) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.jobCase.customerId = user.customerId;
+                            sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        }
+                    })
+            }
+
             const jobCaseStr = localStorage.getItem("tempJobCase");
             const jobCase = JSON.parse(jobCaseStr);
 
@@ -186,28 +199,65 @@
             onBackPage() {
                 window.history.back();
             },
-            onCaseCreate() {
-                //TODO: サーバーに案件の詳細を送る
-                // ...
-                this.$message({
-                    message: '新規案件を登録しました！',
-                    type: 'success'
+            caseSave(status, succMsg, errMsg) {
+                this.jobCase.status = status;
+                this.jobCase.customerId = this.user.customerId;
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
                 });
-                setTimeout(() => {
-                    // localStorageの一時的に保存した案件情報を削除する
-                    localStorage.removeItem("tempJobCase");
-
-                    // 私の案件に移動
-                }, 2000);
-                
+                axios({
+                    method: "POST",
+                    url: "/logged/case/saveCase",
+                    data: this.jobCase,
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data,
+                        } = {} } = res;
+                        if (code == 20011) {
+                            this.$message.success(succMsg);
+                            if (status == 1) {
+                                localStorage.removeItem("tempJobCase");
+                            }
+                        } else {
+                            this.$message.error(errMsg);
+                        }
+                    });
+            },
+            onCaseCreate() {
+                this.caseSave(1, "新規案件を登録しました！", "只今案件の登録ができません、後でもう一度お試しください！");
             },
             onDraftSave() {
-                //TODO: サーバーに案件の詳細を送る
-                this.$message({
-                    message: '下書きを保存しました！',
-                    type: 'success'
+                this.caseSave(0, "下書きを保存しました！", "只今案件の保存ができません、後でもう一度お試しください！");
+            },
+            logout() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
                 });
-                // 私の案件に移動
+                axios({
+                    method: "GET",
+                    url: "/logout",
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            msg = "",
+                        } = {} } = res;
+                        this.$message.success(msg);
+                        sessionStorage.removeItem("userinfo");
+                        setTimeout(() => goLogin(1), 1000);
+                    });
             }
         }
     });

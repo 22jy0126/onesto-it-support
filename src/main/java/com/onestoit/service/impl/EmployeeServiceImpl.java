@@ -3,25 +3,31 @@ package com.onestoit.service.impl;
 import java.util.ArrayList;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.onestoit.controller.Code;
 import com.onestoit.controller.Result;
+import com.onestoit.mapper.EmployeeBaseMapper;
+import com.onestoit.mapper.WorkHistoryMapper;
 import com.onestoit.model.Employee;
 import com.onestoit.model.EmployeeBase;
+import com.onestoit.model.User;
 import com.onestoit.model.WorkHistory;
-import com.onestoit.service.EmployeeBaseService;
 import com.onestoit.service.EmployeeService;
-import com.onestoit.service.WorkHistoryService;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+
 	@Autowired
-	EmployeeBaseService employeeBaseService;
+	EmployeeBaseMapper employeeBaseMapper;
 	
 	@Autowired
-	WorkHistoryService workHistoryService;
+	WorkHistoryMapper workHistoryMapper;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 	
 	@Override
 	public Result save(Employee e) {
@@ -34,12 +40,70 @@ public class EmployeeServiceImpl implements EmployeeService {
 		
 		ArrayList<WorkHistory> whs = e.getWorkHistorys();
 		
-		Result re1 = employeeBaseService.save(eb);
+		Result re1 = saveBase(eb);
 		
 		if (re1.getCode() == Code.SAVE_ERROR || whs.size() == 0) {
 			return re1;
 		}
-		return workHistoryService.batchSave(whs);
+		return batchWorkHistorySave(whs);
 	}
 
+	@Override
+	public Result saveBase(EmployeeBase eb) {
+		int res;
+		try {
+			res = employeeBaseMapper.save(eb);
+		} catch (Exception e) {
+			LOGGER.error("社員の基本情報保存のデータベースのエラーです", e);
+			return new Result(Code.SAVE_ERROR, null, "データベースのエラーです");
+		}
+		return new Result(Code.SAVE_OK, res);
+	}
+
+	@Override
+	public Result batchWorkHistorySave(ArrayList<WorkHistory> workHistorys) {
+		int res;
+		try {
+			res = workHistoryMapper.batchSave(workHistorys);
+		} catch (Exception e) {
+			return new Result(Code.SAVE_ERROR, null, "データベースのエラーです");
+		}
+		return new Result(Code.SAVE_OK, res);
+	}
+
+	@Override
+	public Result alreadyExists(String EmployeeId) {
+		int res = employeeBaseMapper.alreadyExists(EmployeeId);
+		return new Result(Code.GET_OK, res);
+	}
+
+	@Override
+	public Result login(User u) {
+		EmployeeBase res = employeeBaseMapper.login(u);
+		return new Result(Code.LOGIN_OK, res);
+	}
+
+	@Override
+	public Result getWorkHistorysByEmployeeId(String EmployeeId) {
+		ArrayList<WorkHistory> res = workHistoryMapper.getByEmployeeId(EmployeeId);
+		return new Result(Code.GET_OK, res);
+	}
+
+	@Override
+	public Result assembleToEmployee(EmployeeBase eb, ArrayList<WorkHistory> workHistorys) {
+		Employee e = new Employee();
+		e.setType(eb.getType());
+		e.setUsername(eb.getUsername());
+		e.setEmployeeId(eb.getEmployeeId());
+		e.setName(eb.getName());
+		e.setGender(eb.getGender());
+		e.setBirthday(eb.getBirthday());
+		e.setTel(eb.getTel());
+		e.setEmail(eb.getEmail());
+		e.setSkill(eb.getSkill());
+		e.setWorkHistorys(workHistorys);
+		return new Result(Code.GET_OK, e);
+	}
+	
+	
 }

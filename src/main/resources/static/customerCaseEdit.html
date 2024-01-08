@@ -21,7 +21,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
-
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -32,10 +32,8 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <el-badge :value="user.noticeCount" class="item">
-                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge>
-                {{user.username}}さん、こんにちは！
+                {{user.name}}さん、こんにちは！
+                <span class="logout">ログアウト</span>
             </div>
         </header>
 
@@ -204,14 +202,6 @@
                                             </el-button>
                                         </el-popconfirm>
                                     </div>
-                                    <!-- <div class="func-edit">
-                                        <div class="label">機能名</div>
-                                        <el-input 
-                                            placeholder="例：検索機能..." 
-                                            v-model="func.functionName" 
-                                            clearable>
-                                        </el-input>
-                                    </div> -->
                                     <div class="func-edit-wrapper">
                                         <div class="func-edit func-edit-top">
                                             <div class="label">機能説明</div>
@@ -269,28 +259,26 @@
         data() {
             return {
                 // ログインしたユーザー情報
-                user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    username: "田中　慎吾", // ユーザー名
-                    noticeCount: 2, // 通知数
-                },
+                user: {},
                 jobCase: {
-                    caseName: "",            // 案件名
-                    developTools: "",        // 希望開発ツール
-                    bonusMoney: undefined,   //　報酬
-                    bonusMoneyNegotiable: false,       //　報酬相談可能
-                    description: "",        // 案件の説明
-                    deadline: "",           // 開発期限
-                    functions: [{
-                        id: 0,
-                        functionDesc: "機能1********",  // 機能説明
-                    }, {
-                        id: 1,
-                        functionDesc: "機能2",  // 機能説明
-                    }, {
-                        id: 2,
-                        functionDesc: "機能3",  // 機能説明
-                    }],
+                    status: 0,
+                    functions: [],
+                    // caseName: "",            // 案件名
+                    // developTools: "",        // 希望開発ツール
+                    // bonusMoney: undefined,   //　報酬
+                    // bonusMoneyNegotiable: false,       //　報酬相談可能
+                    // description: "",        // 案件の説明
+                    // deadline: "",           // 開発期限
+                    // functions: [{
+                    //     id: 0,
+                    //     functionDesc: "機能1********",  // 機能説明
+                    // }, {
+                    //     id: 1,
+                    //     functionDesc: "機能2",  // 機能説明
+                    // }, {
+                    //     id: 2,
+                    //     functionDesc: "機能3",  // 機能説明
+                    // }],
                 },
                 // 技術選択肢
                 techs,
@@ -309,11 +297,79 @@
             };
         },
         mounted() {
-            const jobCaseStr = localStorage.getItem("tempJobCase") || "";
-            if (jobCaseStr != "") {
-                const jobCase = JSON.parse(jobCaseStr);
-                this.jobCase = jobCase;
+            // ユーザー情報をゲット
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 1) {
+                    goLogin();
+                } else {
+                    this.user = user;
+                }
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 1) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.jobCase.customerId = user.customerId;
+                            sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        }
+                    })
             }
+
+            // 編集している案件情報をゲット
+            const loading = this.$loading({
+                lock: true,
+                text: 'Loading',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.1)'
+            });
+            axios({
+                method: "POST",
+                url: "/logged/case/get",
+                data: {
+                    customerId: this.user.customerId,
+                    status: 0,
+                },
+                withCredentials: true,
+            })
+                .then((res = {}) => {
+                    loading.close();
+                    const { data: {
+                        code,
+                        data,
+                    } = {} } = res;
+                    if (code == 20041 && data == null) {
+                        const jobCaseStr = localStorage.getItem("tempJobCase") || "";
+                        if (jobCaseStr != "") {
+                            const jobCase = JSON.parse(jobCaseStr);
+                            const functions = jobCase.functions || [];
+                            if (functions.length == 0) {
+                                jobCase.functions = [];
+                            }
+                            this.jobCase = jobCase;
+                        }
+                    } else if (code == 20041 && data != null) {
+                        this.jobCase = data;
+                    }
+                })
         },
         methods: {
             goCustomerCaseView,
@@ -378,15 +434,11 @@
                 functions.splice(index, 1);
             },
             onFunctionAdd() {
-                const {
-                    functions = [],
-                    functionIdCnt,
-                } = this.jobCase;
+                const functions = [...(this.jobCase.functions || [])];
                 functions.push({
-                    id: functionIdCnt,
                     functionDesc: "",
                 });
-                this.functionIdCnt = functionIdCnt + 1;
+                this.jobCase.functions = functions;
             },
             onFunctionUp(index) {
                 const {
@@ -478,6 +530,31 @@
                 localStorage.setItem("tempJobCase", jobCaseStr);
                
                 goCustomerCaseDetail();
+            }, 
+            logout() {
+                console.log("logout");
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/logout",
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            msg = "",
+                        } = {} } = res;
+                        this.$message.success(msg);
+                            // sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        sessionStorage.removeItem("userinfo");
+                        setTimeout(() => goLogin(), 1000);
+                    });
             }
         }
     });

@@ -20,7 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
-
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -31,10 +31,8 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <el-badge :value="user.noticeCount" class="item">
-                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge>
                 {{user.username}}さん、こんにちは！
+                <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
 
@@ -47,7 +45,11 @@
                     <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
                     <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
                     <el-menu-item index="3">応募履歴</el-menu-item>
-                    <el-menu-item index="4">通知</el-menu-item>
+                    <el-menu-item index="4" @click="goEmployeeNotification">
+                        <el-badge value="2" class="notice-badge">
+                            <div>通知</div>
+                        </el-badge>
+                    </el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -192,7 +194,8 @@
         methods: {
             goJobCases,
             goEmployeeInfo,
-            goCaseDetail
+            goCaseDetail,
+            goEmployeeNotification
         },
     });
 </script>

@@ -537,3 +537,14 @@ body {
   padding-left: 20px;
   padding-top: 90px;
 }
+.notice-badge .el-badge__content {
+    top: 27px;
+    right: -5px;
+}
+.logout {
+    display: inline-block;
+    margin-left: 10px;
+    color: #409eff;
+    cursor: pointer;
+    text-decoration: underline;
+}

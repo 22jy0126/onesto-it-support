@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.onestoit.mapper.CaseBaseMapper">
+	<!-- 新規案件保存 -->
+	<insert id="save" useGeneratedKeys="true" keyProperty="caseId" keyColumn="case_id">
+		INSERT INTO onestoit_case_base (
+			case_id,
+			customer_id,
+			case_name,
+			bonus_money,
+			bonus_money_negotiable,
+			develop_tools,
+			description,
+			deadline,
+			status
+		) VALUES (
+			#{caseId},
+			#{customerId},
+			#{caseName},
+			#{bonusMoney},
+			#{bonusMoneyNegotiable},
+			#{developTools},
+			#{description},
+			#{deadline},
+			#{status}
+		);
+	</insert>
+	
+	<!-- 案件削除 -->
+	<delete id="deleteByCaseId">	
+		delete from onestoit_case_base where case_id = #{caseId};
+	</delete>
+	
+	<!-- 案件検索 -->
+	<select id="find">
+		select * from onestoit_case_base
+		<where>
+			<if test="caseId != null">
+				case_id = #{caseId}
+			</if>
+			<if test="customerId != null">
+				and customer_id = #{customerId}
+			</if>
+			<if test="caseName != null">
+				and case_name like CONCAT('%', #{caseName}, '%')
+			</if>
+			<if test="bonusMoney != null">
+				and bonus_money >= #{bonusMoney}
+			</if>
+			<if test="status != null">
+				and status = #{status}
+			</if>
+		</where>
+	</select>
+	
+	<!-- ページングで案件検索 -->
+	<select id="findByPage">
+		select * from onestoit_case_base
+		<where>
+			<if test="caseId != null">
+				case_id = #{caseId}
+			</if>
+			<if test="customerId != null">
+				and customer_id = #{customerId}
+			</if>
+			<if test="caseName != null">
+				and case_name like CONCAT('%', #{caseName}, '%')
+			</if>
+			<if test="bonusMoney != null">
+				and bonus_money >= #{bonusMoney}
+			</if>
+			<if test="status != null">
+				and status = #{status}
+			</if>
+		</where>
+		limit #{fromNum}, #{pageSize}
+	</select>
+	
+	<!-- 案件検索の結果の合計数 -->
+	<select id="getTotalCount">
+		select count(*) from onestoit_case_base
+		<where>
+			<if test="caseId != null">
+				case_id = #{caseId}
+			</if>
+			<if test="customerId != null">
+				and customer_id = #{customerId}
+			</if>
+			<if test="caseName != null">
+				and case_name like CONCAT('%', #{caseName}, '%')
+			</if>
+			<if test="bonusMoney != null">
+				and bonus_money >= #{bonusMoney}
+			</if>
+			<if test="status != null">
+				and status = #{status}
+			</if>
+		</where>
+	</select>
+</mapper>

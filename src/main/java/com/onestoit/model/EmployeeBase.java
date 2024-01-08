@@ -17,8 +17,6 @@ public class EmployeeBase extends User {
 	private String email;
 	// 経験開発言語
 	private String skill;
-	// 通知数
-	private Integer noticeCount;  
 	
 	public EmployeeBase() {
 		super();

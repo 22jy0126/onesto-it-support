@@ -1,5 +1,7 @@
 package com.onestoit.controller;
 
+import java.util.ArrayList;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +15,8 @@ import com.onestoit.model.Customer;
 import com.onestoit.model.Employee;
 import com.onestoit.model.EmployeeBase;
 import com.onestoit.model.User;
+import com.onestoit.model.WorkHistory;
 import com.onestoit.service.CustomerService;
-import com.onestoit.service.EmployeeBaseService;
 import com.onestoit.service.EmployeeService;
 
 import jakarta.servlet.http.HttpSession;
@@ -22,9 +24,6 @@ import jakarta.servlet.http.HttpSession;
 @RestController
 @RequestMapping
 public class UserController {
-	@Autowired
-	EmployeeBaseService employeeBaseService;
-	
 	@Autowired
 	EmployeeService employeeService;
 	
@@ -38,7 +37,7 @@ public class UserController {
 	
 	@GetMapping("/register/emp/alreadyExists/{employeeId}")
 	Result alreadyExists(@PathVariable String employeeId) {
-		return employeeBaseService.alreadyExists(employeeId);
+		return employeeService.alreadyExists(employeeId);
 	}
 	
 	@PostMapping("/register/cst/save")
@@ -72,7 +71,7 @@ public class UserController {
 			if (userType == 1) {  // 顧客の処理
 				res = customerService.login(u);
 			} else if (userType == 2) {   // 社員の処理
-				res = employeeBaseService.login(u);
+				res = employeeService.login(u);
 			}
 			
 			if (res.getData() == null) {   // ログイン失敗
@@ -85,6 +84,12 @@ public class UserController {
 		return res;
 	}
 	
+	@GetMapping("/logout")
+	Result logout(HttpSession session) {
+		session.removeAttribute("userinfo");
+		return new Result(Code.GET_OK, null, "ログアウトしました！");
+	}
+	
 	@GetMapping("/login/info")
 	Result getLoginUser(HttpSession session) {
 		User loginUser = (User)session.getAttribute("userinfo");
@@ -95,14 +100,28 @@ public class UserController {
 			Integer userType = loginUser.getType();
 			if (userType == 1) {   // 顧客の処理
 				Customer c = (Customer)session.getAttribute("userinfo");
+				c.setPassword("******");
 				res = new Result(Code.IS_LOGIN, c);
 			} else if (userType == 2) {
 				EmployeeBase eb = (EmployeeBase)session.getAttribute("userinfo");
+				eb.setPassword("******");
 				res = new Result(Code.IS_LOGIN, eb);
 			} else {
 				res = new Result(Code.IS_LOGIN, loginUser);
 			}
 		}
 		return res;
+	}
+	
+	@GetMapping("/logged/emp/info")
+	Result getEmployeeInfo(HttpSession session) {
+		EmployeeBase eb = (EmployeeBase)session.getAttribute("userinfo");
+		if (eb == null) {
+			return new Result(Code.ISNOT_LOGIN, null);
+		}
+		String employeeId = eb.getUsername();
+		Result historyRes = employeeService.getWorkHistorysByEmployeeId(employeeId);
+		ArrayList<WorkHistory> workHistorys = (ArrayList<WorkHistory>)historyRes.getData();
+		return employeeService.assembleToEmployee(eb, workHistorys);
 	}
 }

@@ -20,7 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
-
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -31,10 +31,7 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <el-badge :value="user.noticeCount" class="item">
-                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge>
-                {{user.username}}さん、こんにちは！
+                {{user.name}}さん、こんにちは！
             </div>
         </header>
 
@@ -44,16 +41,16 @@
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="1" class="el-menu-vertical-demo">
-                    <el-menu-item index="1">menu1</el-menu-item>
-                    <el-menu-item index="2">menu2</el-menu-item>
+					<el-menu default-active="2" class="el-menu-vertical-demo">
+						<el-menu-item index="1" @click="goCustomerCaseEdit">新規案件登録</el-menu-item>
+						<el-menu-item index="2">私の案件</el-menu-item>
+						<el-menu-item index="3">通知</el-menu-item>
+					</el-menu>
                 </el-menu>
             </el-aside>
 
             <el-container>
                 <el-main>
-                    <!-- TODO: 内容はここに書く -->
-                    
-                    
                     <!-- 登録案件リスト -->
 	                <section>
 	                    <div class="common-caption">
@@ -61,47 +58,28 @@
 	                        登録案件リスト
 	                    </div>
 	                    <div class="job-case-item" v-for="job in jobList">
-	                        <div class="case-name-line">
-								<!--求人プロジェクト名・開発期限-->
-	                            <div class="case-name">{{job.caseName}}</div>
-	                            <div>
-	                                <span>開発期限:</span>
-	                                <span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
-	                            </div>
-	                        </div>
-	                        <div class="case-sub">
-								<!--仕事予定期間-->
-	                            <div class="case-sub-day">
-	                                <span class="label">予定期間:&nbsp;&nbsp;&nbsp;</span>
-	                                <span>{{job.workDays}}日</span>
-	                            </div>
-	                            <!--報酬・相談可否-->
-	                            <div class="case-sub-money">
-	                                <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
-	                                <span>{{job.bonusMoney.toLocaleString()}}万円</span>
-	                                <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
-	                            </div>
-	                        </div>
-	                        <!--募集人数-->
-	                        <div class="case-sub">
-	                            <span class="label">募集人数:&nbsp;&nbsp;&nbsp;</span>
-	                            <span>{{job.number}}人</span>
-	                        </div>
-	                        <!--必須技術条件-->
-	                        <div class="case-sub">
-	                            <span class="label">希望開発言語:&nbsp;&nbsp;&nbsp;</span>
-	                            <span>{{job.requiredTech}}</span>
-	                        </div>
-	                        <!--プラス技術条件-->
-	                        <div class="case-sub">
-	                            <span class="label">プラス技術条件:&nbsp;&nbsp;&nbsp;</span>
-	                            <span>{{job.pulsTech ?  job.pulsTech: "指定なし"}}</span>
-	                        </div>
-	                        <!--求人説明-->
-	                        <div class="case-sub">
-	                            <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
-	                            <span>{{job.description}}</span>
-	                        </div>    
+							<div class="case-name-line">
+								<div class="case-name">{{job.caseName}}</div>
+								<div>
+									<span>開発期限:</span>
+									<span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
+								</div>
+							</div>
+							<div class="case-sub">
+								<div class="case-sub-money">
+									<span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
+									<span>{{job.bonusMoney.toLocaleString()}}万円</span>
+									<span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
+								</div>
+							</div>
+							<div class="case-sub">
+								<span class="label">希望開発ツール:&nbsp;&nbsp;&nbsp;</span>
+								<span>{{job.developTools}}</span>
+							</div>
+							<div class="case-sub">
+								<span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
+								<span>{{job.description}}</span>
+							</div>
 	                        
 	                        <div class="go-detail">
 	                            詳細>>
@@ -165,6 +143,8 @@
 </body>
 
 </html>
+<script src="./js/pageJump.js"></script>
+<script src="./js/utils.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -184,14 +164,11 @@
                 // 登録した求人票のデータ
                 jobList: [{
                     caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                    requiredTech: "HTML CSS",               //　必須技術条件
-                    pulsTech: "Javascript Java",            //　プラス技術条件
-                    number: 3,                              //　募集人数
-                    workDays: 15,                           //　仕事予定期間
-                    bonusMoney: 5,                    //　報酬
-                    bonusMoneyNegotiable: true,             //　報酬相談可能
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日",                // 開発期限
+					bonusMoney: 5,                    //　報酬
+					bonusMoneyNegotiable: true,             //　報酬相談可能
+					developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+					description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+					deadline: "2024年2月20日",              // 開発期限
                     
                     applicant: [
 	                    {aName: "山田　一",aGender:"男",aAge:"28",aLength:"4"},//名前、性別、年齢、勤続年数
@@ -199,14 +176,11 @@
                 	],
                 }, {
                     caseName: "従業員管理システムの制作",       // 求人プロジェクト名
-                    requiredTech: "HTML CSS",               //　必須技術条件
-                    pulsTech: "",            //　プラス技術条件
-                    number: 3,                              //　募集人数
-                    workDays: 15,                           //　仕事予定期間
-                    bonusMoney: 7.5,                    //　報酬
-                    bonusMoneyNegotiable: false,             //　報酬相談可能                                               
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2099年12月31日",
+                    bonusMoney: 5,                    //　報酬
+					bonusMoneyNegotiable: true,             //　報酬相談可能
+					developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+					description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+					deadline: "2024年2月20日",              // 開発期限
                     applicant: [
 	                    {aName: "中島　三太",aGender:"男",aAge:"34",aLength:"8"},//名前、性別、年齢、勤続年数},
 	                    {aName: "三須　四葉",aGender:"男",aAge:"29",aLength:"3"},//名前、性別、年齢、勤続年数},
@@ -214,16 +188,54 @@
                 	],
                 }, {
                     caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                    requiredTech: "HTML CSS",               //　必須技術条件
-                    pulsTech: "Javascript Java",            //　プラス技術条件
-                    number: 3,                              //　募集人数
-                    workDays: 15,                           //　仕事予定期間
                     bonusMoney: 5,                    //　報酬
-                    bonusMoneyNegotiable: true,             //　報酬相談可能
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日"                // 開発期限
+					bonusMoneyNegotiable: true,             //　報酬相談可能
+					developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+					description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+					deadline: "2024年2月20日",              // 開発期限
                 }]
             };
         },
+		mounted() {
+			// ユーザー情報をゲット
+			const userStr = sessionStorage.getItem("userinfo") || "";
+			if (userStr != "") {
+				const user = JSON.parse(userStr);
+				if (user.type != 1) {
+					goLogin();
+				} else {
+					this.user = user;
+				}
+			} else {
+				const loading = this.$loading({
+					lock: true,
+					text: 'Loading',
+					spinner: 'el-icon-loading',
+					background: 'rgba(0, 0, 0, 0.1)'
+				});
+				axios({
+					method: "GET",
+					url: "/login/info",
+					withCredentials: true,
+				})
+					.then((res) => {
+						loading.close();
+						const { data: {
+							code,
+							data: user = {},
+						} = {} } = res;
+						if (code != 80011 || user.type != 1) {
+							goLogin();
+						} else {
+							this.user = user;
+							this.jobCase.customerId = user.customerId;
+							sessionStorage.setItem("userinfo", JSON.stringify(user));
+						}
+					})
+			}
+		},
+		methods: {
+			goCustomerCaseEdit,
+		}
     });
 </script>
