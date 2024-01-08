@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.onestoit.mapper.CaseApplyMapper">
+	<!-- 新規応募 -->
+	<insert id="apply">
+		INSERT INTO onestoit_case_apply (
+			case_id,
+			employee_id,
+			apply_date,
+			bind
+		) VALUES (
+			#{caseId},
+			#{employeeId},
+			#{applyDate},
+			false
+		);
+	</insert>
+	
+	<!-- 案件開始 -->
+	<update id="applyBind">
+		UPDATE onestoit_case_apply set bind = true where case_id = #{caseId} and employee_id = #{employeeId};
+	</update>
+	
+	<select id="find">
+		select * from onestoit_case_apply
+		<where>
+			<if test="caseId != null">
+				case_id = #{caseId}
+			</if>
+			<if test="employeeId != null">
+				and employee_id = #{employeeId}
+			</if>
+		</where>
+	</select>
+</mapper>

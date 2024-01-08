@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.onestoit.controller.Result;
 import com.onestoit.model.Case;
+import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseBase;
 import com.onestoit.model.CaseFunction;
 import com.onestoit.model.PaginationCaseBaseReq;
@@ -53,4 +54,17 @@ public interface CaseService {
 	 * @return
 	 */
 	Result findOneCase(CaseBase cb);
+	
+	/**
+	 * 新規応募
+	 * @param ca
+	 * @return
+	 */
+	Result apply(CaseApply ca);
+	
+	/**
+	 * 応募検索
+	 * @return
+	 */
+	Result findCaseApply(CaseApply ca);
 }

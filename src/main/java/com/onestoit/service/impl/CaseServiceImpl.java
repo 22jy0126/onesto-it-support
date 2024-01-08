@@ -1,6 +1,7 @@
 package com.onestoit.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.onestoit.controller.Code;
 import com.onestoit.controller.Result;
+import com.onestoit.mapper.CaseApplyMapper;
 import com.onestoit.mapper.CaseBaseMapper;
 import com.onestoit.mapper.CaseFunctionMapper;
 import com.onestoit.model.Case;
+import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseBase;
 import com.onestoit.model.CaseFunction;
 import com.onestoit.model.PaginationCaseBaseReq;
@@ -28,6 +31,9 @@ public class CaseServiceImpl implements CaseService {
 
 	@Autowired
 	CaseFunctionMapper caseFunctionMapper;
+	
+	@Autowired
+	CaseApplyMapper caseApplyMapper;
 
 	@Override
 	public Result saveBase(CaseBase cb) {
@@ -43,7 +49,6 @@ public class CaseServiceImpl implements CaseService {
 
 	@Override
 	public Result saveFunctions(ArrayList<CaseFunction> functions) {
-		System.out.println("saveFunctions");
 		int res;
 		try {
 			res = caseFunctionMapper.batchSave(functions);
@@ -101,6 +106,7 @@ public class CaseServiceImpl implements CaseService {
 		c.setBonusMoneyNegotiable(caseBase.isBonusMoneyNegotiable());
 		c.setDeadline(caseBase.getDeadline());
 		c.setDevelopTools(caseBase.getDevelopTools());
+		c.setStatus(caseBase.getStatus());
 		c.setFunctions(functions);
 		return new Result(Code.GET_OK, c);
 	}
@@ -118,9 +124,25 @@ public class CaseServiceImpl implements CaseService {
 		PaginationCaseBaseRes pcbs = new PaginationCaseBaseRes();
 		pcbs.setList(list);
 		pcbs.setTotalCount(totalCount);
-		System.out.println(pcbs);
 		return new Result(Code.GET_OK, pcbs);
 	}
-	
-	
+
+	@Override
+	public Result apply(CaseApply ca) {
+		int res;
+		ca.setApplyDate(new Date());
+		try {
+			res = caseApplyMapper.apply(ca);
+		} catch (Exception e) {
+			LOGGER.error("新規案件応募のデータベースのエラーです", e);
+			return new Result(Code.SAVE_ERROR, null, "新規案件応募できませんでした");
+		}
+		return new Result(Code.SAVE_OK, res);
+	}
+
+	@Override
+	public Result findCaseApply(CaseApply ca) {
+		ArrayList<CaseApply> data = caseApplyMapper.find(ca);
+		return new Result(Code.GET_OK, data);
+	}
 }

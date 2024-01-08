@@ -21,7 +21,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
-    <script src="js/utils.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -150,15 +150,6 @@
                     noticeCount: 2, // 通知数
                 },
                 jobCase: {},
-                /**
-                 * 0 未応募
-                 * 1 既に応募した、結果出てこない
-                 * 2 既に応募した、不採用した
-                 * 3 既に応募した、案件開始中
-                 * 4 既に応募した、案件終わり
-                 */
-                // applyStatus: 0,
-                
             };
         },
         mounted() {
@@ -199,70 +190,66 @@
                     })
             }
 
-            // TODO: サーバから案件の詳細をリクエスト
-            const jobCase = {
-                caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                bonusMoney: 5,                    //　報酬
-                bonusMoneyNegotiable: true,             //　報酬相談可能
-                developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-                description: "学生の個人情報を管理して、保護者との連絡、学生の個人情報を管理して、保護者との連絡、学生の個人情報を管理して、保護者との連絡、学生の個人情報を管理して、保護者との連絡",   // 求人の説明
-                deadline: "2023-12-22T15:00:00.000Z",   // 開発期限
-                functions: [{
-                    id: 0,
-                    functionDesc: "学籍番号と氏名から学生個人情報が検索できる"
-                }, {
-                    id: 1,
-                    functionDesc: "学生の成績と出席率がチェックできる, 学生の成績と出席率がチェックできる, 学生の成績と出席率がチェックできる, 学生の成績と出席率がチェックできる, 学生の成績と出席率がチェックできる, 学生の成績と出席率がチェックできる, 学生の成績と出席率がチェックできる"
-                }, {
-                    id: 3,
-                    functionDesc: "システムを通じて保護者に連絡ができる, システムを通じて保護者に連絡ができる,システムを通じて保護者に連絡ができる"
-                }],
-                status: 2,
-                entry: true,
-                bind: true, 
-                milestoneStatus: 2,   // 1 編集中　2 更新中
-            };
+            const caseId = getURLParam("caseId");
+            const loading = this.$loading({
+                lock: true,
+                text: 'Loading',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.1)'
+            });
+            axios({
+                method: "POST",
+                url: "/logged/case/getWithCurrEmp",
+                data: {
+                    caseId,
+                },
+                withCredentials: true,
+            })
+                .then((res = {}) => {
+                    loading.close();
+                    const { data: { data = {} } = {}} = res;
+                    const {
+                        c: jobCase = {},
+                        caseApply,
+                    } = data;
 
-            // 日付のフォーマット処理
-            const {
-                deadline,
-                status,
-                bind,
-                entry,
-            } = jobCase;
-            const deadlineVal = dateFormat(deadline);
-            jobCase.deadlineVal = deadlineVal;
-            this.jobCase = jobCase;
+                    // 日付のフォーマット処理
+                    const {
+                        deadline,
+                        status,
+                    } = jobCase;
+                    const deadlineVal = dateFormat(deadline);
+                    jobCase.deadlineVal = deadlineVal;
+                    this.jobCase = jobCase;
 
-            // 応募状況
-            if (status == 1 && !entry) {
-                jobCase.applyStatus = 0;
-                // jobCase.applyStatusText = "応募中";
-                jobCase.statusCls = "hidden";
-            }
-            if (status == 1 && entry) {
-                jobCase.applyStatus = 1;
-                jobCase.applyStatusText = "応募中";
-                jobCase.statusCls = "status status-1";
-            }
-            if (status == 2 && !bind) {
-                jobCase.applyStatus = 2;
-                jobCase.applyStatusText = "応募終了";
-                jobCase.statusCls = "status status-2";
-            }
-            if (status == 2 && bind) {
-                jobCase.applyStatus = 3;
-                jobCase.applyStatusText = "案件作業中";
-                jobCase.statusCls = "status status-3";
-            }
-            if (status == 3 && bind) {
-                jobCase.applyStatus = 4;
-                jobCase.applyStatusText = "案件作業終了";
-                jobCase.statusCls = "status status-4";
-            }
-
-            // どんなページから来た
-            // this.from = getURLParam("from");
+                    // 応募状況
+                    if (caseApply == null) {
+                        jobCase.applyStatus = 0;
+                        jobCase.statusCls = "hidden";
+                    } else {
+                        const { bind } = caseApply;
+                        if (status == 1) {
+                            jobCase.applyStatus = 1;
+                            jobCase.applyStatusText = "応募中";
+                            jobCase.statusCls = "status status-1";
+                        }
+                        if (status == 2 && !bind) {
+                            jobCase.applyStatus = 2;
+                            jobCase.applyStatusText = "応募終了";
+                            jobCase.statusCls = "status status-2";
+                        }
+                        if (status == 2 && bind) {
+                            jobCase.applyStatus = 3;
+                            jobCase.applyStatusText = "案件作業中";
+                            jobCase.statusCls = "status status-3";
+                        }
+                        if (status == 3 && bind) {
+                            jobCase.applyStatus = 4;
+                            jobCase.applyStatusText = "案件作業終了";
+                            jobCase.statusCls = "status status-4";
+                        }
+                    }
+                });
         },
         methods: {
             goEmployeeInfo,
@@ -304,18 +291,43 @@
                     center: false,
                 })
                     .then(() => {
-                        this.$confirm('クライアントが確認するまでしばらくお待ちください', '応募が完了しました', {
-                            confirmButtonText: '分かりました',
-                            type: 'success',
-                            center: true,
-                            showCancelButton: false,
+                        const loading = this.$loading({
+                            lock: true,
+                            text: 'Loading',
+                            spinner: 'el-icon-loading',
+                            background: 'rgba(0, 0, 0, 0.1)'
                         });
+                        axios({
+                            method: "POST",
+                            url: "/logged/case/apply",
+                            data: {
+                                caseId: this.jobCase.caseId,
+                            },
+                            withCredentials: true,
+                        })
+                            .then((res = {}) => {
+                                loading.close();
+                                const { data: {
+                                    code,
+                                    msg = "新規案件応募できませんでした",
+                                } = {} } = res;
+                                if (code == 20011) {
+                                    this.$confirm('クライアントが確認するまでしばらくお待ちください', '応募が完了しました', {
+                                        confirmButtonText: '分かりました',
+                                        type: 'success',
+                                        center: true,
+                                        showCancelButton: false,
+                                    });
 
-                        const jobCase = { ...this.jobCase };
-                        jobCase.applyStatus = 1;
-                        jobCase.applyStatusText = "応募中";
-                        jobCase.statusCls = "status status-1";
-                        this.jobCase = jobCase;
+                                    const jobCase = { ...this.jobCase };
+                                    jobCase.applyStatus = 1;
+                                    jobCase.applyStatusText = "応募中";
+                                    jobCase.statusCls = "status status-1";
+                                    this.jobCase = jobCase;
+                                } else {
+                                    this.$message.error(msg);
+                                }
+                            });
                     });
             }
         }
