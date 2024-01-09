@@ -14,7 +14,6 @@
     <!-- システム共用のスタイルはこのファイルに追加する -->
     <link href="./css/common.css" rel="stylesheet" />
     <link href="./css/employeeApplyHistory.css" rel="stylesheet"/>
-    <!-- TODO: 作るHTMLとペアでCSSファイルを作り、なるべく同じファイル名にする -->
 
     <!-- vue と elementUIの依存javascript -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
@@ -31,7 +30,7 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                {{user.username}}さん、こんにちは！
+                {{user.name}}さん、こんにちは！
                 <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
@@ -71,7 +70,7 @@
                                 </div>
                                 <div>
                                     <span>開発期限:</span>
-                                    <span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
+                                    <span>{{job.deadlineVal}}</span>
                                 </div>
                             </div>
                             <div class="case-sub">
@@ -83,7 +82,7 @@
                             </div>
                             <div class="case-sub">
                                 <span class="label">希望開発ツール:&nbsp;&nbsp;&nbsp;</span>
-                                <span>{{job.requiredTech}}</span>
+                                <span>{{job.developTools}}</span>
                             </div>
                             <div class="case-sub">
                                 <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
@@ -107,6 +106,7 @@
 </body>
 
 </html>
+<script src="./js/utils.js"></script>
 <script src="./js/pageJump.js"></script>
 <script>
     // elementの日本語対応
@@ -129,73 +129,180 @@
             };
         },
         mounted() {
-            const applyList = [{
-                status: 1,
-                caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                bonusMoney: 5,                    //　報酬
-                bonusMoneyNegotiable: true,       //　報酬相談可能
-                developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-                description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                deadline: "2024年2月20日",        // 開発期限
-                bind: false,                      // この社員と契約していますか
-            }, {
-                status: 2,
-                caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                bonusMoney: 5,                    //　報酬
-                bonusMoneyNegotiable: true,       //　報酬相談可能
-                developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-                description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                deadline: "2024年2月20日",        // 開発期限
-                bind: true,                      // この社員と契約していますか
-            }, {
-                status: 2,
-                caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                bonusMoney: 5,                    //　報酬
-                bonusMoneyNegotiable: true,       //　報酬相談可能
-                developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-                description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                deadline: "2024年2月20日",        // 開発期限
-                bind: false,                      // この社員と契約していますか
-            }, {
-                status: 3,
-                caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                bonusMoney: 5,                    //　報酬
-                bonusMoneyNegotiable: true,       //　報酬相談可能
-                developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-                description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                deadline: "2024年2月20日",        // 開発期限
-                bind: true,                      // この社員と契約していますか
-            }];
-            this.applyList = applyList.map((job = {}) => {
-                const { status, bind, ...others} = job;
-                if (status == 1) {
-                    job.applyStatus = 1;
-                    job.applyStatusText = "応募中";
-                    job.statusCls = "status status-1";
+            // ユーザー情報をゲット
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 2) {
+                    goLogin(1);
+                } else {
+                    this.user = user;
                 }
-                if (status == 2 && !bind) {
-                    job.applyStatus = 2;
-                    job.applyStatusText = "応募終了";
-                    job.statusCls = "status status-2";
-                }
-                if (status == 2 && bind) {
-                    job.applyStatus = 3;
-                    job.applyStatusText = "案件作業中";
-                    job.statusCls = "status status-3";
-                }
-                if (status == 3 && bind) {
-                    job.applyStatus = 4;
-                    job.applyStatusText = "案件作業終了";
-                    job.statusCls = "status status-4";
-                }
-                return job;
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 2) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.jobCase.customerId = user.customerId;
+                            sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        }
+                    })
+            }
+
+            const loading = this.$loading({
+                lock: true,
+                text: 'Loading',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.1)'
             });
+            axios({
+                method: "POST",
+                url: "/logged/case/getHistory",
+                withCredentials: true,
+            })
+                .then((res) => {
+                    loading.close();
+                    const { data: {
+                        code,
+                        data: applyList = [],
+                    } = {} } = res;
+                    this.applyList = applyList.map((job = {}) => {
+                        const { deadline, status, bind, ...others} = job;
+
+                        const deadlineVal = dateFormat(deadline);
+                        job.deadlineVal = deadlineVal;
+
+                        if (status == 1) {
+                            job.applyStatus = 1;
+                            job.applyStatusText = "応募中";
+                            job.statusCls = "status status-1";
+                        }
+                        if (status == 2 && !bind) {
+                            job.applyStatus = 2;
+                            job.applyStatusText = "応募終了";
+                            job.statusCls = "status status-2";
+                        }
+                        if (status == 2 && bind) {
+                            job.applyStatus = 3;
+                            job.applyStatusText = "案件作業中";
+                            job.statusCls = "status status-3";
+                        }
+                        if (status == 3 && bind) {
+                            job.applyStatus = 4;
+                            job.applyStatusText = "案件作業終了";
+                            job.statusCls = "status status-4";
+                        }
+                        return job;
+                    });
+                })
+
+            // const applyList = [{
+            //     status: 1,
+            //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
+            //     bonusMoney: 5,                    //　報酬
+            //     bonusMoneyNegotiable: true,       //　報酬相談可能
+            //     developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+            //     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+            //     deadline: "2024年2月20日",        // 開発期限
+            //     bind: false,                      // この社員と契約していますか
+            // }, {
+            //     status: 2,
+            //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
+            //     bonusMoney: 5,                    //　報酬
+            //     bonusMoneyNegotiable: true,       //　報酬相談可能
+            //     developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+            //     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+            //     deadline: "2024年2月20日",        // 開発期限
+            //     bind: true,                      // この社員と契約していますか
+            // }, {
+            //     status: 2,
+            //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
+            //     bonusMoney: 5,                    //　報酬
+            //     bonusMoneyNegotiable: true,       //　報酬相談可能
+            //     developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+            //     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+            //     deadline: "2024年2月20日",        // 開発期限
+            //     bind: false,                      // この社員と契約していますか
+            // }, {
+            //     status: 3,
+            //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
+            //     bonusMoney: 5,                    //　報酬
+            //     bonusMoneyNegotiable: true,       //　報酬相談可能
+            //     developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+            //     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+            //     deadline: "2024年2月20日",        // 開発期限
+            //     bind: true,                      // この社員と契約していますか
+            // }];
+            // this.applyList = applyList.map((job = {}) => {
+            //     const { status, bind, ...others} = job;
+            //     if (status == 1) {
+            //         job.applyStatus = 1;
+            //         job.applyStatusText = "応募中";
+            //         job.statusCls = "status status-1";
+            //     }
+            //     if (status == 2 && !bind) {
+            //         job.applyStatus = 2;
+            //         job.applyStatusText = "応募終了";
+            //         job.statusCls = "status status-2";
+            //     }
+            //     if (status == 2 && bind) {
+            //         job.applyStatus = 3;
+            //         job.applyStatusText = "案件作業中";
+            //         job.statusCls = "status status-3";
+            //     }
+            //     if (status == 3 && bind) {
+            //         job.applyStatus = 4;
+            //         job.applyStatusText = "案件作業終了";
+            //         job.statusCls = "status status-4";
+            //     }
+            //     return job;
+            // });
         },
         methods: {
             goJobCases,
             goEmployeeInfo,
             goCaseDetail,
-            goEmployeeNotification
+            goEmployeeNotification,
+            logout() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/logout",
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            msg = "",
+                        } = {} } = res;
+                        this.$message.success(msg);
+                        sessionStorage.removeItem("userinfo");
+                        setTimeout(() => goLogin(1), 1000);
+                    });
+            },
         },
     });
 </script>

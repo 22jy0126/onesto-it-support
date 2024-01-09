@@ -190,7 +190,9 @@
             const {
                 deadline
             } = jobCase;
+            console.log("deadline", deadline);
             const deadlineVal = dateFormat(deadline);
+            console.log("deadlineVal", deadlineVal);
             jobCase.deadlineVal = deadlineVal;
 
             this.jobCase = jobCase;

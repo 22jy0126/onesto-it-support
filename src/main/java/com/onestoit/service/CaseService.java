@@ -9,6 +9,7 @@ import com.onestoit.model.Case;
 import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseBase;
 import com.onestoit.model.CaseFunction;
+import com.onestoit.model.EmployeeBase;
 import com.onestoit.model.PaginationCaseBaseReq;
 
 @Transactional
@@ -67,4 +68,11 @@ public interface CaseService {
 	 * @return
 	 */
 	Result findCaseApply(CaseApply ca);
+	
+	/**
+	 * 応募歴史検索
+	 * @param eb
+	 * @return
+	 */
+	Result findApplyHistory(EmployeeBase eb);
 }

@@ -6,23 +6,25 @@
 	<!-- 新規応募 -->
 	<insert id="apply">
 		INSERT INTO onestoit_case_apply (
-			case_id,
-			employee_id,
-			apply_date,
-			bind
+		case_id,
+		employee_id,
+		apply_date,
+		bind
 		) VALUES (
-			#{caseId},
-			#{employeeId},
-			#{applyDate},
-			false
+		#{caseId},
+		#{employeeId},
+		#{applyDate},
+		false
 		);
 	</insert>
-	
+
 	<!-- 案件開始 -->
 	<update id="applyBind">
-		UPDATE onestoit_case_apply set bind = true where case_id = #{caseId} and employee_id = #{employeeId};
+		UPDATE onestoit_case_apply set bind = true where
+		case_id = #{caseId} and employee_id = #{employeeId};
 	</update>
 	
+	<!-- 案件の応募検索-->
 	<select id="find">
 		select * from onestoit_case_apply
 		<where>
@@ -33,5 +35,22 @@
 				and employee_id = #{employeeId}
 			</if>
 		</where>
+	</select>
+	
+    <!--応募歴史検索-->
+	<select id="findApplyHistory">
+		select 
+		CA.case_id,
+		CA.employee_id,
+		bind,
+		case_name,
+		bonus_money,
+		bonus_money_negotiable,
+		develop_tools,
+		description,
+		deadline,
+		status
+		from onestoit_case_apply CA inner join onestoit_case_base CB
+		WHERE CA.case_id = CB.case_id AND employee_id = #{employeeId};
 	</select>
 </mapper>

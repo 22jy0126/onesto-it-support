@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.onestoit.model.CaseApply;
+import com.onestoit.model.CaseWithEmpApy;
+import com.onestoit.model.EmployeeBase;
 
 @Mapper
 public interface CaseApplyMapper {
@@ -28,4 +30,11 @@ public interface CaseApplyMapper {
 	 * @return
 	 */
 	ArrayList<CaseApply> find(CaseApply ca);
+	
+	/**
+	 * 応募歴史検索
+	 * @param eb
+	 * @return
+	 */
+	ArrayList<CaseWithEmpApy> findApplyHistory(EmployeeBase eb);
 }

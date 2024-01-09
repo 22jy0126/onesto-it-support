@@ -18,6 +18,8 @@ import com.onestoit.model.Case;
 import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseBase;
 import com.onestoit.model.CaseFunction;
+import com.onestoit.model.CaseWithEmpApy;
+import com.onestoit.model.EmployeeBase;
 import com.onestoit.model.PaginationCaseBaseReq;
 import com.onestoit.model.PaginationCaseBaseRes;
 import com.onestoit.service.CaseService;
@@ -143,6 +145,12 @@ public class CaseServiceImpl implements CaseService {
 	@Override
 	public Result findCaseApply(CaseApply ca) {
 		ArrayList<CaseApply> data = caseApplyMapper.find(ca);
+		return new Result(Code.GET_OK, data);
+	}
+
+	@Override
+	public Result findApplyHistory(EmployeeBase eb) {
+		ArrayList<CaseWithEmpApy> data = caseApplyMapper.findApplyHistory(eb);
 		return new Result(Code.GET_OK, data);
 	}
 }

@@ -12,6 +12,7 @@ import com.onestoit.model.Case;
 import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseBase;
 import com.onestoit.model.CaseWithCurrEmp;
+import com.onestoit.model.EmployeeBase;
 import com.onestoit.model.PaginationCaseBaseReq;
 import com.onestoit.model.User;
 import com.onestoit.service.CaseService;
@@ -71,4 +72,12 @@ public class CaseController {
 		return new Result(Code.GET_OK, cwce);
 	}
 	
+	@PostMapping("/getHistory")
+	Result findApplyHistory(HttpSession session) {
+		User loginUser = (User)session.getAttribute("userinfo");
+		String employeeId = loginUser.getUsername();
+		EmployeeBase eb = new EmployeeBase();
+		eb.setEmployeeId(employeeId);
+		return caseService.findApplyHistory(eb);
+	}
 }
