@@ -1,7 +1,9 @@
 spring:
   datasource: 
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/onestoit?characterEncoding=utf-8&useSSL=false&useUnicode=true
+    # ていの自宅
+    # url: jdbc:mysql://localhost:3306/onestoit?characterEncoding=utf-8&useSSL=false&useUnicode=true
+    url: jdbc:mysql://10.64.144.5:3306/22jy0126?characterEncoding=utf-8&useSSL=false&useUnicode=true
     username: root
     password: 123456
     type: com.zaxxer.hikari.HikariDataSource
