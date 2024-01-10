@@ -61,4 +61,13 @@ public interface EmployeeService {
 	 * @return
 	 */
 	Result assembleToEmployee(EmployeeBase eb, ArrayList<WorkHistory> workHistorys);
+	
+	/**
+	 * 社員Idで社員の基本情報をゲット
+	 * @param employeeId
+	 * @return
+	 */
+	Result getEmployeeBaseById(String employeeId);
+	
+	
 }

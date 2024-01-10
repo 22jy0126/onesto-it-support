@@ -124,4 +124,11 @@ public class UserController {
 		ArrayList<WorkHistory> workHistorys = (ArrayList<WorkHistory>)historyRes.getData();
 		return employeeService.assembleToEmployee(eb, workHistorys);
 	}
+	
+	@GetMapping("/logged/emp/{employeeId}")
+	Result getEmployeeInfoById(@PathVariable String employeeId) {
+		return employeeService.getEmployeeBaseById(employeeId);
+	}
+	
+	
 }

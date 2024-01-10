@@ -23,8 +23,8 @@
 		UPDATE onestoit_case_apply set bind = true where
 		case_id = #{caseId} and employee_id = #{employeeId};
 	</update>
-	
-	<!-- 案件の応募検索-->
+
+	<!-- 案件の応募検索 -->
 	<select id="find">
 		select * from onestoit_case_apply
 		<where>
@@ -36,10 +36,10 @@
 			</if>
 		</where>
 	</select>
-	
-    <!--応募歴史検索-->
+
+	<!--応募歴史検索 -->
 	<select id="findApplyHistory">
-		select 
+		select
 		CA.case_id,
 		CA.employee_id,
 		bind,
@@ -50,7 +50,34 @@
 		description,
 		deadline,
 		status
-		from onestoit_case_apply CA inner join onestoit_case_base CB
-		WHERE CA.case_id = CB.case_id AND employee_id = #{employeeId};
+		from onestoit_case_apply CA
+		inner join onestoit_case_base CB
+		WHERE CA.case_id = CB.case_id AND
+		employee_id = #{employeeId};
+	</select>
+
+	<!--顧客の案件検索 -->
+	<select id="findCaseWithCust">
+		SELECT
+		CB.case_id,
+		CA.bind,
+		CB.STATUS,
+		CB.case_name,
+		CB.customer_id,
+		CB.bonus_money,
+		CB.bonus_money_negotiable,
+		CB.develop_tools,
+		CB.description,
+		CB.deadline,
+		CA.employee_id,
+		EB.name,
+		EB.gender,
+		EB.skill,
+		EB.birthday
+		from onestoit_case_base CB
+		LEFT join onestoit_case_apply CA on CB.case_id = CA.case_id
+		LEFT join onestoit_employee_base EB on EB.employee_id = CA.employee_id
+		where CB.customer_id = #{customerId}
+		order by CB.case_id;
 	</select>
 </mapper>

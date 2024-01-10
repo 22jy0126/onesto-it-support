@@ -38,4 +38,8 @@
 		select * from onestoit_employee_base where employee_id = #{username} and password = #{password};
 	</select>
 	
+	<!--社員Idで社員の基本情報をゲット-->
+	<select id="getById">
+		select * from onestoit_employee_base where employee_id = #{employeeId};
+	</select>
 </mapper>

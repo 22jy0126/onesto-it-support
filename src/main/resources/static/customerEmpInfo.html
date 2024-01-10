@@ -31,7 +31,7 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                {{employeeInfo.name}}さん、こんにちは！
+                {{user.name}}さん、こんにちは！
 				<span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
@@ -42,16 +42,18 @@
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="2" class="el-menu-vertical-demo">
-                    <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
-                    <el-menu-item index="2">個人履歴</el-menu-item>
-                    <el-menu-item index="3" @click="goEmployeeApplyHistory">応募履歴</el-menu-item>
-                    <el-menu-item index="4" @click="goEmployeeNotification">通知</el-menu-item>
+                    <el-menu-item index="1" @click="goCustomerCaseEdit">新規案件登録</el-menu-item>
+                    <el-menu-item index="2">私の案件</el-menu-item>
+                    <el-menu-item index="3">通知</el-menu-item>
                 </el-menu>
             </el-aside>
 
             <el-container>
                 <el-main>
-                    <!-- TODO: 内容はここに書く -->
+                    <div class="goback" @click="goback">
+                        <i class="el-icon-back"></i>
+                        私の案件リストに戻る
+                    </div>
                     
                     <!--プロフィール-->
 					<section>
@@ -155,12 +157,35 @@
 							</el-timeline-item>
 						</el-timeline>
 					</section>
-					
+					<div class="confirm-btn-item">
+                        <el-button type="primary">案件契約</el-button>
+                    </div>
                 </el-main>
             </el-container>
         </el-container>
+        <el-dialog title="案件契約確認" visible="true">
+            <div class="edit-item">
+                <div class="label">
+                    案件名：{{caseInfo.caseName}}
+                </div> 
+            </div>
+            <div class="edit-item">
+                <div class="label">報酬:<span class="required">（必須）</span></div>
+                    <el-input-number 
+                        placeholder="金額を入力してください"
+                        v-model="caseInfo.bonusMoney" 
+                        :min="1" 
+                        :max="999">
+                    </el-input-number>
+                <div class="des">万円</div>
+            </div>
+            <div>
+                <i class="el-icon-warning"></i>
+                <span class="warn-text">後から報酬の金額を変えることはできません！</span>
+            </div>
+        </el-dialog>
     </el-container>
-
+    
 </body>
 
 </html>
@@ -177,10 +202,51 @@
         el: "#app",
         data() {
             return {
+                user: {},
                 employeeInfo: {},
+                caseInfo: {},
             };
         },
 		mounted() {
+            // ユーザー情報をゲット
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 1) {
+                    goLogin();
+                } else {
+                    this.user = user;
+                }
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 1) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.jobCase.customerId = user.customerId;
+                            sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        }
+                    })
+            }
+
+            const employeeId = getURLParam("employeeId");
+            const caseId = getURLParam("caseId");
 			const loading = this.$loading({
 				lock: true,
 				text: 'Loading',
@@ -189,11 +255,11 @@
 			});
 			axios({
 				method: "GET",
-				url: "/logged/emp/info",
+				url: `/logged/emp/${employeeId}`,
 				withCredentials: true,
 			})
 				.then((res) => {
-					loading.close();
+					// loading.close();
 					const { data: {
 						code,
 						data: employeeInfo = {},
@@ -236,13 +302,43 @@
 						});
 
 						this.employeeInfo = employeeInfo;
+
+
+                        // this.$loading({
+                        //     lock: true,
+                        //     text: 'Loading',
+                        //     spinner: 'el-icon-loading',
+                        //     background: 'rgba(0, 0, 0, 0.1)'
+                        // });
+                        axios({
+                            method: "GET",
+                            url: `/logged/case/getbase/${caseId}`,
+                            withCredentials: true,
+                        })
+                            .then((res = {}) => {
+                                loading.close();
+                                const { data: {
+                                    code,
+                                    data = [],
+                                } = {} } = res;
+                                const caseInfo = data[0] || {};
+                                this.caseInfo = caseInfo;
+                            })
+
 					}
-				})
+				});
+
+            
+
+
 		},
 		methods: {
+            goCustomerCaseEdit,
 			goJobCases,
 			goEmployeeApplyHistory,
-			goEmployeeNotification,
+            goback() {
+                window.history.back();
+            },
 			logout() {
 				const loading = this.$loading({
 					lock: true,

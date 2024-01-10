@@ -18,7 +18,10 @@ import com.onestoit.model.Case;
 import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseBase;
 import com.onestoit.model.CaseFunction;
+import com.onestoit.model.CaseWithCurrCust;
+import com.onestoit.model.CaseWithEmp;
 import com.onestoit.model.CaseWithEmpApy;
+import com.onestoit.model.Customer;
 import com.onestoit.model.EmployeeBase;
 import com.onestoit.model.PaginationCaseBaseReq;
 import com.onestoit.model.PaginationCaseBaseRes;
@@ -153,4 +156,52 @@ public class CaseServiceImpl implements CaseService {
 		ArrayList<CaseWithEmpApy> data = caseApplyMapper.findApplyHistory(eb);
 		return new Result(Code.GET_OK, data);
 	}
+
+	@Override
+	public Result findCaseWithCust(Customer c) {
+		ArrayList<CaseWithEmp> list = caseApplyMapper.findCaseWithCust(c);
+		ArrayList<CaseWithCurrCust> myCaseList = new ArrayList<>();
+		for (CaseWithEmp caseWithEmp : list) {
+			boolean has = false;
+			Integer caseId = caseWithEmp.getCaseId();
+			
+			for (CaseWithCurrCust caseWithCurrCust : myCaseList) {
+				CaseBase cb = caseWithCurrCust.getCb();
+				Integer theCaseId = cb.getCaseId();
+				if (caseId == theCaseId) {
+					ArrayList<EmployeeBase> apylist = caseWithCurrCust.getApylist();
+					EmployeeBase eb = new EmployeeBase();
+					eb.setEmployeeId(caseWithEmp.getEmployeeId());
+					eb.setName(caseWithEmp.getName());
+					eb.setGender(caseWithEmp.getGender());
+					eb.setBirthday(caseWithEmp.getBirthday());
+					eb.setSkill(caseWithEmp.getSkill());
+					apylist.add(eb);
+					has = true;
+					break;
+				}
+			}
+			
+			if (has == false) {
+				CaseWithCurrCust caseWithCurrCust = new CaseWithCurrCust();
+				caseWithCurrCust.setCb((CaseBase)caseWithEmp);
+				ArrayList<EmployeeBase> apylist = new ArrayList<>();
+				EmployeeBase eb = new EmployeeBase();
+				eb.setEmployeeId(caseWithEmp.getEmployeeId());
+				eb.setName(caseWithEmp.getName());
+				eb.setGender(caseWithEmp.getGender());
+				eb.setBirthday(caseWithEmp.getBirthday());
+				eb.setSkill(caseWithEmp.getSkill());
+				apylist.add(eb);
+				caseWithCurrCust.setApylist(apylist);
+				myCaseList.add(caseWithCurrCust);
+			}
+		}
+		
+		return new Result(Code.GET_OK, myCaseList);
+	}
 }
+
+
+
+

@@ -59,26 +59,26 @@
 	                    </div>
 	                    <div class="job-case-item" v-for="job in jobList">
 							<div class="case-name-line">
-								<div class="case-name">{{job.caseName}}</div>
+								<div class="case-name">{{job.cb.caseName}}</div>
 								<div>
 									<span>開発期限:</span>
-									<span>{{job.deadline == "2099年12月31日" ? "なし" : job.deadline}}</span>
+									<span>{{job.cb.deadlineVal}}</span>
 								</div>
 							</div>
 							<div class="case-sub">
 								<div class="case-sub-money">
 									<span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
-									<span>{{job.bonusMoney.toLocaleString()}}万円</span>
-									<span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
+									<span>{{job.cb.bonusMoney.toLocaleString()}}万円</span>
+									<span>{{job.cb.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
 								</div>
 							</div>
 							<div class="case-sub">
 								<span class="label">希望開発ツール:&nbsp;&nbsp;&nbsp;</span>
-								<span>{{job.developTools}}</span>
+								<span>{{job.cb.developTools}}</span>
 							</div>
 							<div class="case-sub">
 								<span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
-								<span>{{job.description}}</span>
+								<span>{{job.cb.description}}</span>
 							</div>
 	                        
 	                        <div class="go-detail">
@@ -92,39 +92,41 @@
 					                応募者リスト
 					            </div>
 					            <!--応募人数-->
-					            <div v-bind:class="((job.applicant || []).length == 0) ? 'hidden' : ''" >
+					            <div v-bind:class="((job.cb.apylist || []).length == 0) ? 'hidden' : ''" >
 									<span class="applicantLength">
-										{{(job.applicant || []).length}}
+										{{(job.apylist || []).length}}
 									</span>	
 									人が応募しています
 								</div>
-					            <div v-if="(job.applicant || []).length > 0">
+					            <div v-if="(job.apylist || []).length > 0">
 					                <!-- 応募者がいる場合 -->
-					                <div v-for="applicant in job.applicant" class="applicant-item">
+					                <div v-for="applicant in job.apylist" class="applicant-item">
 					                    <div class="applicant-info">	
-										<el-row>
-											<el-col>
-											    <el-card shadow="hover">
-											    	<div class="applicant-user">
-														<!--名前-->
-														<div class=name>{{applicant.aName}}</div>
-														<!--性別-->
-														<span class=label>性別:&nbsp;&nbsp;&nbsp;<span>{{applicant.aGender}}</span></span>
-														<!--年齢-->
-														<span class=label>年齢:&nbsp;&nbsp;&nbsp;<span>{{applicant.aAge}}歳</span></span>
-														<!--勤続年数-->
-														<span class=label>勤続年数:&nbsp;&nbsp;&nbsp;<span>{{applicant.aLength}}年</span></span>
-													</div>
-											    </el-card>
-											</el-col>
-										</el-row>
-					                        
-					                    </div>
-					                </div>
-					                
-					                
-					                
-					                
+											<el-row>
+												<el-col>
+													<el-card shadow="hover">
+														<div class="applicant-user">
+															<div>
+																<div class="name">
+																	{{applicant.name}}
+																</div>
+																<div>
+																	<span class="apy-label">性別:&nbsp;&nbsp;&nbsp;<span>{{applicant.gender == 0 ? "男性" : "女性"}}</span></span>
+																	<span class="apy-label">生年月日:&nbsp;&nbsp;&nbsp;<span>{{applicant.birthdayVal}}</span></span>
+																</div>
+																<div>
+																	<span class="apy-label">経験開発ツール:&nbsp;&nbsp;&nbsp;<span>{{applicant.skill == null ? "未記入" : applicant.skill}}</span></span>
+																</div>
+															</div>
+															<div class="go-detail" @click="goCustomerEmpInfo(applicant.employeeId, job.cb.caseId)">
+																詳細>>
+															</div>
+														</div>
+													</el-card>
+												</el-col>
+											</el-row>
+										</div>
+									</div>
 					            </div>
 					            <div v-else>
 					                <!-- 応募者がいない場合 -->
@@ -162,38 +164,39 @@
                     noticeCount: 2, // 通知数
                 },
                 // 登録した求人票のデータ
-                jobList: [{
-                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
-					bonusMoney: 5,                    //　報酬
-					bonusMoneyNegotiable: true,             //　報酬相談可能
-					developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-					description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-					deadline: "2024年2月20日",              // 開発期限
+				jobList: [],
+                // jobList: [{
+                //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
+				// 	bonusMoney: 5,                    //　報酬
+				// 	bonusMoneyNegotiable: true,             //　報酬相談可能
+				// 	developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+				// 	description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+				// 	deadline: "2024年2月20日",              // 開発期限
                     
-                    applicant: [
-	                    {aName: "山田　一",aGender:"男",aAge:"28",aLength:"4"},//名前、性別、年齢、勤続年数
-	                    {aName: "鈴木　二花",aGender:"女",aAge:"24",aLength:"3"},//名前、性別、年齢、勤続年数}
-                	],
-                }, {
-                    caseName: "従業員管理システムの制作",       // 求人プロジェクト名
-                    bonusMoney: 5,                    //　報酬
-					bonusMoneyNegotiable: true,             //　報酬相談可能
-					developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-					description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-					deadline: "2024年2月20日",              // 開発期限
-                    applicant: [
-	                    {aName: "中島　三太",aGender:"男",aAge:"34",aLength:"8"},//名前、性別、年齢、勤続年数},
-	                    {aName: "三須　四葉",aGender:"男",aAge:"29",aLength:"3"},//名前、性別、年齢、勤続年数},
-	                    {aName: "土屋　五郎",aGender:"男",aAge:"45",aLength:"11"},//名前、性別、年齢、勤続年数}
-                	],
-                }, {
-                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                    bonusMoney: 5,                    //　報酬
-					bonusMoneyNegotiable: true,             //　報酬相談可能
-					developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-					description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-					deadline: "2024年2月20日",              // 開発期限
-                }]
+                //     applicant: [
+	            //         {aName: "山田　一",aGender:"男",aAge:"28",aLength:"4"},//名前、性別、年齢、勤続年数
+	            //         {aName: "鈴木　二花",aGender:"女",aAge:"24",aLength:"3"},//名前、性別、年齢、勤続年数}
+                // 	],
+                // }, {
+                //     caseName: "従業員管理システムの制作",       // 求人プロジェクト名
+                //     bonusMoney: 5,                    //　報酬
+				// 	bonusMoneyNegotiable: true,             //　報酬相談可能
+				// 	developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+				// 	description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+				// 	deadline: "2024年2月20日",              // 開発期限
+                //     applicant: [
+	            //         {aName: "中島　三太",aGender:"男",aAge:"34",aLength:"8"},//名前、性別、年齢、勤続年数},
+	            //         {aName: "三須　四葉",aGender:"男",aAge:"29",aLength:"3"},//名前、性別、年齢、勤続年数},
+	            //         {aName: "土屋　五郎",aGender:"男",aAge:"45",aLength:"11"},//名前、性別、年齢、勤続年数}
+                // 	],
+                // }, {
+                //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                //     bonusMoney: 5,                    //　報酬
+				// 	bonusMoneyNegotiable: true,             //　報酬相談可能
+				// 	developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+				// 	description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+				// 	deadline: "2024年2月20日",              // 開発期限
+                // }]
             };
         },
 		mounted() {
@@ -233,9 +236,48 @@
 						}
 					})
 			}
+
+			// 私の案件リストをゲット
+			const loading = this.$loading({
+				lock: true,
+				text: 'Loading',
+				spinner: 'el-icon-loading',
+				background: 'rgba(0, 0, 0, 0.1)'
+			});
+			axios({
+				method: "GET",
+				url: "/logged/case/getMyCases",
+				withCredentials: true,
+			})
+				.then((res = {}) => {
+					loading.close();
+					const { data: {
+						code,
+						data: jobList = [],
+					} = {} } = res;
+					this.jobList = jobList.map((job = {}) => {
+						// const { cb = {} } = job;
+						const cb = { ...job.cb };
+						const apylist = [...(job.apylist || [])];
+						const { deadline } = cb;
+						const deadlineVal = dateFormat(deadline);
+						cb.deadlineVal = deadlineVal;
+
+						apylist.forEach((emp = {}) => {
+							const { birthday } = emp;
+							const birthdayVal = dateFormat(birthday);
+							emp.birthdayVal = birthdayVal;
+						});
+
+						job.cb = cb;
+						return job;
+					});
+					
+				})
 		},
 		methods: {
 			goCustomerCaseEdit,
+			goCustomerEmpInfo,
 		}
     });
 </script>

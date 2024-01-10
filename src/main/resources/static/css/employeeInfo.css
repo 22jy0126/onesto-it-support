@@ -97,6 +97,25 @@ h4{
 .history {
 	width: 100%;
 }
+.goback {
+    color: #409eff;
+    padding: 10px 0 20px;
+    cursor: pointer;
+}
+.edit-item {
+	display: flex;
+	align-items: center;
+	margin-bottom: 10px;
+}
+.edit-item .el-input-number {
+	width: 300px;
+}
+.edit-item .des {
+	margin-left: 10px;
+}
+.el-icon-warning, .warn-text {
+	color: #E6A23C;
+}
 
 
 

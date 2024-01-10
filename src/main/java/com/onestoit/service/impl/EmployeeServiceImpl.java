@@ -84,8 +84,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public Result getWorkHistorysByEmployeeId(String EmployeeId) {
-		ArrayList<WorkHistory> res = workHistoryMapper.getByEmployeeId(EmployeeId);
+	public Result getWorkHistorysByEmployeeId(String employeeId) {
+		ArrayList<WorkHistory> res = workHistoryMapper.getByEmployeeId(employeeId);
 		return new Result(Code.GET_OK, res);
 	}
 
@@ -103,6 +103,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 		e.setSkill(eb.getSkill());
 		e.setWorkHistorys(workHistorys);
 		return new Result(Code.GET_OK, e);
+	}
+
+	@Override
+	public Result getEmployeeBaseById(String employeeId) {
+		EmployeeBase eb = employeeBaseMapper.getById(employeeId);
+		ArrayList<WorkHistory> workHistorys = workHistoryMapper.getByEmployeeId(employeeId);
+		return assembleToEmployee(eb, workHistorys);
 	}
 	
 	

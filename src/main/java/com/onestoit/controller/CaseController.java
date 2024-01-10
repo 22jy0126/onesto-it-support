@@ -3,6 +3,8 @@ package com.onestoit.controller;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +14,7 @@ import com.onestoit.model.Case;
 import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseBase;
 import com.onestoit.model.CaseWithCurrEmp;
+import com.onestoit.model.Customer;
 import com.onestoit.model.EmployeeBase;
 import com.onestoit.model.PaginationCaseBaseReq;
 import com.onestoit.model.User;
@@ -29,6 +32,13 @@ public class CaseController {
 	@PostMapping("/saveCase")
 	Result saveCase(@RequestBody Case c) {
 		return caseService.saveCase(c);
+	}
+	
+	@GetMapping("/getbase/{caseId}")
+	Result findCaseBase(@PathVariable Integer caseId) {
+		CaseBase cb = new CaseBase();
+		cb.setCaseId(caseId);
+		return caseService.findCaseBase(cb);
 	}
 	
 	@PostMapping("/get")
@@ -72,12 +82,18 @@ public class CaseController {
 		return new Result(Code.GET_OK, cwce);
 	}
 	
-	@PostMapping("/getHistory")
+	@GetMapping("/getHistory")
 	Result findApplyHistory(HttpSession session) {
 		User loginUser = (User)session.getAttribute("userinfo");
 		String employeeId = loginUser.getUsername();
 		EmployeeBase eb = new EmployeeBase();
 		eb.setEmployeeId(employeeId);
 		return caseService.findApplyHistory(eb);
+	}
+	
+	@GetMapping("/getMyCases")
+	Result findCaseWithCust(HttpSession session) {
+		Customer c = (Customer)session.getAttribute("userinfo");
+		return caseService.findCaseWithCust(c);
 	}
 }

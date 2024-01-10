@@ -91,6 +91,11 @@ const goCustomerCaseEdit = () => {
     goTo("/customercaseedit.html");
 };
 
+// お客様・案件応募者の詳細チェック
+const goCustomerEmpInfo = (employeeId, caseId) => {
+    goTo(`/customerempinfo.html?employeeId=${employeeId}&caseId=${caseId}`);
+};
+
 // お客様・案件詳細
 const goCustomerCaseDetail = () => {
     goTo("/customercasedetail.html");

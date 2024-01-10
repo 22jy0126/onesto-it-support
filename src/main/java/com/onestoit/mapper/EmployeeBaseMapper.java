@@ -27,4 +27,11 @@ public interface EmployeeBaseMapper {
 	 * @return
 	 */
 	EmployeeBase login(User u);
+	
+	/**
+	 * 社員Idで社員の基本情報をゲット
+	 * @param employeeId
+	 * @return
+	 */
+	EmployeeBase getById(String employeeId);
 }

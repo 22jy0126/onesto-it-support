@@ -19,6 +19,7 @@
 .job-case-item .label {
     display: inline-block;
     color: #4e4949;
+    white-space: nowrap;
     /* width: 100px; */
 }
 
