@@ -44,8 +44,8 @@
                 <el-menu default-active="2" class="el-menu-vertical-demo">
                     <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
                     <el-menu-item index="2">個人履歴</el-menu-item>
-                    <el-menu-item index="3" @click="goEmployeeApplyHistory">応募歴史</el-menu-item>
-                    <el-menu-item index="4">通知</el-menu-item>
+                    <el-menu-item index="3" @click="goEmployeeApplyHistory">応募履歴</el-menu-item>
+                    <el-menu-item index="4" @click="goEmployeeNotification">通知</el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -242,6 +242,7 @@
 		methods: {
 			goJobCases,
 			goEmployeeApplyHistory,
+			goEmployeeNotification,
 			logout() {
 				const loading = this.$loading({
 					lock: true,
