@@ -117,5 +117,14 @@ h4{
 	color: #E6A23C;
 }
 
+.confirm-caption {
+	margin-bottom: 10px;
+	font-weight: bold;
+}
+.confirm-mark {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
 
 
