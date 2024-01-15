@@ -92,7 +92,7 @@
                                 状況:
                             </div> -->
                             <div class="go-detail"
-                                @click="goCaseDetail(1,2)"
+                                @click="goCaseDetail(job.caseId)"
                             >
                                 詳細>>
                             </div>
@@ -213,67 +213,6 @@
                     });
                 })
 
-            // const applyList = [{
-            //     status: 1,
-            //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
-            //     bonusMoney: 5,                    //　報酬
-            //     bonusMoneyNegotiable: true,       //　報酬相談可能
-            //     developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-            //     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-            //     deadline: "2024年2月20日",        // 開発期限
-            //     bind: false,                      // この社員と契約していますか
-            // }, {
-            //     status: 2,
-            //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
-            //     bonusMoney: 5,                    //　報酬
-            //     bonusMoneyNegotiable: true,       //　報酬相談可能
-            //     developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-            //     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-            //     deadline: "2024年2月20日",        // 開発期限
-            //     bind: true,                      // この社員と契約していますか
-            // }, {
-            //     status: 2,
-            //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
-            //     bonusMoney: 5,                    //　報酬
-            //     bonusMoneyNegotiable: true,       //　報酬相談可能
-            //     developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-            //     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-            //     deadline: "2024年2月20日",        // 開発期限
-            //     bind: false,                      // この社員と契約していますか
-            // }, {
-            //     status: 3,
-            //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
-            //     bonusMoney: 5,                    //　報酬
-            //     bonusMoneyNegotiable: true,       //　報酬相談可能
-            //     developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-            //     description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-            //     deadline: "2024年2月20日",        // 開発期限
-            //     bind: true,                      // この社員と契約していますか
-            // }];
-            // this.applyList = applyList.map((job = {}) => {
-            //     const { status, bind, ...others} = job;
-            //     if (status == 1) {
-            //         job.applyStatus = 1;
-            //         job.applyStatusText = "応募中";
-            //         job.statusCls = "status status-1";
-            //     }
-            //     if (status == 2 && !bind) {
-            //         job.applyStatus = 2;
-            //         job.applyStatusText = "応募終了";
-            //         job.statusCls = "status status-2";
-            //     }
-            //     if (status == 2 && bind) {
-            //         job.applyStatus = 3;
-            //         job.applyStatusText = "案件作業中";
-            //         job.statusCls = "status status-3";
-            //     }
-            //     if (status == 3 && bind) {
-            //         job.applyStatus = 4;
-            //         job.applyStatusText = "案件作業終了";
-            //         job.statusCls = "status status-4";
-            //     }
-            //     return job;
-            // });
         },
         methods: {
             goJobCases,

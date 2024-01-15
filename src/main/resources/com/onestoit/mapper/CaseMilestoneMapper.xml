@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.onestoit.mapper.CaseMilestoneMapper">
+	<!-- 案件マイルストンを保存する -->
+	<insert id="saveOne">
+		insert into onestoit_case_milestone (
+			case_id,
+			name,
+			description,
+			is_comment,
+			create_data,
+		) values (
+			#{caseId},
+			#{name},
+			#{description},
+			#{isComment},
+			#{createData}
+		);
+	</insert>
+	
+	<!-- 案件マイルストーンを削除 -->
+	<delete id="deleteById">
+		delete from onestoit_case_milestone where id = #{id};
+	</delete>
+	
+	<!-- 案件マイルストーンを更新 -->
+	<update id="updateOne">
+		update onestoit_case_milestone
+		<set>
+			<if test="status != null">
+				status = #{status}
+			</if>
+			<if test="name != null">
+				, name = #{name}
+			</if>
+			<if test="description != null">
+				, description = #{description}
+			</if>
+			<if test="is_comment != null">
+				, is_comment = #{isComment}
+			</if>
+			<if test="comment != null">
+				, comment = #{comment}
+			</if>
+			<if test="update_date != null">
+				, update_date = #{updateDate}
+			</if>
+		</set> 
+	</update>
+	
+	<!-- 案件マイルストーンを検索 -->
+	<select id="findByCaseId">
+		select from onestoit_case_milestone where case_id = #{caseId};
+	</select>
+</mapper>

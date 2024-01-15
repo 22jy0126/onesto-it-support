@@ -46,4 +46,11 @@ public interface CaseApplyMapper {
 	 * @return
 	 */
 	ArrayList<CaseWithEmp> findCaseWithCust(Customer c);
+	
+	/**
+	 * 案件契約
+	 * @param ca
+	 * @return
+	 */
+	int caseBind(CaseApply ca);
 }

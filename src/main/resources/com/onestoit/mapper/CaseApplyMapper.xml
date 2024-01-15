@@ -77,7 +77,12 @@
 		from onestoit_case_base CB
 		LEFT join onestoit_case_apply CA on CB.case_id = CA.case_id
 		LEFT join onestoit_employee_base EB on EB.employee_id = CA.employee_id
-		where CB.customer_id = #{customerId}
+		where CB.customer_id = #{customerId} and CB.STATUS != 0
 		order by CB.case_id;
 	</select>
+	
+	<!-- 案件契約 -->
+	<update id="caseBind">
+		update onestoit_case_apply set bind = true where case_id = #{caseId} and employee_id = #{employeeId};
+	</update>
 </mapper>

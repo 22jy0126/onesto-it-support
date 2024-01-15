@@ -17,6 +17,7 @@ import com.onestoit.mapper.CaseFunctionMapper;
 import com.onestoit.model.Case;
 import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseBase;
+import com.onestoit.model.CaseBind;
 import com.onestoit.model.CaseFunction;
 import com.onestoit.model.CaseWithCurrCust;
 import com.onestoit.model.CaseWithEmp;
@@ -77,6 +78,9 @@ public class CaseServiceImpl implements CaseService {
 		System.out.println(functions.size());
 		
 		Result res1 = saveBase(cb);
+		if (functions.size() == 0) {
+			return res1;
+		}
 		caseId = cb.getCaseId();
 		for (CaseFunction caseFunction : functions) {
 			caseFunction.setCaseId(caseId);
@@ -186,19 +190,37 @@ public class CaseServiceImpl implements CaseService {
 				CaseWithCurrCust caseWithCurrCust = new CaseWithCurrCust();
 				caseWithCurrCust.setCb((CaseBase)caseWithEmp);
 				ArrayList<EmployeeBase> apylist = new ArrayList<>();
-				EmployeeBase eb = new EmployeeBase();
-				eb.setEmployeeId(caseWithEmp.getEmployeeId());
-				eb.setName(caseWithEmp.getName());
-				eb.setGender(caseWithEmp.getGender());
-				eb.setBirthday(caseWithEmp.getBirthday());
-				eb.setSkill(caseWithEmp.getSkill());
-				apylist.add(eb);
+				if (caseWithEmp.getEmployeeId() != null) {
+					EmployeeBase eb = new EmployeeBase();
+					eb.setEmployeeId(caseWithEmp.getEmployeeId());
+					eb.setName(caseWithEmp.getName());
+					eb.setGender(caseWithEmp.getGender());
+					eb.setBirthday(caseWithEmp.getBirthday());
+					eb.setSkill(caseWithEmp.getSkill());
+					apylist.add(eb);
+				}
 				caseWithCurrCust.setApylist(apylist);
 				myCaseList.add(caseWithCurrCust);
 			}
 		}
 		
 		return new Result(Code.GET_OK, myCaseList);
+	}
+
+	@Override
+	@Transactional
+	public Result caseToBind(CaseBind cb) {
+		CaseBase c = (CaseBase)cb;
+		CaseApply ca = cb.getCa();
+		int res;
+		try {
+			res = caseBaseMapper.updateCaseStatusOrMoney(c);
+			caseApplyMapper.applyBind(ca);
+		} catch (Exception e) {
+			LOGGER.error("案件契約のデータベースのエラーです", e);
+			return new Result(Code.UPDATE_ERROR, null, "案件契約できませんでした");
+		}
+		return new Result(Code.UPDATE_OK, res);
 	}
 }
 

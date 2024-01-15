@@ -180,6 +180,12 @@
                     return;
                 }
 
+                if (type == 3) {
+                    debugger;
+                    goManageCustomer();
+                    return;
+                }
+
                 const loading = this.$loading({
                     lock: true,
                     text: 'Loading',

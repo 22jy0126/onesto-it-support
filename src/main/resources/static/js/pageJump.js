@@ -97,8 +97,12 @@ const goCustomerEmpInfo = (employeeId, caseId) => {
 };
 
 // お客様・案件詳細
-const goCustomerCaseDetail = () => {
-    goTo("/customercasedetail.html");
+const goCustomerCaseDetail = (caseId = "") => {
+    let url = "/customercasedetail.html";
+    if (caseId != "") {
+        url = `${url}?caseId=${caseId}`;
+    }
+    goTo(url);
 };
 
 // お客様・登録した案件リスト
@@ -117,3 +121,12 @@ const goMilestoneProgressConfirm = () => {
 };
 
 // お客様・通知
+
+// 管理者・顧客管理
+const goManageCustomer = () => {
+    goTo("/managecustomer.html");
+};
+
+const goManageEmployee = () => {
+    goTo("/manageemployee.html");
+};

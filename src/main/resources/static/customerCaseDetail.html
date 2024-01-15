@@ -35,7 +35,7 @@
             </div>
             <div class="login-info">
                 {{user.name}}さん、こんにちは！
-                <span class="logout">ログアウト</span>
+                <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
 
@@ -44,7 +44,7 @@
             <!-- サイドメニュー -->
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
-                <el-menu default-active="1" class="el-menu-vertical-demo">
+                <el-menu default-active="2" class="el-menu-vertical-demo">
                     <el-menu-item index="1">新規案件登録</el-menu-item>
                     <el-menu-item index="2" @click="goCustomerCaseView">私の案件</el-menu-item>
                     <el-menu-item index="3">通知</el-menu-item>
@@ -58,6 +58,9 @@
                             <div class="caption-wrapper">
                                 <i class="el-icon-s-order"></i>
                                 <div class="caption">案件の基本情報</div> 
+                                <div v-if="(+jobCase.status) > 0" v-bind:class="jobCase.statusCls">
+                                    {{jobCase.applyStatusText}}
+                                </div>
                             </div> 
                             <section class="base-infos">
                                 <div class="info-item">
@@ -105,7 +108,7 @@
                                     </div>
                                 </div>
                             </section>
-                            <div class="save-btns">
+                            <div v-if="(+jobCase.status) == 0" class="save-btns">
                                 <el-button 
                                     @click="onBackPage"
                                     type="primary">編集に戻る</el-button>
@@ -115,6 +118,13 @@
                                 <el-button 
                                     @click="onDraftSave"
                                     type="info">下書きとして保存</el-button>
+                            </div>
+                            <div v-if="(+jobCase.status) == 2" class="save-btns">
+                                <el-button @click="onMilestoneCheck" type="primary">マイルストーンをチェック</el-button>
+                                <el-button type="success">案件終了</el-button>
+                            </div>
+                            <div v-if="(+jobCase.status) == 1" class="save-btns">
+                                <el-button type="danger">案件削除</el-button>
                             </div>
                     </section>
                     
@@ -182,22 +192,74 @@
                         }
                     })
             }
+            const caseId = getURLParam("caseId") || "";
+            if (caseId != "") {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "POST",
+                    url: "/logged/case/get",
+                    data: {
+                        caseId,
+                    },
+                    withCredentials: true,
+                })
+                    .then((res ={}) => {
+                        const { data ={}} = res;
+                        loading.close();
+                        const {
+                            code,
+                            data: jobCase,
+                        } = data;
+                        // jobCase = jobCase;
+                        // 日付のフォーマット処理
+                        const {
+                            deadline,
+                            status,
+                        } = jobCase;
+                        const deadlineVal = dateFormat(deadline);
+                        jobCase.deadlineVal = deadlineVal;
 
-            const jobCaseStr = localStorage.getItem("tempJobCase");
-            const jobCase = JSON.parse(jobCaseStr);
+                        if (status == 1) {
+                            jobCase.applyStatus = 1;
+                            jobCase.applyStatusText = "応募中";
+                            jobCase.statusCls = "status status-1";
+                        }
+                        if (status == 2) {
+                            jobCase.applyStatus = 3;
+                            jobCase.applyStatusText = "案件作業中";
+                            jobCase.statusCls = "status status-3";
+                        }
+                        if (status == 3) {
+                            jobCase.applyStatus = 4;
+                            jobCase.applyStatusText = "案件作業終了";
+                            jobCase.statusCls = "status status-4";
+                        }
+                        this.jobCase = jobCase;
+                    });
+                
+            } else {
+                const jobCaseStr = localStorage.getItem("tempJobCase");
+                const jobCase = JSON.parse(jobCaseStr);
+                // 日付のフォーマット処理
+                const {
+                    deadline,
+                    status,
+                } = jobCase;
+                const deadlineVal = dateFormat(deadline);
+                jobCase.deadlineVal = deadlineVal;
+                this.jobCase = jobCase;
+            }
 
-            // 日付のフォーマット処理
-            const {
-                deadline
-            } = jobCase;
-            console.log("deadline", deadline);
-            const deadlineVal = dateFormat(deadline);
-            console.log("deadlineVal", deadlineVal);
-            jobCase.deadlineVal = deadlineVal;
-
-            this.jobCase = jobCase;
+            
         },
         methods: {
+            goCustomerCaseView,
+            goMilestoneDetailConfirm,
             onBackPage() {
                 window.history.back();
             },
@@ -260,7 +322,39 @@
                         sessionStorage.removeItem("userinfo");
                         setTimeout(() => goLogin(1), 1000);
                     });
-            }
+            },
+            onMilestoneCheck() {
+                const ms = getURLParam("ms") || "";
+                // debugger;
+                if (ms == 1) {
+                    goMilestoneProgressConfirm();
+                } else {
+                    goMilestoneDetailConfirm();
+                }
+            },
+            logout() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/logout",
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            msg = "",
+                        } = {} } = res;
+                        this.$message.success(msg);
+                        sessionStorage.removeItem("userinfo");
+                        setTimeout(() => goLogin(), 1000);
+                    });
+            },
         }
     });
 </script>

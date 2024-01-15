@@ -12,6 +12,10 @@ public class CaseApply {
 	 */
 	private String employeeId;
 	/*
+	 * 顧客Id
+	 */
+	private Integer customerId;
+	/*
 	 * 応募日付
 	 */
 	private Date applyDate;

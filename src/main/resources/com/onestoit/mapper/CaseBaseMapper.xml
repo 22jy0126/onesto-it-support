@@ -99,4 +99,18 @@
 			</if>
 		</where>
 	</select>
+	
+	<!-- 案件状態それとも報酬更新 -->
+	<update id="updateCaseStatusOrMoney">
+		update onestoit_case_base 
+		<set>
+			<if test="bonusMoney != null">
+				bonus_money = #{bonusMoney}
+			</if>
+			<if test="status != null">
+				, status = #{status}
+			</if>
+		</set>
+		where case_id = #{caseId}
+	</update>
 </mapper>

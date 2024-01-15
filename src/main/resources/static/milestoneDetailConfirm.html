@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
-
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -30,10 +30,11 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <el-badge :value="user.noticeCount" class="item">
+                <!-- <el-badge :value="user.noticeCount" class="item">
                     <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge>
+                </el-badge> -->
                 {{user.username}}さん、こんにちは！
+                <span class="logout">ログアウト</span>
             </div>
         </header>
 
@@ -43,8 +44,8 @@
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="2" class="el-menu-vertical-demo">
-                    <el-menu-item index="1">新規案件登録</el-menu-item>
-                    <el-menu-item index="2">私の案件</el-menu-item>
+                    <el-menu-item index="1" @click="goCustomerCaseEdit">新規案件登録</el-menu-item>
+                    <el-menu-item index="2" @click="goCustomerCaseView">私の案件</el-menu-item>
                     <el-menu-item index="3">通知</el-menu-item>
                 </el-menu>
             </el-aside>
@@ -52,7 +53,7 @@
             <el-container>
                 <el-main>
                     <div class="milestone-detail-container">
-                        <div class="goback">
+                        <div class="goback" @click="goback">
                             <i class="el-icon-back"></i>
                             案件詳細に戻る
                         </div>
@@ -128,6 +129,8 @@
 </body>
 
 </html>
+<script src="./js/consts.js"></script>
+<script src="./js/pageJump.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -171,6 +174,11 @@
             };
         },
         methods: {
+            goCustomerCaseView,
+            goCustomerCaseEdit,
+            goback() {
+                window.history.back();
+            },
             onCommentAdd(index) {
                 const {
                     milestones = [],

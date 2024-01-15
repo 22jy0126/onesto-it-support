@@ -30,10 +30,11 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <el-badge :value="user.noticeCount" class="item">
+                <!-- <el-badge :value="user.noticeCount" class="item">
                     <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge>
+                </el-badge> -->
                 {{user.username}}さん、こんにちは！
+                <span class="logout">ログアウト</span>
             </div>
         </header>
 
@@ -44,7 +45,7 @@
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="1" class="el-menu-vertical-demo">
                     <el-menu-item index="1">お客様管理</el-menu-item>
-                    <el-menu-item index="2">社員管理</el-menu-item>
+                    <el-menu-item index="2" @click="goManageEmployee">社員管理</el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -137,6 +138,8 @@
 </body>
 
 </html>
+<script src="./js/pageJump.js"></script>
+<script src="./js/utils.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -163,6 +166,7 @@
             this.init();
         },
         methods: {
+            goManageEmployee,
             init() {
                 const customers = [{
                     id: 0,

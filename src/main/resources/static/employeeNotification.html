@@ -32,6 +32,7 @@
             </div>
             <div class="login-info">
                 {{user.username}}さん、こんにちは！
+                <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
 
@@ -153,7 +154,30 @@
         methods: {
             goJobCases,
             goEmployeeInfo,
-            goEmployeeApplyHistory
+            goEmployeeApplyHistory,
+            logout() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/logout",
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            msg = "",
+                        } = {} } = res;
+                        this.$message.success(msg);
+                        sessionStorage.removeItem("userinfo");
+                        setTimeout(() => goLogin(1), 1000);
+                    });
+            }
         },
     });
 </script>

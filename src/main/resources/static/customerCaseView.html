@@ -32,6 +32,7 @@
             </div>
             <div class="login-info">
                 {{user.name}}さん、こんにちは！
+				<span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
 
@@ -59,7 +60,13 @@
 	                    </div>
 	                    <div class="job-case-item" v-for="job in jobList">
 							<div class="case-name-line">
-								<div class="case-name">{{job.cb.caseName}}</div>
+								<div class="title">
+									<div class="case-name">{{job.cb.caseName}}</div>
+									<div v-bind:class="job.cb.statusCls">
+										{{job.cb.applyStatusText}}
+									</div>
+								</div>
+								<!-- <div class="case-name">{{job.cb.caseName}}</div> -->
 								<div>
 									<span>開発期限:</span>
 									<span>{{job.cb.deadlineVal}}</span>
@@ -68,7 +75,7 @@
 							<div class="case-sub">
 								<div class="case-sub-money">
 									<span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
-									<span>{{job.cb.bonusMoney.toLocaleString()}}万円</span>
+									<span>{{(job.cb.bonusMoney|| 0).toLocaleString()}}万円</span>
 									<span>{{job.cb.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
 								</div>
 							</div>
@@ -81,12 +88,12 @@
 								<span>{{job.cb.description}}</span>
 							</div>
 	                        
-	                        <div class="go-detail">
+	                        <div class="go-detail" @click="goCustomerCaseDetail(job.cb.caseId)">
 	                            詳細>>
 	                        </div>     
 	                        
 	                        <!-- 応募者リスト -->
-					        <div class="applicants-list">
+					        <div class="applicants-list" v-if="job.cb.status == 1">
 					            <div class="common-caption">
 					                <i class="el-icon-user icon"></i>
 					                応募者リスト
@@ -165,38 +172,6 @@
                 },
                 // 登録した求人票のデータ
 				jobList: [],
-                // jobList: [{
-                //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
-				// 	bonusMoney: 5,                    //　報酬
-				// 	bonusMoneyNegotiable: true,             //　報酬相談可能
-				// 	developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-				// 	description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-				// 	deadline: "2024年2月20日",              // 開発期限
-                    
-                //     applicant: [
-	            //         {aName: "山田　一",aGender:"男",aAge:"28",aLength:"4"},//名前、性別、年齢、勤続年数
-	            //         {aName: "鈴木　二花",aGender:"女",aAge:"24",aLength:"3"},//名前、性別、年齢、勤続年数}
-                // 	],
-                // }, {
-                //     caseName: "従業員管理システムの制作",       // 求人プロジェクト名
-                //     bonusMoney: 5,                    //　報酬
-				// 	bonusMoneyNegotiable: true,             //　報酬相談可能
-				// 	developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-				// 	description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-				// 	deadline: "2024年2月20日",              // 開発期限
-                //     applicant: [
-	            //         {aName: "中島　三太",aGender:"男",aAge:"34",aLength:"8"},//名前、性別、年齢、勤続年数},
-	            //         {aName: "三須　四葉",aGender:"男",aAge:"29",aLength:"3"},//名前、性別、年齢、勤続年数},
-	            //         {aName: "土屋　五郎",aGender:"男",aAge:"45",aLength:"11"},//名前、性別、年齢、勤続年数}
-                // 	],
-                // }, {
-                //     caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                //     bonusMoney: 5,                    //　報酬
-				// 	bonusMoneyNegotiable: true,             //　報酬相談可能
-				// 	developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-				// 	description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-				// 	deadline: "2024年2月20日",              // 開発期限
-                // }]
             };
         },
 		mounted() {
@@ -256,12 +231,27 @@
 						data: jobList = [],
 					} = {} } = res;
 					this.jobList = jobList.map((job = {}) => {
-						// const { cb = {} } = job;
 						const cb = { ...job.cb };
 						const apylist = [...(job.apylist || [])];
-						const { deadline } = cb;
+						const { deadline, status, bind } = cb;
 						const deadlineVal = dateFormat(deadline);
 						cb.deadlineVal = deadlineVal;
+
+						if (status == 1) {
+							cb.applyStatus = 1;
+							cb.applyStatusText = "応募中";
+							cb.statusCls = "status status-1";
+						}
+						if (status == 2) {
+							cb.applyStatus = 3;
+							cb.applyStatusText = "案件作業中";
+							cb.statusCls = "status status-3";
+						}
+						if (status == 3) {
+							cb.applyStatus = 4;
+							cb.applyStatusText = "案件作業終了";
+							cb.statusCls = "status status-4";
+						}
 
 						apylist.forEach((emp = {}) => {
 							const { birthday } = emp;
@@ -278,6 +268,30 @@
 		methods: {
 			goCustomerCaseEdit,
 			goCustomerEmpInfo,
+			goCustomerCaseDetail,
+			logout() {
+				const loading = this.$loading({
+					lock: true,
+					text: 'Loading',
+					spinner: 'el-icon-loading',
+					background: 'rgba(0, 0, 0, 0.1)'
+				});
+				axios({
+					method: "GET",
+					url: "/logout",
+					withCredentials: true,
+				})
+					.then((res = {}) => {
+						loading.close();
+						const { data: {
+							code,
+							msg = "",
+						} = {} } = res;
+						this.$message.success(msg);
+						sessionStorage.removeItem("userinfo");
+						setTimeout(() => goLogin(1), 1000);
+					});
+			},
 		}
     });
 </script>

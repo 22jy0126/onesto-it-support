@@ -37,3 +37,37 @@
 	justify-content: space-between;
 	align-items: center;
 }
+.case-name-line .title {
+    display: flex;
+    align-items: center;
+}
+.status {
+    font-size: 12px;
+    display: inline-block;
+    padding: 4px 7px;
+    border-radius: 3px;
+    position: relative;
+    top: -2px;
+    left: 2px;
+    margin-left: 10px;
+}
+.status-1 {
+    color: #e08900;
+    border: 1px solid #e08900;
+    background-color: #fff1db;
+}
+.status-2 {
+    color: #999;
+    border: 1px solid #ccc;
+    background-color: #f8f8f8;
+}
+.status-3 {
+    color: #409eff;
+    border: 1px solid #409eff;
+    background-color: #d5eaff;
+}
+.status-4 {
+    color: #51af3f;
+    border: 1px solid #67c23a;
+    background-color: #d6f5c8;
+}

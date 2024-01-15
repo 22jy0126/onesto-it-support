@@ -33,7 +33,7 @@
             </div>
             <div class="login-info">
                 {{user.name}}さん、こんにちは！
-                <span class="logout">ログアウト</span>
+                <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
 
@@ -263,23 +263,9 @@
                 user: {},
                 jobCase: {
                     status: 0,
-                    functions: [],
-                    // caseName: "",            // 案件名
-                    // developTools: "",        // 希望開発ツール
-                    // bonusMoney: undefined,   //　報酬
-                    // bonusMoneyNegotiable: false,       //　報酬相談可能
-                    // description: "",        // 案件の説明
-                    // deadline: "",           // 開発期限
-                    // functions: [{
-                    //     id: 0,
-                    //     functionDesc: "機能1********",  // 機能説明
-                    // }, {
-                    //     id: 1,
-                    //     functionDesc: "機能2",  // 機能説明
-                    // }, {
-                    //     id: 2,
-                    //     functionDesc: "機能3",  // 機能説明
-                    // }],
+                    functions: [{
+                        functionDesc: "",
+                    }],
                 },
                 // 技術選択肢
                 techs,
@@ -368,6 +354,10 @@
                             this.jobCase = jobCase;
                         }
                     } else if (code == 20041 && data != null) {
+                        const { bonusMoney } = data;
+                        if (bonusMoney == null) {
+                            data.bonusMoney = undefined;
+                        }
                         this.jobCase = data;
                     }
                 })
@@ -484,9 +474,36 @@
                     this.errors.caseNameDraft = true;
                     return;
                 }
-                this.$message({
-                    message: '下書きを保存しました！',
-                    type: 'success'
+
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "POST",
+                    url: "/logged/case/saveCase",
+                    data: {
+                        ...this.jobCase,
+                        customerId: this.user.customerId,
+                        status: 0,
+                    },
+                    withCredentials: true,
+                }).then((res) => {
+                    loading.close();
+                    const { data: {
+                        code,
+                        data,
+                    } = {} } = res;
+                    if (code == 20011) {
+                        this.$message({
+                            message: '下書きを保存しました！',
+                            type: 'success'
+                        });
+                    } else {
+                        this.$message.error("只今案件の保存ができません、後でもう一度お試しください！");
+                    }
                 });
                 
             },
@@ -499,25 +516,26 @@
                     functions = [],
                 } = this.jobCase;
                 let flag = true;
-                if (caseName == "") {
+                // debugger;
+                if (caseName == "" || caseName == null) {
                     flag = false;
                     this.errors.caseNameErr = true;
                 }
-                if (bonusMoney == "") {
+                if (bonusMoney == "" || bonusMoney == null) {
                     flag = false;
                     this.errors.bonusMoneyErr = true;
                 }
-                if (description == "") {
+                if (description == "" || description == null) {
                     flag = false;
                     this.errors.descriptionErr = true;
                 }
-                if (deadline == "") {
+                if (deadline == "" || deadline == null) {
                     flag = false;
                     this.errors.deadlineErr = true;
                 }
                 functions.forEach((item = {}) => {
                     const { functionDesc = "" } = item;
-                    if (functionDesc == "") {
+                    if (functionDesc == "" || functionDesc == null) {
                         flag = false;
                         item.err = true;
                     }
@@ -533,7 +551,6 @@
                 goCustomerCaseDetail();
             }, 
             logout() {
-                console.log("logout");
                 const loading = this.$loading({
                     lock: true,
                     text: 'Loading',
@@ -552,7 +569,6 @@
                             msg = "",
                         } = {} } = res;
                         this.$message.success(msg);
-                            // sessionStorage.setItem("userinfo", JSON.stringify(user));
                         sessionStorage.removeItem("userinfo");
                         setTimeout(() => goLogin(), 1000);
                     });

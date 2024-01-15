@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.onestoit.model.Case;
 import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseBase;
+import com.onestoit.model.CaseBind;
 import com.onestoit.model.CaseWithCurrEmp;
 import com.onestoit.model.Customer;
 import com.onestoit.model.EmployeeBase;
@@ -95,5 +96,10 @@ public class CaseController {
 	Result findCaseWithCust(HttpSession session) {
 		Customer c = (Customer)session.getAttribute("userinfo");
 		return caseService.findCaseWithCust(c);
+	}
+	
+	@PostMapping("/bind")
+	Result caseBind(@RequestBody CaseBind cb) {
+		return caseService.caseToBind(cb);
 	}
 }

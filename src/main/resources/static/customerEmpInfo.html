@@ -158,7 +158,9 @@
 						</el-timeline>
 					</section>
 					<div class="confirm-btn-item">
-                        <el-button type="primary" @click="openBindWindow">案件契約</el-button>
+                        <el-button 
+							v-bind:class="caseInfo.status != 1 ? 'hidden' : ''"
+							type="primary" @click="openBindWindow">案件契約</el-button>
                     </div>
                 </el-main>
             </el-container>
@@ -167,11 +169,6 @@
 			<div class="confirm-caption">
 				{{employeeInfo.name}}さんと「{{caseInfo.caseName}}」案件を契約して、よろしいですか。
 			</div>
-            <!-- <div class="edit-item">
-                <div class="label">
-                    案件名：{{caseInfo.caseName}}
-                </div> 
-            </div> -->
             <div class="edit-item">
                 <div class="label">報酬:<span class="required">（必須）</span></div>
                     <el-input-number 
@@ -191,7 +188,6 @@
 			</div>
 			<div>
 				<el-button 
-					v-bind:class=""
 					@click="onBind"
 					type="primary">
 					契約決定
@@ -218,10 +214,11 @@
             return {
                 user: {},
                 employeeInfo: {},
-                caseInfo: {},
+                caseInfo: {
+					status: 1,
+				},
+				show: true,
 				bindWindowOpen: false,
-				btnShow: false,
-				// binded
             };
         },
 		mounted() {
@@ -351,7 +348,8 @@
 			goJobCases,
 			goEmployeeApplyHistory,
             goback() {
-                window.history.back();
+                // window.history.back();
+				goCustomerCaseView();
             },
 			logout() {
 				const loading = this.$loading({
@@ -378,8 +376,42 @@
 			},
 			onBind() {
 				this.bindWindowOpen = false;
-				this.$message.success("契約しました！");
-				this.caseInfo.bind = true;
+				const loading = this.$loading({
+					lock: true,
+					text: 'Loading',
+					spinner: 'el-icon-loading',
+					background: 'rgba(0, 0, 0, 0.1)'
+				});
+				axios({
+					method: "POST",
+					url: "/logged/case/bind",
+					data: {
+						caseId: this.caseInfo.caseId,
+						bonusMoney: this.caseInfo.bonusMoney,
+						status: 2,
+						ca: {
+							caseId: this.caseInfo.caseId,
+							employeeId: this.employeeInfo.employeeId,
+						}
+					},
+					withCredentials: true,
+				})
+					.then((res) => {
+						loading.close();
+						const { data: {
+							code,
+							msg = "",
+						} = {} } = res;
+						if (code == 20031) {
+							this.$message.success("契約しました！");
+							this.caseInfo.status = 2;
+						} else {
+							this.$message.error(msg);
+						}
+					});
+
+
+				
 			},
 			openBindWindow() {
 				this.bindWindowOpen = true;

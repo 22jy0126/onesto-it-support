@@ -8,6 +8,7 @@ import com.onestoit.controller.Result;
 import com.onestoit.model.Case;
 import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseBase;
+import com.onestoit.model.CaseBind;
 import com.onestoit.model.CaseFunction;
 import com.onestoit.model.Customer;
 import com.onestoit.model.EmployeeBase;
@@ -82,4 +83,11 @@ public interface CaseService {
 	 * @return
 	 */
 	Result findCaseWithCust(Customer c);
+	
+	/**
+	 * 案件契約
+	 * @param cb
+	 * @return
+	 */
+	Result caseToBind(CaseBind cb);
 }

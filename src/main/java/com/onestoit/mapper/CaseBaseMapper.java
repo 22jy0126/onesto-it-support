@@ -43,4 +43,11 @@ public interface CaseBaseMapper {
 	 * @return
 	 */
 	Integer getTotalCount(CaseBase cb);
+	
+	/**
+	 * 案件状態それとも報酬更新
+	 * @param cb
+	 * @return
+	 */
+	Integer updateCaseStatusOrMoney(CaseBase cb);
 }
