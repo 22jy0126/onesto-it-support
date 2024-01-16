@@ -112,6 +112,25 @@
                                 </div>
                             </div>
                         </section>
+                        
+                        
+                        <section class="client-infos">
+							<div class="caption-wrapper">
+                                <i class="el-icon-user-solid"></i>
+                                <div class="caption">クライアントの情報</div>
+                            </div>
+                            
+                            <el-card class="box-card">
+								<div>
+									<span class="c-label">氏名:&nbsp;&nbsp;&nbsp;<span>あああ</span></span>
+									<span class="c-label">メールアドレス:&nbsp;&nbsp;&nbsp;<span>aaaa@icloud.com</span></span>
+									<!--<span>居住地域</span>-->
+								</div>
+							</el-card>
+                        </section>
+                        
+                        
+                        
                         <div class="save-btns">
                             <el-button @click="onApply" v-bind:class="this.jobCase.applyStatus != 0 ? 'hidden' : ''" type="primary">
                                 応募する

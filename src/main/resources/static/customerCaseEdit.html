@@ -122,7 +122,7 @@
                             </div>
                             <div class="edit-item-wrapper">
                                 <div class="edit-item">
-                                    <div class="label">報酬:<span class="required">（必須）</span></div>
+                                    <div class="label">報酬（税込）:<span class="required">（必須）</span></div>
                                     <el-input-number 
                                         v-bind:class="errors.bonusMoneyErr ? 'input-err number-input' : 'number-input'"
                                         placeholder="金額を入力してください"
@@ -132,6 +132,11 @@
                                         :max="999">
                                     </el-input-number>
                                     <div class="des">万円</div>
+                                    
+                                    <div class="commission">
+									  	手数料:  <span>{{ jobCase.bonusMoney ? (jobCase.bonusMoney * 10000 * 0.1): '0' }}</span>円 
+									</div>
+                                    
                                     <div class="sub-edit">
                                         <span class="sub-lable">相談可否</span>
                                         <el-switch 
@@ -575,4 +580,5 @@
             }
         }
     });
+  
 </script>

@@ -128,4 +128,15 @@
     display: flex;
     align-items: center;
 }
+
+.commission{
+	padding-left: 1em;
+}
+
+.commission span{
+	font-weight: 600;
+}
     
+.label .tax{
+	color: dimgray;
+}
