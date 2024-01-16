@@ -20,6 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 </head>
 
@@ -31,7 +32,7 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                {{user.username}}さん、こんにちは！
+                {{user.name}}さん、こんにちは！
                 <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
@@ -80,6 +81,7 @@
 </body>
 
 </html>
+<script src="./js/utils.js"></script>
 <script src="./js/pageJump.js"></script>
 <script>
     // elementの日本語対応
@@ -132,6 +134,55 @@
             };
         },
         mounted() {
+
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 2) {
+                    goLogin(1);
+                } else {
+                    this.user = user;
+                }
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 2) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.jobCase.customerId = user.customerId;
+                            sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        }
+                    })
+            }
+
+            const loading = this.$loading({
+                lock: true,
+                text: 'Loading',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.1)'
+            });
+            axios({
+                method: "GET",
+                url: "/logged/case/getHistory",
+                withCredentials: true,
+            })
+
             const notices = [{
                 date: "2024年2月20日",                   // 送信日付
                 caseId: 1,                              // 案件Id
@@ -154,6 +205,7 @@
         methods: {
             goJobCases,
             goEmployeeInfo,
+            goCaseDetail,
             goEmployeeApplyHistory,
             logout() {
                 const loading = this.$loading({
