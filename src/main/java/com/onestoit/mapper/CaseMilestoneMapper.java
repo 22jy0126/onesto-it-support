@@ -28,7 +28,7 @@ public interface CaseMilestoneMapper {
 	 * @param m
 	 * @return
 	 */
-	int updateOne(Milestone m);
+	int updateOne(Milestone m);	
 	
 	/**
 	 * 案件マイルストーンを検索
