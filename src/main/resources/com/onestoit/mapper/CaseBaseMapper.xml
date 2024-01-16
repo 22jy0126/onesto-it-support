@@ -14,7 +14,8 @@
 			develop_tools,
 			description,
 			deadline,
-			status
+			status,
+			milestone_status
 		) VALUES (
 			#{caseId},
 			#{customerId},
@@ -24,7 +25,8 @@
 			#{developTools},
 			#{description},
 			#{deadline},
-			#{status}
+			#{status},
+			#{milestoneStatus}
 		);
 	</insert>
 	
@@ -109,6 +111,9 @@
 			</if>
 			<if test="status != null">
 				, status = #{status}
+			</if>
+			<if test="milestoneStatus != null">
+				, milestone_status = #{milestoneStatus}
 			</if>
 		</set>
 		where case_id = #{caseId}

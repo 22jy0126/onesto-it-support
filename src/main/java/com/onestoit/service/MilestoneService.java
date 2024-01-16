@@ -15,4 +15,11 @@ public interface MilestoneService {
 	 * @return
 	 */
 	Result caseMilestonesSave(ArrayList<Milestone> milestones);
+	
+	/**
+	 * 案件のマイルストーンリスト検索
+	 * @param caseId
+	 * @return
+	 */
+	Result getCaseMilestones(Integer caseId);
 }

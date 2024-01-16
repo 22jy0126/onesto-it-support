@@ -116,10 +116,10 @@
                             <el-button @click="onApply" v-bind:class="this.jobCase.applyStatus != 0 ? 'hidden' : ''" type="primary">
                                 応募する
                             </el-button>
-                            <el-button @click="goMilestoneEdit(1)" v-if="this.jobCase.status == 2 && inp != 1" type="primary">
+                            <el-button @click="goMilestoneEdit(1)" v-if="this.jobCase.status == 2 && this.jobCase.milestoneStatus == 0" type="primary">
                                 マイルストーン編集
                             </el-button>
-                            <el-button @click="goMilestoneProgressUpdate" v-if="this.jobCase.status == 2 && inp == 1" type="primary">
+                            <el-button @click="goMilestoneProgressUpdate" v-if="this.jobCase.status == 2 && this.jobCase.milestoneStatus == 1" type="primary">
                                 マイルストーン詳細
                             </el-button>
                         </div>

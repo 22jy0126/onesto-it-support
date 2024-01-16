@@ -4,25 +4,35 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.onestoit.mapper.CaseMilestoneMapper">
 	<!-- 案件マイルストンを保存する -->
-	<insert id="saveOne">
+	<insert id="saveBatch">
 		insert into onestoit_case_milestone (
 			case_id,
 			name,
+			edit_status,
+			status,
 			description,
 			is_comment,
 			create_data,
-		) values (
-			#{caseId},
-			#{name},
-			#{description},
-			#{isComment},
-			#{createData}
-		);
+		) values 
+		<foreach collection="list" separator="," item="item">
+			(
+				#{item.caseId},
+				#{item.name},
+				#{item.description},
+				#{item.editStatus},
+				#{item.status},
+				#{isComment},
+				#{createData}
+			)
+		</foreach>
 	</insert>
 	
 	<!-- 案件マイルストーンを削除 -->
-	<delete id="deleteById">
-		delete from onestoit_case_milestone where id = #{id};
+	<delete id="deleteByIds">
+		delete from onestoit_case_milestone where id in 
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+              #{id}
+        </foreach>
 	</delete>
 	
 	<!-- 案件マイルストーンを更新 -->
@@ -31,6 +41,9 @@
 		<set>
 			<if test="status != null">
 				status = #{status}
+			</if>
+			<if test="editStatus != null">
+				, edit_status = #{editStatus}
 			</if>
 			<if test="name != null">
 				, name = #{name}
@@ -47,11 +60,12 @@
 			<if test="update_date != null">
 				, update_date = #{updateDate}
 			</if>
-		</set> 
+		</set>
+		where id = #{id} 
 	</update>
 	
 	<!-- 案件マイルストーンを検索 -->
 	<select id="findByCaseId">
-		select from onestoit_case_milestone where case_id = #{caseId};
+		select * from onestoit_case_milestone where case_id = #{caseId};
 	</select>
 </mapper>

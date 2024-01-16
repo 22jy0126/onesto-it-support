@@ -12,6 +12,13 @@ public class Milestone {
 	 */
 	private Integer caseId;
 	/**
+	 * マイルストーンの編集状態
+	 * @param 0 社員編集中
+	 * @param 1 顧客確認中
+	 * @param 2 顧客確認済み（変更できない）
+	 */
+	private Integer editStatus;
+	/**
 	 * マイルストーンの状態
 	 * 
 	 * @param 0 編集中
@@ -45,6 +52,11 @@ public class Milestone {
 	 * 更新日付
 	 */
 	private Date updateDate;
+	
+	/*
+	 * 削除必要
+	 */
+	private Boolean isDel;
 
 	public Integer getId() {
 		return id;
@@ -117,4 +129,21 @@ public class Milestone {
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
 	}
+
+	public Integer getEditStatus() {
+		return editStatus;
+	}
+
+	public void setEditStatus(Integer editStatus) {
+		this.editStatus = editStatus;
+	}
+
+	public Boolean getIsDel() {
+		return isDel;
+	}
+
+	public void setIsDel(Boolean isDel) {
+		this.isDel = isDel;
+	}
+	
 }

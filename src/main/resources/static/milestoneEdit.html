@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
-
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -67,7 +67,7 @@
                         </div>
                         <el-timeline>
                             <el-timeline-item
-                                v-for="(milestoneItem, index) in jobCase.milestones"
+                                v-for="(milestoneItem, index) in milestones"
                                 :key="index"
                                 size="large">
                               <div class="milestone-item">
@@ -122,7 +122,7 @@
                                     </div>
                                     <div 
                                         @click="onMilestonenDown(index)"
-                                        v-bind:class="index==(jobCase.milestones.length-1) ? 'opt-item-hidden' : 'opt-item'">
+                                        v-bind:class="index==(milestones.length-1) ? 'opt-item-hidden' : 'opt-item'">
                                         <i class="el-icon-bottom"></i>
                                         下に移動
                                     </div>
@@ -136,7 +136,7 @@
                                         <el-button 
                                             slot="reference" 
                                             icon="el-icon-delete"
-                                            v-bind:class="jobCase.milestones.length==1 ? 'opt-item-hidden' : 'opt-item opt-item-del'">
+                                            v-bind:class="milestones.length==1 ? 'opt-item-hidden' : 'opt-item opt-item-del'">
                                             削除
                                         </el-button>
                                     </el-popconfirm>
@@ -172,6 +172,7 @@
 
 </html>
 <script src="./js/pageJump.js"></script>
+<script src="./js/utils.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -189,17 +190,62 @@
                     noticeCount: 2, // 通知数
                 },
                 jobCase: {
+                    caseId: undefined,
                     caseName: "学生管理システムの作成",
-                    milestones: [{
-                        nameErr: false,
-                        descErr: false,
-                        isComment: true,
-                        comment: "もうちょっど詳しく書いてほうしい",
-                        name: "設計",
-                        description: "設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計"
-                    }],
                 },
+                milestones: [{
+                    nameErr: false,
+                    descErr: false,
+                    editStatus: 0,
+                    status: 0,
+                    // isComment: true,
+                    // comment: "もうちょっど詳しく書いてほうしい",
+                    // name: "設計",
+                    // description: "設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計設計"
+                }],
+                deletedMilestones: [],
             };
+        },
+        mounted() {
+            // ユーザー情報をゲット
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 2) {
+                    goLogin(1);
+                } else {
+                    this.user = user;
+                }
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 2) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.jobCase.customerId = user.customerId;
+                            sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        }
+                    })
+            }
+            const caseId = getURLParam("caseId");
+            this.jobCase.caseId = caseId;
+            this.init();
         },
         methods: {
             goJobCases,
@@ -209,25 +255,78 @@
             goback() {
                 window.history.back();
             },
+            init() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                const { caseId } = this.jobCase;
+                axios({
+                    method: "GET",
+                    url: `/logged/case/getbase/${caseId}`,
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        const { data: {
+                            code,
+                            data = [],
+                        } = {} } = res;
+                        if (code == 20041) {
+                            this.jobCase = data[0];
+                            
+                            axios({
+                                method: "GET",
+                                url: `/logged/milestone/get/${caseId}`,
+                                withCredentials: true,
+                            })
+                                .then((res = {}) => {
+                                    loading.close();
+                                    const { data: {
+                                        code,
+                                        data: milestones = [],
+                                    } = {} } = res;
+                                    if (milestones.length) {
+                                        this.milestones = milestones.map((m = {}) => {
+                                            return {
+                                                ...m,
+                                                nameErr: false,
+                                                descErr: false,
+                                            };
+                                        });
+                                    }
+                                    
+                                });
+                        }
+                    })
+            },
             onMilestonenDel(index) {
                 const {
                     milestones = [],
                 } = this.jobCase;
+                const target = milestones[index];
+                if (target.id) {
+                    target.isDel = true;
+                    this.deletedMilestones.push(target);
+                }
                 milestones.splice(index, 1);
             },
             onMilestonenAdd() {
                 const {
                     milestones = [],
-                } = this.jobCase;
+                } = this;
                 milestones.push({
                     nameErr: false,
                     descErr: false,
+                    editStatus: 0,
+                    status: 0,
                 });
             },
             onMilestonenUp(index) {
                 const {
                     milestones = [],
-                } = this.jobCase;
+                } = this;
                 const target = milestones[index];
                 milestones.splice(index, 1);
                 milestones.splice(index - 1, 0, target);
@@ -235,7 +334,7 @@
             onMilestonenDown(index) {
                 const {
                     milestones = [],
-                } = this.jobCase;
+                } = this;
                 const target = milestones[index];
                 milestones.splice(index, 1);
                 milestones.splice(index + 1, 0, target);
@@ -243,14 +342,14 @@
             errClear(index, attr) {
                 const {
                     milestones = [],
-                } = this.jobCase;
+                } = this;
                 const attrName = attr + "Err";
                 milestones[index][attrName] = false;
             },
             onFinish() {
                 const {
                     milestones = [],
-                } = this.jobCase;
+                } = this;
                 let flag = true;
                 milestones.forEach((item = {}) => {
                     const { 
@@ -272,6 +371,9 @@
                 }
 
                 //TODO: サーバーにマイルストーンのデータを送る
+
+
+
                 this.$confirm('確認するまでしばらくお待ちください', 'クライアントに送りました', {
                     confirmButtonText: '分かりました',
                     type: 'success',

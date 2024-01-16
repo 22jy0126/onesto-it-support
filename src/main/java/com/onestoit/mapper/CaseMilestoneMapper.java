@@ -3,6 +3,7 @@ package com.onestoit.mapper;
 import java.util.ArrayList;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.onestoit.model.Milestone;
 
@@ -13,14 +14,14 @@ public interface CaseMilestoneMapper {
 	 * @param m
 	 * @return
 	 */
-	int saveOne(Milestone m);
+	int saveBatch(ArrayList<Milestone> milestones);
 	
 	/**
 	 * 案件マイルストーンを削除
 	 * @param id
 	 * @return
 	 */
-	int deleteById(Integer id);
+	int deleteByIds(@Param(value = "ids") ArrayList<Integer> ids);
 	
 	/**
 	 * 案件マイルストーンを更新

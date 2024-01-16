@@ -43,6 +43,13 @@ public class CaseBase {
 	 *3 終わり
 	 */
 	private Integer status;
+	/*
+	 * マイルストーン状態
+	 * 0 編集中
+	 * 1 進捗更新中
+	 */
+	private Integer milestoneStatus;
+	
 	public Integer getCaseId() {
 		return caseId;
 	}
@@ -97,4 +104,11 @@ public class CaseBase {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
+	public Integer getMilestoneStatus() {
+		return milestoneStatus;
+	}
+	public void setMilestoneStatus(Integer milestoneStatus) {
+		this.milestoneStatus = milestoneStatus;
+	}
+	
 }

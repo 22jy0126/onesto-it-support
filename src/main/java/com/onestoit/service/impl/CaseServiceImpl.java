@@ -115,6 +115,7 @@ public class CaseServiceImpl implements CaseService {
 		c.setBonusMoneyNegotiable(caseBase.isBonusMoneyNegotiable());
 		c.setDeadline(caseBase.getDeadline());
 		c.setDevelopTools(caseBase.getDevelopTools());
+		c.setMilestoneStatus(caseBase.getMilestoneStatus());
 		c.setStatus(caseBase.getStatus());
 		c.setFunctions(functions);
 		return new Result(Code.GET_OK, c);

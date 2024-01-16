@@ -199,31 +199,31 @@
                 totalCount: 0,
             };
         },
-        mounted() {
-            const loading = this.$loading({
-                lock: true,
-                text: 'Loading',
-                spinner: 'el-icon-loading',
-                background: 'rgba(0, 0, 0, 0.1)'
-            });
-            axios({
-                method: "GET",
-                url: "/login/info",
-                withCredentials: true,
-            })
-                .then((res) => {
-                    loading.close();
-                    const { data: {
-                        code,
-                        data: user = {},
-                    } = {} } = res;
-                    if (code != 80011) {
-                        goLogin(1);
-                    } else {
-                        this.user = user;
-                    }
-                })
-        },
+        // mounted() {
+        //     const loading = this.$loading({
+        //         lock: true,
+        //         text: 'Loading',
+        //         spinner: 'el-icon-loading',
+        //         background: 'rgba(0, 0, 0, 0.1)'
+        //     });
+        //     axios({
+        //         method: "GET",
+        //         url: "/login/info",
+        //         withCredentials: true,
+        //     })
+        //         .then((res) => {
+        //             loading.close();
+        //             const { data: {
+        //                 code,
+        //                 data: user = {},
+        //             } = {} } = res;
+        //             if (code != 80011) {
+        //                 goLogin(1);
+        //             } else {
+        //                 this.user = user;
+        //             }
+        //         })
+        // },
         mounted() {
             // ユーザー情報をゲット
             const userStr = sessionStorage.getItem("userinfo") || "";
