@@ -38,7 +38,7 @@
                     class="el-menu-vertical-demo">
                 <el-menu-item index="1">求人一覧</el-menu-item>
                 <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
-                <el-menu-item index="3" @click="goEmployeeApplyHistory">応募歴史</el-menu-item>
+                <el-menu-item index="3" @click="goEmployeeApplyHistory">応募履歴</el-menu-item>
                 <el-menu-item index="4" @click="goEmployeeNotification">
                     <el-badge v-if="true" value="2" class="notice-badge">
                         <div>通知</div>
@@ -99,7 +99,7 @@
                         <div class="case-sub">
                             <div class="case-sub-money">
                                 <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
-                                <span>{{job.bonusMoney.toLocaleString()}}万円</span>
+                                <span>{{job.bonusMoney*0.9.toFixed(1).toLocaleString()}}万円</span>
                                 <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
                             </div>
                         </div>
