@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- TODO: ページの名にチェンジする -->
+    <title>顧客案件リスト</title>
+    <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
+    <!-- vue と elementUIの依存css -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <!-- システム共用のスタイルはこのファイルに追加する -->
+    <link href="./css/common.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/manage.css">
+    <link rel="stylesheet" href="./css/jobCase.css">
+    <!-- vue と elementUIの依存javascript -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
+
+</head>
+
+<body>
+    <el-container id="app" v-cloak>
+        <!-- ヘッドの部分 各々の画面は同じです -->
+        <header class="common-header">
+            <div class="logo">
+                ブリッジ
+            </div>
+            <div class="login-info">
+                {{user.username}}さん、こんにちは！
+				<span class="logout" @click="logout">ログアウト</span>
+            </div>
+        </header>
+
+        <!-- メインの部分 -->
+        <el-container class="common-mian manage-main">
+            <!-- サイドメニュー -->
+            <el-aside width="200px">
+                <!-- TODO: default-active は今いるのメニューです -->
+                <el-menu default-active="1" class="el-menu-vertical-demo">
+                    <el-menu-item index="1" @click="goManageCustomer">お客様管理</el-menu-item>
+                    <el-menu-item index="2" @click="goManageEmployee">社員管理</el-menu-item>
+                </el-menu>
+            </el-aside>
+
+            <el-container>
+                <el-main>
+                    <section>
+	                    <div class="common-caption">
+	                        <i class="el-icon-files icon"></i>
+	                        登録案件リスト
+	                    </div>
+                        <div class="job-case-item" v-for="job in jobList">
+                            <div class="case-name-line">
+                                <div class="case-name">{{job.caseName}}</div>
+                                <div v-bind:class="job.statusCls">
+                                    {{job.applyStatusText}}
+                                </div>
+                                <div>
+                                    <span>業務期間:</span>
+                                    <span>{{job.deadlineVal}}</span>
+                                </div>
+                            </div>
+                            <div class="case-sub">
+                                <div class="case-sub-money">
+                                    <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
+                                    <span>{{job.bonusMoney*0.9.toFixed(1).toLocaleString()}}万円</span>
+                                    <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
+                                </div>
+                            </div>
+                            <div class="case-sub">
+                                <span class="label">希望開発ツール:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.developTools}}</span>
+                            </div>
+                            <div class="case-sub">
+                                <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.description}}</span>
+                            </div>
+                            <div 
+                                class="go-detail"
+                                @click="goCaseDetail(job.caseId)"
+                            >
+                                詳細>>
+                            </div>
+                        </div>
+                    </section>
+                </el-main>
+            </el-container>
+        </el-container>
+    </el-container>
+</body>
+
+</html>
+<script src="./js/pageJump.js"></script>
+<script src="./js/utils.js"></script>
+<script>
+    // elementの日本語対応
+    ELEMENT.locale(ELEMENT.lang.ja);
+
+    let vm;
+    vm = new Vue({
+        // id はapp の属性の中の部分を管理する
+        el: "#app",
+        data() {
+            return {
+                // ログインしたユーザー情報
+                user: {
+                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
+                    username: "管理者", // ユーザー名
+                    noticeCount: 2, // 通知数
+                },
+                jobList: [{
+                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                    bonusMoney: 5,                    //　報酬
+                    bonusMoneyNegotiable: true,             //　報酬相談可能
+                    developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadlineVal: "2024年2月20日",                // 業務期間
+                    applyStatusText:"1"
+                }, {
+                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                    bonusMoney: 5,                    //　報酬
+                    bonusMoneyNegotiable: true,             //　報酬相談可能
+                    developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadlineVal: "2024年2月20日",                // 業務期間
+                    applyStatusText:"2"
+                }, {
+                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                    bonusMoney: 5,                    //　報酬
+                    bonusMoneyNegotiable: true,             //　報酬相談可能
+                    developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadlineVal: "2024年2月20日",                // 業務期間
+                    applyStatusText:"3"
+                }, {
+                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                    bonusMoney: 5,                    //　報酬
+                    bonusMoneyNegotiable: true,             //　報酬相談可能
+                    developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadlineVal: "2024年2月20日",                // 業務期間
+                    applyStatusText:"4"
+                }, {
+                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
+                    bonusMoney: 5,                    //　報酬
+                    bonusMoneyNegotiable: true,             //　報酬相談可能
+                    developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
+                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
+                    deadlineVal: "2024年2月20日",                // 業務期間
+                    applyStatusText: "案件作業終了"
+                }],
+            };
+        },
+        mounted() {
+            this.applyList = applyList.map((job = {}) => {
+                        const { deadline, status, bind, ...others} = job;
+
+                        const deadlineVal = dateFormat(deadline);
+                        job.deadlineVal = deadlineVal;
+
+                        if (status == 1) {
+                            job.applyStatus = 1;
+                            job.applyStatusText = "応募中";
+                            job.statusCls = "status status-1";
+                        }
+                        if (status == 2 && !bind) {
+                            job.applyStatus = 2;
+                            job.applyStatusText = "応募終了";
+                            job.statusCls = "status status-2";
+                        }
+                        if (status == 2 && bind) {
+                            job.applyStatus = 3;
+                            job.applyStatusText = "案件作業中";
+                            job.statusCls = "status status-3";
+                        }
+                        if (status == 3 && bind) {
+                            job.applyStatus = 4;
+                            job.applyStatusText = "案件作業終了";
+                            job.statusCls = "status status-4";
+                        }
+                        return job;
+                    });
+        },
+        methods: {
+            goManageCustomer,
+            goManageEmployee,
+            logout() {
+				const loading = this.$loading({
+					lock: true,
+					text: 'Loading',
+					spinner: 'el-icon-loading',
+					background: 'rgba(0, 0, 0, 0.1)'
+				});
+				axios({
+					method: "GET",
+					url: "/logout",
+					withCredentials: true,
+				})
+					.then((res = {}) => {
+						loading.close();
+						const { data: {
+							code,
+							msg = "",
+						} = {} } = res;
+						this.$message.success(msg);
+						sessionStorage.removeItem("userinfo");
+						setTimeout(() => goLogin(1), 1000);
+					});
+			},
+        },
+    });
+</script>
