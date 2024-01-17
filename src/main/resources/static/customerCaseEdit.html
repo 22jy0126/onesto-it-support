@@ -146,7 +146,7 @@
                             </div>
                             <div class="edit-item-wrapper">
                                 <div class="edit-item">
-                                    <div class="label">開発期限:<span class="required">（必須）</span></div>
+                                    <div class="label">納品期間:<span class="required">（必須）</span></div>
                                     <el-date-picker 
                                         v-bind:class="errors.deadlineErr ? 'input-err' : ''"
                                         v-model="jobCase.deadline" 
@@ -154,12 +154,12 @@
                                         @change="errClean('deadline')"
                                         format="yyyy年MM月dd日"
                                         value-format="yyyy-MM-dd"
-                                        placeholder="開発期限を選択してください">
+                                        placeholder="納品期間を選択してください">
                                     </el-date-picker>
                                 </div>
                                 <div v-bind:class="errors.deadlineErr ? 'err-item' : 'opt-item-hidden'">
                                     <i class="el-icon-warning error-icon"></i>
-                                    開発期限を選択してください
+                                    納品期間を選択してください
                                 </div>
                             </div>
                             
