@@ -30,11 +30,8 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <!-- <el-badge :value="user.noticeCount" class="item">
-                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge> -->
-                {{user.username}}さん、こんにちは！
-                <span class="logout">ログアウト</span>
+                {{user.name}}さん、こんにちは！
+                <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
 
@@ -63,11 +60,15 @@
                         </div>
                         <div class="sub-caption">
                             マイルストーンの確認
+                            <span class="wait-tips" v-if="(milestones[0] || {}).editStatus == 0">
+                                <i class="el-icon-warning"></i>
+                                社員が編集中です、しばらくお待ちください！
+                            </span>
                         </div>
                         <section class="milestone-wrapper">
                             <el-timeline>
                                 <el-timeline-item
-                                    v-for="(milestoneItem, index) in jobCase.milestones"
+                                    v-for="(milestoneItem, index) in milestones"
                                     :key="index"
                                     size="large">
                                     <div class="name">
@@ -87,10 +88,11 @@
                                                 type="textarea"
                                                 :rows="3"
                                                 placeholder="コメントを入力してください" 
+                                                :disabled="milestoneItem.editStatus == 0"
                                                 v-model="milestoneItem.comment" 
                                                 clearable>
                                             </el-input>
-                                            <div class="btn-wrapper">
+                                            <div class="btn-wrapper" v-if="milestoneItem.editStatus == 1">
                                                 <el-popconfirm
                                                     confirm-button-text='キャンセル'
                                                     cancel-button-text='キャンセルしない' 
@@ -110,14 +112,14 @@
                                 </el-timeline-item>
                             </el-timeline>
                         </section>
-                        <div class="btns-container">
+                        <div class="btns-container" v-if="(milestones[0] || {}).editStatus == 1">
                             <el-button type="primary" 
                                 @click="onOk"
                             >
                                 同意する
                             </el-button>
-                            <el-button type="info">
-                                コメントを踏んで、直してほうしい
+                            <el-button type="info" @click="onUpd">
+                                修正を依頼する
                             </el-button>
                         </div>
                     </div>
@@ -130,6 +132,7 @@
 
 </html>
 <script src="./js/consts.js"></script>
+<script src="./js/utils.js"></script>
 <script src="./js/pageJump.js"></script>
 <script>
     // elementの日本語対応
@@ -148,30 +151,72 @@
                     noticeCount: 2, // 通知数
                 },
                 jobCase: {
-                    caseName: "学生管理システムの作成",
-                    milestones: [{
-                        id: 0,
-                        name: "上流設計完成",
-                        description: "アクティビティ図とユースケース図の完成、画面の項目と画面の遷移を明確にして、説明の詳細はドキュメントにする",
-                        isComment: false,
-                    }, {
-                        id: 1,
-                        name: "詳細設計完成",
-                        description: "モックアップの作成して、オブジェクト図とシーケンス図が完成して、データベースの設計の完成する,",
-                        isComment: false,
-                    }, {
-                        id: 2,
-                        name: "実装完成",
-                        description: "設計通りに開発完成する、機能は全部実現する",
-                        isComment: false,
-                    }, {
-                        id: 3,
-                        name: "テスト完成",
-                        description: "機能は全部設計通りに実現するのは検証して、完全性とパーフォーマンスも検証する",
-                        isComment: false,
-                    }],
+                    // caseName: "学生管理システムの作成",
+                    // milestones: [{
+                    //     id: 0,
+                    //     name: "上流設計完成",
+                    //     description: "アクティビティ図とユースケース図の完成、画面の項目と画面の遷移を明確にして、説明の詳細はドキュメントにする",
+                    //     isComment: false,
+                    // }, {
+                    //     id: 1,
+                    //     name: "詳細設計完成",
+                    //     description: "モックアップの作成して、オブジェクト図とシーケンス図が完成して、データベースの設計の完成する,",
+                    //     isComment: false,
+                    // }, {
+                    //     id: 2,
+                    //     name: "実装完成",
+                    //     description: "設計通りに開発完成する、機能は全部実現する",
+                    //     isComment: false,
+                    // }, {
+                    //     id: 3,
+                    //     name: "テスト完成",
+                    //     description: "機能は全部設計通りに実現するのは検証して、完全性とパーフォーマンスも検証する",
+                    //     isComment: false,
+                    // }],
                 },
+                milestones: [],
             };
+        },
+        mounted() {
+            // ユーザー情報をゲット
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 1) {
+                    goLogin();
+                } else {
+                    this.user = user;
+                }
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 1) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.jobCase.customerId = user.customerId;
+                            sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        }
+                    })
+            }
+            const caseId = getURLParam("caseId");
+            this.jobCase.caseId = caseId;
+            this.init();
         },
         methods: {
             goCustomerCaseView,
@@ -179,26 +224,121 @@
             goback() {
                 window.history.back();
             },
+            init() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                const { caseId } = this.jobCase;
+                axios({
+                    method: "GET",
+                    url: `/logged/case/getbase/${caseId}`,
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        const { data: {
+                            code,
+                            data = [],
+                        } = {} } = res;
+                        if (code == 20041) {
+                            this.jobCase = data[0];
+                            axios({
+                                method: "GET",
+                                url: `/logged/milestone/get/${caseId}`,
+                                withCredentials: true,
+                            })
+                                .then((res = {}) => {
+                                    loading.close();
+                                    const { data: {
+                                        code,
+                                        data: milestones = [],
+                                    } = {} } = res;
+                                    if (milestones.length) {
+                                        this.milestones = milestones;
+                                    }
+                                });
+                        }
+                    })
+            },
             onCommentAdd(index) {
                 const {
                     milestones = [],
-                } = this.jobCase;
+                } = this;
                 milestones[index].isComment = true;
             },
             onCommentCancel(index) {
                 const {
                     milestones = [],
-                } = this.jobCase;
+                } = this;
                 milestones[index].comment = "";
                 milestones[index].isComment = false;
             },
             onOk() {
                 this.$confirm('同意したマイルストーンは後で直せません、よろしいですか?', '確認', {
                     confirmButtonText: '同意する',
-                    cancelButtonText: "もうちょっと考える",
+                    cancelButtonText: "検討する",
                     type: 'warning',
                     center: false,
                 });
+            },
+            onUpd() {
+                const {
+                    milestones = [],
+                } = this;
+                milestones.forEach(m => {
+                    m.caseId = this.jobCase.caseId;
+                    m.editStatus = 0;
+                    m.status = 0;
+                });
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "POST",
+                    url: `/logged/milestone/update`,
+                    data: milestones,
+                    withCredentials: true,
+                })
+                    .then(() => {
+                        loading.close();
+                        this.$confirm('しばらくお待ちください', '修正を依頼しました', {
+                            confirmButtonText: '承諾する',
+                            type: 'success',
+                            center: true,
+                            showCancelButton: false,
+                        });
+                        this.milestones.forEach(m => {
+                            m.editStatus = 0;
+                        });
+                    })
+            },
+            logout() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/logout",
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            msg = "",
+                        } = {} } = res;
+                        this.$message.success(msg);
+                        sessionStorage.removeItem("userinfo");
+                        setTimeout(() => goLogin(), 1000);
+                    });
             }
         }
     });

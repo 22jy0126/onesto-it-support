@@ -111,12 +111,12 @@ const goCustomerCaseView = () => {
 };
 
 // お客様・案件のマイルストーン確認
-const goMilestoneDetailConfirm = () => {
-    goTo("/milestonedetailconfirm.html");
+const goMilestoneDetailConfirm = (caseId = "") => {
+    goTo(`/milestonedetailconfirm.html?caseId=${caseId}`);
 };
 
 // お客様・案件のマイルストーン進捗確認
-const goMilestoneProgressConfirm = () => {
+const goMilestoneProgressConfirm = (caseId = "") => {
     goTo("/milestoneprogressconfirm.html");
 };
 

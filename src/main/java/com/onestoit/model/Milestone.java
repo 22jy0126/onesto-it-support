@@ -56,7 +56,7 @@ public class Milestone {
 	/*
 	 * 削除必要
 	 */
-	private Boolean isDel;
+	private Boolean isDel = false;
 
 	public Integer getId() {
 		return id;

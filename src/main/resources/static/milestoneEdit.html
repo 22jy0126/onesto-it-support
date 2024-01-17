@@ -30,11 +30,8 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <!-- <el-badge :value="user.noticeCount" class="item">
-                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge> -->
-                {{user.username}}さん、こんにちは！
-                <span class="logout">ログアウト</span>
+                {{user.name}}さん、こんにちは！
+                <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
 
@@ -64,7 +61,12 @@
                         </div>
                         <div class="sub-caption">
                             マイルストーンの編集
+                            <span class="wait-tips" v-if="milestones[0].editStatus == 1">
+                                <i class="el-icon-warning"></i>
+                                クライアントが確認中です、しばらくお待ちください！
+                            </span>
                         </div>
+                        
                         <el-timeline>
                             <el-timeline-item
                                 v-for="(milestoneItem, index) in milestones"
@@ -75,6 +77,7 @@
                                     <div class="milestone-edit">
                                         <div class="label">タイトル<span class="required">（必須）</span></div>
                                         <el-input 
+                                            v-if="milestoneItem.editStatus == 0"
                                             draggable="false"
                                             v-bind:class="milestoneItem.nameErr ? 'input-err' : ''"
                                             :rows="3"
@@ -83,11 +86,13 @@
                                             @input="errClear(index, 'name')"
                                             clearable>
                                         </el-input>
+                                        <div v-if="milestoneItem.editStatus == 1">
+                                            {{milestoneItem.name}}
+                                        </div>
                                     </div>
                                     <!-- <div>1111{{milestoneItem.nameErr}}</div> -->
                                     <div v-bind:class="milestoneItem.nameErr ? 'err-item err-item-func' : 'opt-item-hidden'">
                                         <i class="el-icon-warning error-icon"></i>
-                                        
                                         マイルストーン名を入力してください
                                     </div>
                                 </div>
@@ -95,6 +100,7 @@
                                     <div class="milestone-edit">
                                         <div class="label">詳細<span class="required">（必須）</span></div>
                                         <el-input 
+                                            v-if="milestoneItem.editStatus == 0"
                                             draggable="false"
                                             v-bind:class="milestoneItem.descErr ? 'input-err' : ''"
                                             type="textarea"
@@ -104,16 +110,19 @@
                                             @input="errClear(index, 'desc')"
                                             clearable>
                                         </el-input>
+                                        <div v-if="milestoneItem.editStatus == 1">
+                                            {{milestoneItem.description}}
+                                        </div>
                                     </div>
                                     <div v-bind:class="milestoneItem.descErr ? 'err-item err-item-func' : 'opt-item-hidden'">
                                         <i class="el-icon-warning error-icon"></i>
                                         マイルストーンの説明を入力してください
                                     </div>
                                 </div>
-                                <div v-bind:class="milestoneItem.isComment ? 'comment-view' : 'hidden'">
+                                <div v-if="milestoneItem.isComment" class="comment-view">
                                     ※コメント： {{milestoneItem.comment}}
                                 </div>
-                                <div class="opts">
+                                <div class="opts" v-if="milestoneItem.editStatus == 0">
                                     <div 
                                         @click="onMilestonenUp(index)"
                                         v-bind:class="index==0 ? 'opt-item-hidden' : 'opt-item'">
@@ -145,7 +154,7 @@
                             </el-timeline-item>
                           </el-timeline>
                     </div>
-                    <div class="btns-container">
+                    <div v-if="milestones[0].editStatus == 0" class="btns-container">
                         <el-button 
                             icon="el-icon-plus"
                             @click="onMilestonenAdd" 
@@ -153,7 +162,7 @@
                             マイルストーン追加
                         </el-button>
                     </div>
-                    <div class="btns-container">
+                    <div class="btns-container" v-if="milestones[0].editStatus == 0">
                         <el-button type="primary" 
                             @click="onFinish"
                         >
@@ -191,7 +200,7 @@
                 },
                 jobCase: {
                     caseId: undefined,
-                    caseName: "学生管理システムの作成",
+                    // caseName: "学生管理システムの作成",
                 },
                 milestones: [{
                     nameErr: false,
@@ -304,7 +313,7 @@
             onMilestonenDel(index) {
                 const {
                     milestones = [],
-                } = this.jobCase;
+                } = this;
                 const target = milestones[index];
                 if (target.id) {
                     target.isDel = true;
@@ -370,17 +379,61 @@
                     return;
                 }
 
-                //TODO: サーバーにマイルストーンのデータを送る
-
-
-
-                this.$confirm('確認するまでしばらくお待ちください', 'クライアントに送りました', {
-                    confirmButtonText: '分かりました',
-                    type: 'success',
-                    center: true,
-                    showCancelButton: false,
+                const data = [...(this.milestones || [])];
+                data.push(...this.deletedMilestones);
+                data.forEach(m => {
+                    m.caseId = this.jobCase.caseId;
+                    m.editStatus = 1;
+                    m.status = 0;
                 });
-            }
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "POST",
+                    url: `/logged/milestone/update`,
+                    data,
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        this.$confirm('確認するまでしばらくお待ちください', 'クライアントに送りました', {
+                            confirmButtonText: '承諾する',
+                            type: 'success',
+                            center: true,
+                            showCancelButton: false,
+                        });
+                        this.milestones.forEach(m => {
+                            m.editStatus = 1;
+                        });
+                    });
+            },
+            logout() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/logout",
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            msg = "",
+                        } = {} } = res;
+                        this.$message.success(msg);
+                        sessionStorage.removeItem("userinfo");
+                        setTimeout(() => goLogin(1), 1000);
+                    });
+            },
         }
     });
 </script>

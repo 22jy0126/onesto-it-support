@@ -8,11 +8,11 @@
 		insert into onestoit_case_milestone (
 			case_id,
 			name,
+			description,
 			edit_status,
 			status,
-			description,
 			is_comment,
-			create_data,
+			create_data
 		) values 
 		<foreach collection="list" separator="," item="item">
 			(
@@ -21,8 +21,8 @@
 				#{item.description},
 				#{item.editStatus},
 				#{item.status},
-				#{isComment},
-				#{createData}
+				#{item.isComment},
+				#{item.createData}
 			)
 		</foreach>
 	</insert>
@@ -30,7 +30,7 @@
 	<!-- 案件マイルストーンを削除 -->
 	<delete id="deleteByIds">
 		delete from onestoit_case_milestone where id in 
-		<foreach item="id" collection="ids" open="(" separator="," close=")">
+		<foreach item="id" collection="list" open="(" separator="," close=")">
               #{id}
         </foreach>
 	</delete>
@@ -51,13 +51,13 @@
 			<if test="description != null">
 				, description = #{description}
 			</if>
-			<if test="is_comment != null">
+			<if test="isComment != null">
 				, is_comment = #{isComment}
 			</if>
 			<if test="comment != null">
 				, comment = #{comment}
 			</if>
-			<if test="update_date != null">
+			<if test="updateDate != null">
 				, update_date = #{updateDate}
 			</if>
 		</set>

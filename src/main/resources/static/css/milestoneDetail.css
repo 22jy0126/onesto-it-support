@@ -97,3 +97,10 @@
     padding: 10px 0 20px;
     cursor: pointer;
 }
+.wait-tips {
+    color: #e08900;
+    font-size: 13px;
+}
+.wait-tips i {
+    font-size: 16px;
+}

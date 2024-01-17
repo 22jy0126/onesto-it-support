@@ -325,11 +325,12 @@
             },
             onMilestoneCheck() {
                 const ms = getURLParam("ms") || "";
+                const { caseId, milestoneStatus } = this.jobCase;
                 // debugger;
-                if (ms == 1) {
-                    goMilestoneProgressConfirm();
+                if (milestoneStatus == 1) {
+                    goMilestoneProgressConfirm(caseId);
                 } else {
-                    goMilestoneDetailConfirm();
+                    goMilestoneDetailConfirm(caseId);
                 }
             },
             logout() {

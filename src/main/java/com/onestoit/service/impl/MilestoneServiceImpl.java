@@ -29,15 +29,19 @@ public class MilestoneServiceImpl implements MilestoneService {
 				continue;
 			}
 			if (m.getId() != null) {
-				m.setCreateData(new Date());
+				m.setUpdateDate(new Date());
 				updList.add(m);
 				continue;
 			}
+			m.setCreateData(new Date());
 			saveList.add(m);
 		}
-		
-		caseMilestoneMapper.deleteByIds(delList);
-		caseMilestoneMapper.saveBatch(saveList);
+		if (delList.size() > 0) {
+			caseMilestoneMapper.deleteByIds(delList);
+		}
+		if (saveList.size() > 0) {
+			caseMilestoneMapper.saveBatch(saveList);
+		}
 		for (Milestone milestone : updList) {
 			milestone.setUpdateDate(new Date());
 			caseMilestoneMapper.updateOne(milestone);

@@ -79,6 +79,7 @@ public class UserController {
 			} else {                       // ログイン成功
 				System.out.println(res.getData());
 				session.setAttribute("userinfo", res.getData());
+				
 			}
 		}
 		return res;
