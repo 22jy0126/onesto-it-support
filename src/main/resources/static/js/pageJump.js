@@ -44,14 +44,6 @@ const goEmployeeApplyHistory = () => {
 };
 
 // 社員・案件の詳細
-/**
- * @Param from
- * 1 案件一覧
- * 2 応募歴史
- * 
- * @Param caseId
- */
-//
 const goCaseDetail = (caseId) => {
     goTo(`/casedetail.html?caseId=${caseId}`);
 };
@@ -62,8 +54,8 @@ const goMilestoneEdit = (caseId) => {
 };
 
 // 社員・案件のマイルストー進捗更新
-const goMilestoneProgressUpdate = () => {
-    goTo("/milestoneprogressupdate.html");
+const goMilestoneProgressUpdate = (caseId) => {
+    goTo(`/milestoneprogressupdate.html?caseId=${caseId}`);
 };
 
 // 社員・通知
@@ -117,7 +109,7 @@ const goMilestoneDetailConfirm = (caseId = "") => {
 
 // お客様・案件のマイルストーン進捗確認
 const goMilestoneProgressConfirm = (caseId = "") => {
-    goTo("/milestoneprogressconfirm.html");
+    goTo(`/milestoneprogressconfirm.html?caseId=${caseId}`);
 };
 
 // お客様・通知

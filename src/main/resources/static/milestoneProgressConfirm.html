@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
-
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -30,11 +30,8 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <!-- <el-badge :value="user.noticeCount" class="item">
-                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge> -->
-                {{user.username}}さん、こんにちは！
-                <span class="logout">ログアウト</span>
+                {{user.name}}さん、こんにちは！
+                <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
 
@@ -45,7 +42,7 @@
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="2" class="el-menu-vertical-demo">
                     <el-menu-item index="1" @click="goCustomerCaseEdit">新規案件登録</el-menu-item>
-                    <el-menu-item index="2">私の案件</el-menu-item>
+                    <el-menu-item index="2" @click="goCustomerCaseView">私の案件</el-menu-item>
                     <el-menu-item index="3">通知</el-menu-item>
                 </el-menu>
             </el-aside>
@@ -67,7 +64,7 @@
                         <section class="milestone-wrapper">
                             <el-timeline>
                                 <el-timeline-item
-                                    v-for="(milestoneItem, index) in jobCase.milestones"
+                                    v-for="(milestoneItem, index) in milestones"
                                     :key="index"
                                     :color="milestoneItem.color"
                                     size="large">
@@ -78,7 +75,7 @@
                                     <div class="desc">
                                         {{milestoneItem.description}}
                                     </div>
-                                    <div class="opt-line">
+                                    <div class="opt-line" v-if="milestoneItem.status == 3">
                                         <span v-bind:class="!milestoneItem.isComment && milestoneItem.status == 3 ? 'comment-add' : 'hidden'" 
                                             @click="onCommentAdd(index)">
                                             完成物についてのコメントを追加
@@ -109,12 +106,22 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div v-if="milestoneItem.status == 2 && milestoneItem.isComment == true"
+                                        class="comment-view">
+                                        ※コメント： {{milestoneItem.comment}}
+                                    </div>
                                     <div v-bind:class="milestoneItem.status != 3 ? 'hidden' : 'opt-line'">
                                         <el-button 
                                             size="small" 
                                             @click="onConfirm(index)"
                                             type="primary">
                                             作業完成確認
+                                        </el-button>
+                                        <el-button 
+                                            size="small" 
+                                            @click="onUpd(index)"
+                                            type="info">
+                                            修正を依頼する
                                         </el-button>
                                     </div>
                                 </el-timeline-item>
@@ -131,6 +138,7 @@
 </html>
 <script src="./js/consts.js"></script>
 <script src="./js/pageJump.js"></script>
+<script src="./js/utils.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -142,104 +150,258 @@
         data() {
             return {
                 // ログインしたユーザー情報
-                user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    username: "鈴木　奈々", // ユーザー名
-                    noticeCount: 2, // 通知数
-                },
+                user: {},
                 jobCase: {},
+                milestones: [],
             };
         },
         mounted() {
+            // ユーザー情報をゲット
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 1) {
+                    goLogin();
+                } else {
+                    this.user = user;
+                }
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 1) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.jobCase.customerId = user.customerId;
+                            sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        }
+                    })
+            }
+            const caseId = getURLParam("caseId");
+            this.jobCase.caseId = caseId;
             this.init();
         },
         methods: {
             init() {
-                this.getMilestoneData();
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                const { caseId } = this.jobCase;
+                axios({
+                    method: "GET",
+                    url: `/logged/case/getbase/${caseId}`,
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        const { data: {
+                            code,
+                            data = [],
+                        } = {} } = res;
+                        if (code == 20041) {
+                            this.jobCase = data[0];
+                            axios({
+                                method: "GET",
+                                url: `/logged/milestone/get/${caseId}`,
+                                withCredentials: true,
+                            })
+                                .then((res = {}) => {
+                                    loading.close();
+                                    const { data: {
+                                        code,
+                                        data: milestones = [],
+                                    } = {} } = res;
+                                    milestones.forEach(item => {
+                                        const { status } = item;
+                                        const s = milestoneStatus.find(({ code: c }) => c == status);
+                                        item.statusText = s.text;
+                                        item.color = s.color;
+                                        item.markCls = `mark mark-${s.code}`;
+                                    });
+                                    this.milestones = milestones;
+                                });
+                        }
+                    })
             },
             goCustomerCaseEdit,
+            goCustomerCaseView,
             goback() {
                 window.history.back();
-            },
-            /**
-             * 案件のデータをゲット
-            */
-            getMilestoneData() {
-                const mock = {
-                    caseName: "学生管理システムの作成",
-                    milestones: [{
-                        id: 0,
-                        name: "上流設計完成",
-                        description: "アクティビティ図とユースケース図の完成、画面の項目と画面の遷移を明確にして、説明の詳細はドキュメントにする",
-                        isComment: false,
-                        status: 4,
-                    }, {
-                        id: 1,
-                        name: "詳細設計完成",
-                        description: "モックアップの作成して、オブジェクト図とシーケンス図が完成して、データベースの設計の完成する,",
-                        isComment: false,
-                        status: 3,
-                        // comment: "もうちょっど詳しく書いてほしい",
-                    }, {
-                        id: 2,
-                        name: "実装完成",
-                        description: "設計通りに開発完成する、機能は全部実現する",
-                        status: 1,
-                        isComment: false,
-                    }, {
-                        id: 3,
-                        name: "テスト完成",
-                        description: "機能は全部設計通りに実現するのは検証して、完全性とパーフォーマンスも検証する",
-                        status: 1,
-                        isComment: false,
-                    }],
-                };
-                const jobCase = mock;
-                const milestones = jobCase.milestones;
-                milestones.forEach(item => {
-                    const { status } = item;
-                    const s = milestoneStatus.find(({code: c}) => c == status);
-                    item.statusText = s.text;
-                    item.color = s.color;
-                    item.markCls = `mark mark-${s.code}`;
-                });
-                jobCase.milestones = milestones;
-                this.jobCase = jobCase;
-            },
-            onConfirm(index) {
-                this.$confirm('確認を完了すると前の状態には戻れません、よろしいですか?', '確認', {
-                    confirmButtonText: '確認する',
-                    cancelButtonText: "もうちょっと考える",
-                    type: 'warning',
-                    center: false,
-                })
-                    .then(() => {
-                        const milestones = { ...this.jobCase.milestones };
-                        milestones[index].status = 4;
-                        milestones[index].statusText = "確認済み";
-                        milestones[index].color = "#67c23a";
-                        milestones[index].markCls = "mark mark-4";
-
-                        milestones[index + 1].status = 2;
-                        milestones[index + 1].statusText = "作業中";
-                        milestones[index + 1].color = "#409eff";
-                        milestones[index + 1].markCls = "mark mark-2";
-                        this.jobCase.milestones = milestones;
-                    });
             },
             onCommentAdd(index) {
                 const {
                     milestones = [],
-                } = this.jobCase;
+                } = this;
                 milestones[index].isComment = true;
             },
             onCommentCancel(index) {
                 const {
                     milestones = [],
-                } = this.jobCase;
+                } = this;
                 milestones[index].comment = "";
                 milestones[index].isComment = false;
             },
+            onUpd(index) {
+                const {
+                    milestones = [],
+                } = this;
+                const data = milestones[index];
+                data.status = 2;
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "POST",
+                    url: "/logged/milestone/updateOne",
+                    data,
+                    withCredentials: true,
+                })
+                    .then(() => {
+                        loading.close();
+                        const milestones = [...this.milestones];
+                        milestones[index].status = 2;
+                        milestones[index].statusText = "作業中";
+                        milestones[index].color = "#409eff";
+                        milestones[index].markCls = "mark mark-2";
+                        this.milestones = milestones;
+                        this.$confirm('しばらくお待ちください', '修正を依頼しました', {
+                            confirmButtonText: '承諾する',
+                            type: 'success',
+                            center: true,
+                            showCancelButton: false,
+                        });
+                    })
+            },
+            onConfirm(index) {
+                this.$confirm('確認を完了すると前の状態には戻れません、よろしいですか?', '確認', {
+                    confirmButtonText: '確認する',
+                    cancelButtonText: "検討する",
+                    type: 'warning',
+                    center: false,
+                })
+                    .then(() => {
+                        const {
+                            milestones = [],
+                        } = this;
+                        const data = milestones[index];
+                        data.status = 4;
+                        data.isComment = false;
+                        data.comment = "";
+                        const loading = this.$loading({
+                            lock: true,
+                            text: 'Loading',
+                            spinner: 'el-icon-loading',
+                            background: 'rgba(0, 0, 0, 0.1)'
+                        });
+                        axios({
+                            method: "POST",
+                            url: "/logged/milestone/updateOne",
+                            data,
+                            withCredentials: true,
+                        })
+                            .then(() => {
+                                if (index != (milestones.length - 1)) {
+                                    const next = milestones[index + 1];
+                                    next.status = 2;
+                                    axios({
+                                        method: "POST",
+                                        url: "/logged/milestone/updateOne",
+                                        data: next,
+                                        withCredentials: true,
+                                    })
+                                        .then(() => {
+                                            loading.close();
+                                            const milestones = [...this.milestones];
+                                            milestones[index].status = 4;
+                                            milestones[index].statusText = "確認済み";
+                                            milestones[index].color = "#67c23a";
+                                            milestones[index].markCls = "mark mark-4";
+
+                                            milestones[index + 1].status = 2;
+                                            milestones[index + 1].statusText = "作業中";
+                                            milestones[index + 1].color = "#409eff";
+                                            milestones[index + 1].markCls = "mark mark-2";
+                                            this.milestones = milestones;
+                                        })
+
+                                } else {
+                                    loading.close();
+                                    const milestones = [...this.milestones];
+                                    milestones[index].status = 4;
+                                    milestones[index].statusText = "確認済み";
+                                    milestones[index].color = "#67c23a";
+                                    milestones[index].markCls = "mark mark-4";
+                                    this.milestones = milestones;
+                                }
+                            })
+                    })
+
+
+                
+
+                // this.$confirm('確認を完了すると前の状態には戻れません、よろしいですか?', '確認', {
+                //     confirmButtonText: '確認する',
+                //     cancelButtonText: "検討する",
+                //     type: 'warning',
+                //     center: false,
+                // })
+                //     .then(() => {
+                //         const milestones = [...this.milestones];
+                //         milestones[index].status = 4;
+                //         milestones[index].statusText = "確認済み";
+                //         milestones[index].color = "#67c23a";
+                //         milestones[index].markCls = "mark mark-4";
+
+                //         milestones[index + 1].status = 2;
+                //         milestones[index + 1].statusText = "作業中";
+                //         milestones[index + 1].color = "#409eff";
+                //         milestones[index + 1].markCls = "mark mark-2";
+                //         this.milestones = milestones;
+                //     });
+            },
+            logout() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/logout",
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            msg = "",
+                        } = {} } = res;
+                        this.$message.success(msg);
+                        sessionStorage.removeItem("userinfo");
+                        setTimeout(() => goLogin(), 1000);
+                    });
+            }
         }
     });
 </script>

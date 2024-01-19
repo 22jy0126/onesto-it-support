@@ -324,9 +324,7 @@
                     });
             },
             onMilestoneCheck() {
-                const ms = getURLParam("ms") || "";
                 const { caseId, milestoneStatus } = this.jobCase;
-                // debugger;
                 if (milestoneStatus == 1) {
                     goMilestoneProgressConfirm(caseId);
                 } else {

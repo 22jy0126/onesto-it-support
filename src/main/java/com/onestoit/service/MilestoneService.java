@@ -22,4 +22,18 @@ public interface MilestoneService {
 	 * @return
 	 */
 	Result getCaseMilestones(Integer caseId);
+	
+	/**
+	 * マイルストーンリストの作成について同意する
+	 * @param milestones
+	 * @return
+	 */
+	Result editConfirmed(ArrayList<Milestone> milestones);
+	
+	/**
+	 * 一つのマイルストーンの更新
+	 * @param m
+	 * @return
+	 */
+	Result updateOne(Milestone m);
 }

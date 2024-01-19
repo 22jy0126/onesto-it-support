@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.onestoit.controller.Code;
 import com.onestoit.controller.Result;
+import com.onestoit.mapper.CaseBaseMapper;
 import com.onestoit.mapper.CaseMilestoneMapper;
+import com.onestoit.model.CaseBase;
 import com.onestoit.model.Milestone;
 import com.onestoit.service.MilestoneService;
 
@@ -16,6 +18,9 @@ import com.onestoit.service.MilestoneService;
 public class MilestoneServiceImpl implements MilestoneService {
 	@Autowired
 	CaseMilestoneMapper caseMilestoneMapper;
+	
+	@Autowired
+	CaseBaseMapper caseBaseMapper;
 
 	@Override
 	public Result caseMilestonesSave(ArrayList<Milestone> milestones) {
@@ -54,6 +59,23 @@ public class MilestoneServiceImpl implements MilestoneService {
 	public Result getCaseMilestones(Integer caseId) {
 		ArrayList<Milestone> milestones = caseMilestoneMapper.findByCaseId(caseId);
 		return new Result(Code.GET_OK, milestones);
+	}
+
+	@Override
+	public Result editConfirmed(ArrayList<Milestone> milestones) {
+		caseMilestonesSave(milestones);
+		CaseBase cb = new CaseBase();
+		Milestone m = milestones.get(0);
+		cb.setCaseId(m.getCaseId());
+		cb.setMilestoneStatus(1);
+		caseBaseMapper.updateCaseStatusOrMoney(cb);
+		return new Result(Code.UPDATE_OK, null);
+	}
+
+	@Override
+	public Result updateOne(Milestone m) {
+		int res = caseMilestoneMapper.updateOne(m);
+		return new Result(Code.UPDATE_OK, res);
 	}
 
 }

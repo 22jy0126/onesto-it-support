@@ -90,4 +90,11 @@ public interface CaseService {
 	 * @return
 	 */
 	Result caseToBind(CaseBind cb);
+	
+//	/**
+//	 * 案件基本情報更新（報酬、状態、マイルストーン状態）
+//	 * @param cb
+//	 * @return
+//	 */
+//	Result caseBaseUpdate(CaseBind cb);
 }

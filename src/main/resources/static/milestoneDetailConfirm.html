@@ -65,7 +65,7 @@
                                 社員が編集中です、しばらくお待ちください！
                             </span>
                         </div>
-                        <section class="milestone-wrapper">
+                        <section class="milestone-wrapper" v-if="milestones.length > 0">
                             <el-timeline>
                                 <el-timeline-item
                                     v-for="(milestoneItem, index) in milestones"
@@ -112,6 +112,12 @@
                                 </el-timeline-item>
                             </el-timeline>
                         </section>
+                        <section class="milestones-empty" v-if="milestones.length == 0">
+                            <div class="milestones-empty-inner">
+                                <img src="./img/computer_sagyouin_woman.png" alt="">
+                                <div class="text">社員は今編集中です、しばらくお待ちください！</div>
+                            </div>
+                        </section>
                         <div class="btns-container" v-if="(milestones[0] || {}).editStatus == 1">
                             <el-button type="primary" 
                                 @click="onOk"
@@ -145,36 +151,9 @@
         data() {
             return {
                 // ログインしたユーザー情報
-                user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    username: "鈴木　奈々", // ユーザー名
-                    noticeCount: 2, // 通知数
-                },
-                jobCase: {
-                    // caseName: "学生管理システムの作成",
-                    // milestones: [{
-                    //     id: 0,
-                    //     name: "上流設計完成",
-                    //     description: "アクティビティ図とユースケース図の完成、画面の項目と画面の遷移を明確にして、説明の詳細はドキュメントにする",
-                    //     isComment: false,
-                    // }, {
-                    //     id: 1,
-                    //     name: "詳細設計完成",
-                    //     description: "モックアップの作成して、オブジェクト図とシーケンス図が完成して、データベースの設計の完成する,",
-                    //     isComment: false,
-                    // }, {
-                    //     id: 2,
-                    //     name: "実装完成",
-                    //     description: "設計通りに開発完成する、機能は全部実現する",
-                    //     isComment: false,
-                    // }, {
-                    //     id: 3,
-                    //     name: "テスト完成",
-                    //     description: "機能は全部設計通りに実現するのは検証して、完全性とパーフォーマンスも検証する",
-                    //     isComment: false,
-                    // }],
-                },
-                milestones: [],
+                user: {},
+                jobCase: {},
+                milestones: [{}],
             };
         },
         mounted() {
@@ -255,9 +234,7 @@
                                         code,
                                         data: milestones = [],
                                     } = {} } = res;
-                                    if (milestones.length) {
-                                        this.milestones = milestones;
-                                    }
+                                    this.milestones = milestones;
                                 });
                         }
                     })
@@ -281,7 +258,43 @@
                     cancelButtonText: "検討する",
                     type: 'warning',
                     center: false,
-                });
+                })
+                    .then(() => {
+                        const {
+                            milestones = [],
+                        } = this;
+                        const { caseId } = this.jobCase;
+                        milestones.forEach((m, idx) => {
+                            m.caseId = caseId;
+                            m.editStatus = 2;
+                            m.comment = "";
+                            m.isComment = false;
+                            if (idx == 0) {
+                                m.status = 2;
+                            } else {
+                                m.status = 1;
+                            }
+                        });
+                        const loading = this.$loading({
+                            lock: true,
+                            text: 'Loading',
+                            spinner: 'el-icon-loading',
+                            background: 'rgba(0, 0, 0, 0.1)'
+                        });
+                        axios({
+                            method: "POST",
+                            url: `/logged/milestone/editConfirmed`,
+                            data: milestones,
+                            withCredentials: true,
+                        })
+                            .then(() => {
+                                loading.close();
+                                this.$message.success("マイルストーンを同意しました！");
+                                setTimeout(() => {
+                                    goMilestoneProgressConfirm(caseId);
+                                }, 1000);
+                            });
+                    })
             },
             onUpd() {
                 const {

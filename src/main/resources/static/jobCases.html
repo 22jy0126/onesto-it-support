@@ -99,7 +99,7 @@
                         <div class="case-sub">
                             <div class="case-sub-money">
                                 <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
-                                <span>{{job.bonusMoney*0.9.toFixed(1).toLocaleString()}}万円</span>
+                                <span>{{+parseFloat(job.bonusMoney*0.9).toFixed(1).toLocaleString()}}万円</span>
                                 <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
                             </div>
                         </div>
@@ -199,31 +199,6 @@
                 totalCount: 0,
             };
         },
-        // mounted() {
-        //     const loading = this.$loading({
-        //         lock: true,
-        //         text: 'Loading',
-        //         spinner: 'el-icon-loading',
-        //         background: 'rgba(0, 0, 0, 0.1)'
-        //     });
-        //     axios({
-        //         method: "GET",
-        //         url: "/login/info",
-        //         withCredentials: true,
-        //     })
-        //         .then((res) => {
-        //             loading.close();
-        //             const { data: {
-        //                 code,
-        //                 data: user = {},
-        //             } = {} } = res;
-        //             if (code != 80011) {
-        //                 goLogin(1);
-        //             } else {
-        //                 this.user = user;
-        //             }
-        //         })
-        // },
         mounted() {
             // ユーザー情報をゲット
             const userStr = sessionStorage.getItem("userinfo") || "";

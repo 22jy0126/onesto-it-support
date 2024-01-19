@@ -29,4 +29,14 @@ public class MilestoneController {
 	Result getMilestones(@PathVariable Integer caseId) {
 		return milestoneService.getCaseMilestones(caseId);
 	}
+	
+	@PostMapping("/editConfirmed")
+	Result editConfirmed(@RequestBody ArrayList<Milestone> milestones) {
+		return milestoneService.editConfirmed(milestones);
+	}
+	
+	@PostMapping("/updateOne")
+	Result updateOne(@RequestBody Milestone m) {
+		return milestoneService.updateOne(m);
+	}
 }

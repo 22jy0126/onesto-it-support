@@ -223,6 +223,12 @@ public class CaseServiceImpl implements CaseService {
 		}
 		return new Result(Code.UPDATE_OK, res);
 	}
+
+//	@Override
+//	public Result caseBaseUpdate(CaseBind cb) {
+//		int res = caseBaseMapper.updateCaseStatusOrMoney(cb);
+//		return new Result(Code.UPDATE_OK, res);
+//	}
 }
 
 
