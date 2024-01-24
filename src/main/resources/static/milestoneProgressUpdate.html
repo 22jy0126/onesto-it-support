@@ -44,7 +44,12 @@
                     <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
                     <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
                     <el-menu-item index="3" @click="goEmployeeApplyHistory">応募履歴</el-menu-item>
-                    <el-menu-item index="4" @click="goEmployeeNotification">通知</el-menu-item>
+                    <el-menu-item index="4" @click="goEmployeeNotification">
+                        <el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
+                            <div>通知</div>
+                        </el-badge>
+                        <div v-if="noticeCount == 0">通知</div>
+                    </el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -53,7 +58,7 @@
                     <div class="milestone-detail-container">
                         <div class="goback" @click="goback">
                             <i class="el-icon-back"></i>
-                            案件詳細に戻る
+                            戻る
                         </div>
                         <div class="caption">
                             <i class="el-icon-s-order"></i>
@@ -113,11 +118,8 @@
         data() {
             return {
                 // ログインしたユーザー情報
-                user: {
-                    // avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    // username: "鈴木　奈々", // ユーザー名
-                    // noticeCount: 2, // 通知数
-                },
+                user: {},
+                noticeCount: 0,
                 jobCase: {},
                 milestones: [],
             };
@@ -131,6 +133,18 @@
                     goLogin(1);
                 } else {
                     this.user = user;
+                    axios({
+                        method: "GET",
+                        url: `/logged/emp/notice/${user.employeeId}`,
+                        withCredentials: true,
+                    })
+                        .then((res = {}) => {
+                            const { data: {
+                                code,
+                                data: noticeCount,
+                            } = {} } = res;
+                            this.noticeCount = noticeCount;
+                        });
                 }
             } else {
                 const loading = this.$loading({
@@ -154,8 +168,19 @@
                             goLogin();
                         } else {
                             this.user = user;
-                            this.jobCase.customerId = user.customerId;
                             sessionStorage.setItem("userinfo", JSON.stringify(user));
+                            axios({
+                                method: "GET",
+                                url: `/logged/emp/notice/${user.employeeId}`,
+                                withCredentials: true,
+                            })
+                                .then((res = {}) => {
+                                    const { data: {
+                                        code,
+                                        data: noticeCount,
+                                    } = {} } = res;
+                                    this.noticeCount = noticeCount;
+                                });
                         }
                     })
             }
@@ -220,8 +245,8 @@
             },
             onFinish(index) {
                 const { milestones = [] } = this; 
-                const data = milestones[index];
-                data.status = 3;
+                const milestone = milestones[index];
+                milestone.status = 3;
                 const loading = this.$loading({
                     lock: true,
                     text: 'Loading',
@@ -230,8 +255,11 @@
                 });
                 axios({
                     method: "POST",
-                    url: "/logged/milestone/updateOne",
-                    data,
+                    url: "/logged/milestone/emp/proc/update",
+                    data: {
+                        ...this.jobCase,
+                        milestone,
+                    },
                     withCredentials: true,
                 })
                     .then(() => {

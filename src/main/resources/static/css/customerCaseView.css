@@ -71,3 +71,8 @@
     border: 1px solid #67c23a;
     background-color: #d6f5c8;
 }
+.goback {
+    color: #409eff;
+    padding: 10px 0 20px;
+    cursor: pointer;
+}

@@ -8,6 +8,7 @@ import com.onestoit.model.CaseApply;
 import com.onestoit.model.CaseWithEmp;
 import com.onestoit.model.CaseWithEmpApy;
 import com.onestoit.model.Customer;
+import com.onestoit.model.EmpBindedCase;
 import com.onestoit.model.EmployeeBase;
 
 @Mapper
@@ -53,4 +54,18 @@ public interface CaseApplyMapper {
 	 * @return
 	 */
 	int caseBind(CaseApply ca);
+	
+	/**
+	 * 社員の契約案件
+	 * @param employeeId
+	 * @return
+	 */
+	ArrayList<EmpBindedCase> findEmpCase(String employeeId);
+	
+	/**
+	 * 削除する案件の関連削除
+	 * @param caseId
+	 * @return
+	 */
+	int deleteByCaseId(Integer caseId);
 }

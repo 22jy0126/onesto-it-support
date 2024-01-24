@@ -44,8 +44,8 @@ const goEmployeeApplyHistory = () => {
 };
 
 // 社員・案件の詳細
-const goCaseDetail = (caseId) => {
-    goTo(`/casedetail.html?caseId=${caseId}`);
+const goCaseDetail = (caseId, tom = "0") => {
+    goTo(`/casedetail.html?caseId=${caseId}&tom=${tom}`);
 };
 
 // 社員・案件のマイルストーン編集
@@ -89,10 +89,13 @@ const goCustomerEmpInfo = (employeeId, caseId) => {
 };
 
 // お客様・案件詳細
-const goCustomerCaseDetail = (caseId = "") => {
+const goCustomerCaseDetail = (caseId = "", tom = "") => {
     let url = "/customercasedetail.html";
     if (caseId != "") {
         url = `${url}?caseId=${caseId}`;
+    }
+    if (tom != "") {
+        url = `${url}&tom=${tom}`;
     }
     goTo(url);
 };
@@ -113,12 +116,30 @@ const goMilestoneProgressConfirm = (caseId = "") => {
 };
 
 // お客様・通知
+const goCustomerNotification = () => {
+    goTo(`/customernotification.html`);
+};
 
 // 管理者・顧客管理
 const goManageCustomer = () => {
     goTo("/managecustomer.html");
 };
 
+// 管理者・社員管理
 const goManageEmployee = () => {
     goTo("/manageemployee.html");
 };
+
+// 管理者・顧客案件リスト
+const goManageCustomerDetail = (customerId) => {
+    goTo(`/managecustomerdetail.html?customerId=${customerId}`);
+};
+
+// 管理者・社員案件リスト
+const goManageEmployeeDetail = (employeeId) => {
+    goTo(`/manageemployeedetail.html?employeeId=${employeeId}`);
+};
+
+const goManageCaseDetail = (caseId, from) => {
+    goTo(`/managecasedetail.html?caseId=${caseId}&from=${from}`);
+}

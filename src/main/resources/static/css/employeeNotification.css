@@ -2,8 +2,30 @@
 .notice-case-item {
     border: 1px solid #ddd;
     border-radius: 3px;
-    padding: 20px;
+    padding: 30px 20px 20px;
     margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    /* padding-top: 20px; */
+}
+.read-mark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 45px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 0 0 5px 0;
+    font-size: 12px;
+}
+.read-mark-0 {
+    color: #fff;
+    background-color: #f56c6c;  
+}
+.read-mark-1 {
+    color: #999;
+    background-color: #eee;  
 }
 .notice-case-item .case-name-line {
     display: flex;

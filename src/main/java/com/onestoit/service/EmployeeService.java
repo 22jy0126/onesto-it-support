@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.onestoit.controller.Result;
 import com.onestoit.model.Employee;
 import com.onestoit.model.EmployeeBase;
+import com.onestoit.model.PaginationEmpReq;
 import com.onestoit.model.User;
 import com.onestoit.model.WorkHistory;
 
@@ -69,5 +70,10 @@ public interface EmployeeService {
 	 */
 	Result getEmployeeBaseById(String employeeId);
 	
-	
+	/**
+	 * 社員のページングクエリー
+	 * @param emp
+	 * @return
+	 */
+	Result findEmployeeByPage(PaginationEmpReq emp);
 }

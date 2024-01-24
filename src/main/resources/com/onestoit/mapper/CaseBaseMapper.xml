@@ -54,7 +54,11 @@
 			<if test="status != null">
 				and status = #{status}
 			</if>
+			<if test="status == null">
+				and status != 0
+			</if>
 		</where>
+		order by case_id desc;
 	</select>
 	
 	<!-- ページングで案件検索 -->
@@ -77,6 +81,7 @@
 				and status = #{status}
 			</if>
 		</where>
+		order by case_id desc
 		limit #{fromNum}, #{pageSize}
 	</select>
 	

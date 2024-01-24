@@ -45,7 +45,12 @@
                     <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
                     <el-menu-item index="2">個人履歴</el-menu-item>
                     <el-menu-item index="3" @click="goEmployeeApplyHistory">応募履歴</el-menu-item>
-                    <el-menu-item index="4" @click="goEmployeeNotification">通知</el-menu-item>
+					<el-menu-item index="4" @click="goEmployeeNotification">
+						<el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
+							<div>通知</div>
+						</el-badge>
+						<div v-if="noticeCount == 0">通知</div>
+					</el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -178,6 +183,7 @@
         data() {
             return {
                 employeeInfo: {},
+				noticeCount: 0,
             };
         },
 		mounted() {
@@ -202,10 +208,23 @@
 						goLogin(1);
 					} else {
 						const {
+							employeeId,
 							birthday,
 							gender,
 							workHistorys = [],
 						} = employeeInfo;
+						axios({
+							method: "GET",
+							url: `/logged/emp/notice/${employeeId}`,
+							withCredentials: true,
+						})
+							.then((res = {}) => {
+								const { data: {
+									code,
+									data: noticeCount,
+								} = {} } = res;
+								this.noticeCount = noticeCount;
+							});
 						const birthdayVal = dateFormat(birthday);
 						employeeInfo.birthdayVal = birthdayVal;
 						let genderVal;

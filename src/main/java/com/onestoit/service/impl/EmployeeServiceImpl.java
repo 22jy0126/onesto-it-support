@@ -12,8 +12,11 @@ import com.onestoit.controller.Code;
 import com.onestoit.controller.Result;
 import com.onestoit.mapper.EmployeeBaseMapper;
 import com.onestoit.mapper.WorkHistoryMapper;
+import com.onestoit.model.EmpCaseCount;
 import com.onestoit.model.Employee;
 import com.onestoit.model.EmployeeBase;
+import com.onestoit.model.PaginationEmpReq;
+import com.onestoit.model.PaginationRes;
 import com.onestoit.model.User;
 import com.onestoit.model.WorkHistory;
 import com.onestoit.service.EmployeeService;
@@ -111,6 +114,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 		ArrayList<WorkHistory> workHistorys = workHistoryMapper.getByEmployeeId(employeeId);
 		return assembleToEmployee(eb, workHistorys);
 	}
-	
+
+	@Override
+	public Result findEmployeeByPage(PaginationEmpReq emp) {
+		PaginationRes<EmpCaseCount> data = new PaginationRes<>();
+		ArrayList<EmpCaseCount> list = employeeBaseMapper.findEmployeeByPage(emp);
+		data.setList(list);
+		EmpCaseCount e = (EmpCaseCount)emp;
+		Integer totalCount = employeeBaseMapper.employeeCount(e);
+		data.setTotalCount(totalCount);
+		return new Result(Code.GET_OK, data);
+	}
 	
 }

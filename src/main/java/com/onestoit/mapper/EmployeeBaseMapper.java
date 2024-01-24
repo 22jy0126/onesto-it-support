@@ -1,8 +1,12 @@
 package com.onestoit.mapper;
 
+import java.util.ArrayList;
+
 import org.apache.ibatis.annotations.Mapper;
 
+import com.onestoit.model.EmpCaseCount;
 import com.onestoit.model.EmployeeBase;
+import com.onestoit.model.PaginationEmpReq;
 import com.onestoit.model.User;
 
 @Mapper
@@ -34,4 +38,18 @@ public interface EmployeeBaseMapper {
 	 * @return
 	 */
 	EmployeeBase getById(String employeeId);
+	
+	/**
+	 * 社員検索
+	 * @param emp
+	 * @return
+	 */
+	ArrayList<EmpCaseCount> findEmployeeByPage(PaginationEmpReq emp);
+	
+	/**
+	 * 社員検索の合計数
+	 * @param emp
+	 * @return
+	 */
+	int employeeCount(EmpCaseCount emp);
 }

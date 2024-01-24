@@ -10,12 +10,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.onestoit.controller.Code;
+import com.onestoit.controller.NoticeType;
 import com.onestoit.controller.Result;
 import com.onestoit.mapper.CaseApplyMapper;
 import com.onestoit.mapper.CaseBaseMapper;
 import com.onestoit.mapper.CaseFunctionMapper;
+import com.onestoit.mapper.NotificationCustomerMapper;
+import com.onestoit.mapper.NotificationEmployeeMapper;
 import com.onestoit.model.Case;
 import com.onestoit.model.CaseApply;
+import com.onestoit.model.CaseApplyWithCaseName;
 import com.onestoit.model.CaseBase;
 import com.onestoit.model.CaseBind;
 import com.onestoit.model.CaseFunction;
@@ -23,7 +27,10 @@ import com.onestoit.model.CaseWithCurrCust;
 import com.onestoit.model.CaseWithEmp;
 import com.onestoit.model.CaseWithEmpApy;
 import com.onestoit.model.Customer;
+import com.onestoit.model.EmpBindedCase;
 import com.onestoit.model.EmployeeBase;
+import com.onestoit.model.NotificationCust;
+import com.onestoit.model.NotificationEmp;
 import com.onestoit.model.PaginationCaseBaseReq;
 import com.onestoit.model.PaginationCaseBaseRes;
 import com.onestoit.service.CaseService;
@@ -37,9 +44,15 @@ public class CaseServiceImpl implements CaseService {
 
 	@Autowired
 	CaseFunctionMapper caseFunctionMapper;
-	
+
 	@Autowired
 	CaseApplyMapper caseApplyMapper;
+
+	@Autowired
+	NotificationEmployeeMapper notificationEmployeeMapper;
+
+	@Autowired
+	NotificationCustomerMapper notificationCustomerMapper;
 
 	@Override
 	public Result saveBase(CaseBase cb) {
@@ -76,7 +89,7 @@ public class CaseServiceImpl implements CaseService {
 		CaseBase cb = (CaseBase) c;
 		ArrayList<CaseFunction> functions = c.getFunctions();
 		System.out.println(functions.size());
-		
+
 		Result res1 = saveBase(cb);
 		if (functions.size() == 0) {
 			return res1;
@@ -130,7 +143,7 @@ public class CaseServiceImpl implements CaseService {
 		/*
 		 * 結果の合計数をゲット
 		 */
-		Integer totalCount = caseBaseMapper.getTotalCount((CaseBase)pcbq);
+		Integer totalCount = caseBaseMapper.getTotalCount((CaseBase) pcbq);
 		PaginationCaseBaseRes pcbs = new PaginationCaseBaseRes();
 		pcbs.setList(list);
 		pcbs.setTotalCount(totalCount);
@@ -138,11 +151,22 @@ public class CaseServiceImpl implements CaseService {
 	}
 
 	@Override
-	public Result apply(CaseApply ca) {
+	public Result apply(CaseApplyWithCaseName can) {
 		int res;
+		CaseApply ca = (CaseApply) can;
 		ca.setApplyDate(new Date());
 		try {
 			res = caseApplyMapper.apply(ca);
+
+			// クライアントに通知
+			String caseName = can.getCaseName();
+			NotificationCust nc = new NotificationCust();
+			nc.setCaseId(can.getCaseId());
+			nc.setCustomerId(can.getCustomerId());
+			nc.setCreateDate(new Date());
+			nc.setType(NoticeType.CUST_CASE_NEW_APPLY);
+			nc.setReaded(0);
+			notificationCustomerMapper.addOne(nc);
 		} catch (Exception e) {
 			LOGGER.error("新規案件応募のデータベースのエラーです", e);
 			return new Result(Code.SAVE_ERROR, null, "新規案件応募できませんでした");
@@ -169,54 +193,66 @@ public class CaseServiceImpl implements CaseService {
 		for (CaseWithEmp caseWithEmp : list) {
 			boolean has = false;
 			Integer caseId = caseWithEmp.getCaseId();
-			
+
 			for (CaseWithCurrCust caseWithCurrCust : myCaseList) {
 				CaseBase cb = caseWithCurrCust.getCb();
 				Integer theCaseId = cb.getCaseId();
 				if (caseId == theCaseId) {
-					ArrayList<EmployeeBase> apylist = caseWithCurrCust.getApylist();
-					EmployeeBase eb = new EmployeeBase();
-					eb.setEmployeeId(caseWithEmp.getEmployeeId());
-					eb.setName(caseWithEmp.getName());
-					eb.setGender(caseWithEmp.getGender());
-					eb.setBirthday(caseWithEmp.getBirthday());
-					eb.setSkill(caseWithEmp.getSkill());
-					apylist.add(eb);
+					ArrayList<CaseWithEmp> apylist = caseWithCurrCust.getApylist();
+//					EmployeeBase eb = new EmployeeBase();
+//					eb.setEmployeeId(caseWithEmp.getEmployeeId());
+//					eb.setName(caseWithEmp.getName());
+//					eb.setGender(caseWithEmp.getGender());
+//					eb.setBirthday(caseWithEmp.getBirthday());
+//					eb.setSkill(caseWithEmp.getSkill());
+					apylist.add(caseWithEmp);
 					has = true;
 					break;
 				}
 			}
-			
+
 			if (has == false) {
 				CaseWithCurrCust caseWithCurrCust = new CaseWithCurrCust();
-				caseWithCurrCust.setCb((CaseBase)caseWithEmp);
-				ArrayList<EmployeeBase> apylist = new ArrayList<>();
+				caseWithCurrCust.setCb((CaseBase) caseWithEmp);
+				ArrayList<CaseWithEmp> apylist = new ArrayList<>();
 				if (caseWithEmp.getEmployeeId() != null) {
-					EmployeeBase eb = new EmployeeBase();
-					eb.setEmployeeId(caseWithEmp.getEmployeeId());
-					eb.setName(caseWithEmp.getName());
-					eb.setGender(caseWithEmp.getGender());
-					eb.setBirthday(caseWithEmp.getBirthday());
-					eb.setSkill(caseWithEmp.getSkill());
-					apylist.add(eb);
+//					EmployeeBase eb = new EmployeeBase();
+//					eb.setEmployeeId(caseWithEmp.getEmployeeId());
+//					eb.setName(caseWithEmp.getName());
+//					eb.setGender(caseWithEmp.getGender());
+//					eb.setBirthday(caseWithEmp.getBirthday());
+//					eb.setSkill(caseWithEmp.getSkill());
+					apylist.add(caseWithEmp);
 				}
 				caseWithCurrCust.setApylist(apylist);
 				myCaseList.add(caseWithCurrCust);
 			}
 		}
-		
+
 		return new Result(Code.GET_OK, myCaseList);
 	}
 
 	@Override
 	@Transactional
 	public Result caseToBind(CaseBind cb) {
-		CaseBase c = (CaseBase)cb;
+		CaseBase c = (CaseBase) cb;
 		CaseApply ca = cb.getCa();
+		ca.setBindDate(new Date());
 		int res;
 		try {
+			// 案件の報酬額と状態更新（案件開始状態に）
 			res = caseBaseMapper.updateCaseStatusOrMoney(c);
+			// 案件の応募歴史に更新する
 			caseApplyMapper.applyBind(ca);
+			// 社員に応募成功に通知する
+			NotificationEmp ne = new NotificationEmp();
+			ne.setEmployeeId(ca.getEmployeeId());
+			ne.setCaseId(c.getCaseId());
+			ne.setCaseName(c.getCaseName());
+			ne.setType(NoticeType.EMP_CASE_START);
+			ne.setCreateDate(new Date());
+			ne.setReaded(0);
+			notificationEmployeeMapper.addOne(ne);
 		} catch (Exception e) {
 			LOGGER.error("案件契約のデータベースのエラーです", e);
 			return new Result(Code.UPDATE_ERROR, null, "案件契約できませんでした");
@@ -224,13 +260,65 @@ public class CaseServiceImpl implements CaseService {
 		return new Result(Code.UPDATE_OK, res);
 	}
 
-//	@Override
-//	public Result caseBaseUpdate(CaseBind cb) {
-//		int res = caseBaseMapper.updateCaseStatusOrMoney(cb);
-//		return new Result(Code.UPDATE_OK, res);
-//	}
+	@Override
+	public Result findCaseBindEmployeeId(Integer caseId) {
+		CaseApply ca = new CaseApply();
+		ca.setCaseId(caseId);
+		ca.setBind(true);
+		ArrayList<CaseApply> res = caseApplyMapper.find(ca);
+		String employeeId = null;
+		if (res.size() > 0) {
+			CaseApply caseApply = res.get(0);
+			employeeId = caseApply.getEmployeeId();
+		}
+		return new Result(Code.GET_OK, employeeId);
+	}
+
+	@Override
+	public Result findBindedCasesByEmployeeId(String employeeId) {
+		ArrayList<EmpBindedCase> data = caseApplyMapper.findEmpCase(employeeId);
+		return new Result(Code.GET_OK, data);
+	}
+
+	@Override
+	public Result caseFinish(CaseBase cb) {
+		// 案件状態更新
+		cb.setStatus(3);
+		caseBaseMapper.updateCaseStatusOrMoney(cb);
+
+		// 社員に通知する
+		Integer caseId = cb.getCaseId();
+		Result caRes = findCaseBindEmployeeId(caseId);
+		String employeeId = (String) caRes.getData();
+		NotificationEmp ne = new NotificationEmp();
+		ne.setCaseId(cb.getCaseId());
+		ne.setCaseName(cb.getCaseName());
+		ne.setEmployeeId(employeeId);
+		ne.setType(NoticeType.EMP_CASE_FINISH);
+		ne.setCreateDate(new Date());
+		ne.setReaded(0);
+		notificationEmployeeMapper.addOne(ne);
+
+		// クライアントに通知
+		NotificationCust nc = new NotificationCust();
+		nc.setCaseId(cb.getCaseId());
+		nc.setCaseName(cb.getCaseName());
+		nc.setCustomerId(cb.getCustomerId());
+		nc.setType(NoticeType.CUST_CASE_FINISH);
+		nc.setCreateDate(new Date());
+		nc.setReaded(0);
+		notificationCustomerMapper.addOne(nc);
+
+		return new Result(Code.UPDATE_OK, null);
+	}
+
+	@Override
+	public Result deleteCase(Integer caseId) {
+		caseFunctionMapper.deleteByCaseId(caseId);
+		caseApplyMapper.deleteByCaseId(caseId);
+		caseBaseMapper.deleteByCaseId(caseId);
+		
+		return new Result(Code.UPDATE_OK, null);
+	}
+
 }
-
-
-
-

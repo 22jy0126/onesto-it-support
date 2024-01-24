@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.onestoit.controller.Result;
 import com.onestoit.model.Case;
 import com.onestoit.model.CaseApply;
+import com.onestoit.model.CaseApplyWithCaseName;
 import com.onestoit.model.CaseBase;
 import com.onestoit.model.CaseBind;
 import com.onestoit.model.CaseFunction;
@@ -63,7 +64,7 @@ public interface CaseService {
 	 * @param ca
 	 * @return
 	 */
-	Result apply(CaseApply ca);
+	Result apply(CaseApplyWithCaseName can);
 	
 	/**
 	 * 応募検索
@@ -91,10 +92,31 @@ public interface CaseService {
 	 */
 	Result caseToBind(CaseBind cb);
 	
-//	/**
-//	 * 案件基本情報更新（報酬、状態、マイルストーン状態）
-//	 * @param cb
-//	 * @return
-//	 */
-//	Result caseBaseUpdate(CaseBind cb);
+	/**
+	 * 案件契約の社員検索
+	 * @param caseId
+	 * @return
+	 */
+	Result findCaseBindEmployeeId(Integer caseId);
+	
+	/**
+	 * 社員の契約案件検索
+	 * @param employeeId
+	 * @return
+	 */
+	Result findBindedCasesByEmployeeId(String employeeId);
+	
+	/**
+	 * 案件終了
+	 * @param cb
+	 * @return
+	 */
+	Result caseFinish(CaseBase cb);
+	
+	/**
+	 * 案件削除
+	 * @param caseId
+	 * @return
+	 */
+	Result deleteCase(Integer caseId);
 }

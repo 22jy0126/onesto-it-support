@@ -10,6 +10,8 @@ public class CaseWithCurrEmp {
 	 */
 	private CaseApply caseApply;
 	
+	private Customer cust;
+	
 	public Case getC() {
 		return c;
 	}
@@ -21,5 +23,11 @@ public class CaseWithCurrEmp {
 	}
 	public void setCaseApply(CaseApply caseApply) {
 		this.caseApply = caseApply;
+	}
+	public Customer getCust() {
+		return cust;
+	}
+	public void setCust(Customer cust) {
+		this.cust = cust;
 	}
 }

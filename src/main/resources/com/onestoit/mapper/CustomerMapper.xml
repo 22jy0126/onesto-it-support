@@ -6,39 +6,140 @@
 	<!-- 新規顧客情報保存 -->
 	<insert id="save">
 		INSERT INTO onestoit_customer (
-			username,
-			type,
-			name,
-			password,
-			tel,
-			email,
-			zipcode,
-			addr1,
-			addr2,
-			addr3,
-			addr4
+		username,
+		type,
+		name,
+		password,
+		tel,
+		email,
+		zipcode,
+		addr1,
+		addr2,
+		addr3,
+		addr4
 		) VALUES (
-			#{username},
-			#{type},
-			#{name},
-			#{password},
-			#{tel},
-			#{email},
-			#{zipcode},
-			#{addr1},
-			#{addr2},
-			#{addr3},
-			#{addr4}
+		#{username},
+		#{type},
+		#{name},
+		#{password},
+		#{tel},
+		#{email},
+		#{zipcode},
+		#{addr1},
+		#{addr2},
+		#{addr3},
+		#{addr4}
 		);
 	</insert>
-	
+
 	<!-- 新規顧客のユーザ名名既にあるかどうかを調べる -->
 	<select id="alreadyExists">
-		select count(*) from onestoit_customer where username = #{username};
+		select count(*) from onestoit_customer where username
+		= #{username};
 	</select>
-	
+
 	<!-- 顧客ログイン -->
 	<select id="login">
-		select * from onestoit_customer where username = #{username} and password = #{password};
+		select * from onestoit_customer where username =
+		#{username} and password = #{password};
+	</select>
+
+	<!-- 顧客検索 -->
+	<select id="findCustomer">
+		select
+		OC.customer_id,
+		OC.username,
+		OC.type,
+		OC.name,
+		OC.tel,
+		OC.email,
+		OC.zipcode,
+		OC.addr1,
+		OC.addr2,
+		OC.addr3,
+		OC.addr4,
+		CT.caseCount
+		from
+		onestoit_customer OC left join (
+		select
+		customer_id,
+		count(customer_id) AS caseCount
+		from onestoit_case_base
+		where status > 0
+		group by customer_id
+		) CT on OC.customer_id = CT.customer_id
+		<where>
+			<if test="customerId != null">
+				OC.customer_id = #{customerId}
+			</if>
+			<if test="name != null">
+				and OC.name like CONCAT('%', #{name}, '%')
+			</if>
+			<if test="caseCount != null">
+				and caseCount >= #{caseCount}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 顧客検索 -->
+	<select id="findCustomerByPage">
+		select
+		OC.customer_id,
+		OC.username,
+		OC.type,
+		OC.name,
+		OC.tel,
+		OC.email,
+		OC.zipcode,
+		OC.addr1,
+		OC.addr2,
+		OC.addr3,
+		OC.addr4,
+		CT.caseCount
+		from
+		onestoit_customer OC left join (
+		select
+		customer_id,
+		count(customer_id) AS caseCount
+		from onestoit_case_base
+		where status > 0
+		group by customer_id
+		) CT on OC.customer_id = CT.customer_id
+		<where>
+			<if test="customerId != null">
+				OC.customer_id = #{customerId}
+			</if>
+			<if test="name != null">
+				and OC.name like CONCAT('%', #{name}, '%')
+			</if>
+			<if test="caseCount != null">
+				and caseCount >= #{caseCount}
+			</if>
+		</where>
+		limit #{fromNum}, #{pageSize};
+	</select>
+	
+	<!-- 顧客検索の合計数 -->
+	<select id="customerCount">
+		select count(OC.customer_id) from 
+		onestoit_customer OC inner join (
+		select
+		customer_id,
+		count(customer_id) AS caseCount
+		from onestoit_case_base
+		where status > 0
+		group by customer_id
+		) CT on OC.customer_id = CT.customer_id
+		<where>
+			<if test="customerId != null">
+				OC.customer_id = #{customerId}
+			</if>
+			<if test="name != null">
+				and OC.name like CONCAT('%', #{name}, '%')
+			</if>
+			<if test="caseCount != null">
+				and caseCount >= #{caseCount}
+			</if>
+		</where>
 	</select>
 </mapper>

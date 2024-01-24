@@ -20,8 +20,9 @@
 
 	<!-- 案件開始 -->
 	<update id="applyBind">
-		UPDATE onestoit_case_apply set bind = true where
-		case_id = #{caseId} and employee_id = #{employeeId};
+		UPDATE onestoit_case_apply set bind = true, bind_date
+		= #{bindDate}
+		where case_id = #{caseId} and employee_id = #{employeeId};
 	</update>
 
 	<!-- 案件の応募検索 -->
@@ -33,6 +34,9 @@
 			</if>
 			<if test="employeeId != null">
 				and employee_id = #{employeeId}
+			</if>
+			<if test="bind != null">
+				and bind = #{bind}
 			</if>
 		</where>
 	</select>
@@ -51,9 +55,11 @@
 		deadline,
 		status
 		from onestoit_case_apply CA
-		inner join onestoit_case_base CB
+		inner join
+		onestoit_case_base CB
 		WHERE CA.case_id = CB.case_id AND
-		employee_id = #{employeeId};
+		employee_id =
+		#{employeeId};
 	</select>
 
 	<!--顧客の案件検索 -->
@@ -75,14 +81,48 @@
 		EB.skill,
 		EB.birthday
 		from onestoit_case_base CB
-		LEFT join onestoit_case_apply CA on CB.case_id = CA.case_id
-		LEFT join onestoit_employee_base EB on EB.employee_id = CA.employee_id
-		where CB.customer_id = #{customerId} and CB.STATUS != 0
+		LEFT join
+		onestoit_case_apply CA on CB.case_id = CA.case_id
+		LEFT join
+		onestoit_employee_base EB on EB.employee_id = CA.employee_id
+		where
+		CB.customer_id = #{customerId} and CB.STATUS != 0
 		order by CB.case_id;
 	</select>
-	
+
 	<!-- 案件契約 -->
 	<update id="caseBind">
-		update onestoit_case_apply set bind = true where case_id = #{caseId} and employee_id = #{employeeId};
+		update onestoit_case_apply set bind = true, bind_date
+		= #{bindDate} where case_id = #{caseId} and employee_id =
+		#{employeeId};
 	</update>
+
+	<!-- 社員の参加した案件を検索 -->
+	<select id="findEmpCase">
+		select
+		OCB.case_id,
+		OCA.employee_id,
+		OCB.customer_id,
+		OCB.case_name,
+		OCB.bonus_money,
+		OCB.bonus_money_negotiable,
+		OCB.develop_tools,
+		OCB.description,
+		OCB.deadline,
+		OCB.status,
+		OCA.bind_date,
+		OCA.bind
+		from onestoit_case_apply OCA
+		inner join
+		onestoit_case_base OCB
+		on OCA.case_id = OCB.case_id
+		where
+		OCA.employee_id = #{employeeId}
+		and OCA.bind = true;
+	</select>
+	
+	<!-- 削除する案件の関連削除 -->
+	<delete id="deleteByCaseId">
+		delete from onestoit_case_apply where case_id = #{caseId}
+	</delete>
 </mapper>

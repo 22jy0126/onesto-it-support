@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
-
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -30,11 +30,8 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                <!-- <el-badge :value="user.noticeCount" class="item">
-                    <el-avatar size="medium" :src="user.avatarUrl"></el-avatar>
-                </el-badge> -->
-                {{user.username}}さん、こんにちは！
-                <span class="logout">ログアウト</span>
+                {{user.name}}さん、こんにちは！
+                <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
 
@@ -65,20 +62,20 @@
                                 <el-input
                                         clearable
                                         placeholder="氏名を入力して検索"
-                                        v-model="search.name">
+                                        v-model="search.employeeId">
                                 </el-input>
                             </div>
                             <div class="search-item">
                                 <div class="search-label">
                                     参加案件数
                                 </div>
-                                <el-input-number v-model="search.caseCount" :min="1" :max="99999">
+                                <el-input-number v-model="search.caseCount" :min="0" :max="99999">
                                 </el-input-number>
                                 <div class="mark">以上</div>
                             </div>
                             <div class="search-item">
-                                <el-button type="primary">検索</el-button>
-                                <el-button type="info">リセット</el-button>
+                                <el-button type="primary" @click="searchEmployees">検索</el-button>
+                                <el-button type="info" @click="searchReset">リセット</el-button>
                             </div>
                         </div>
                     </section>
@@ -86,13 +83,13 @@
                     <section>
                         <div class="common-caption">
                             <i class="el-icon-user icon"></i>
-                            合計<span class="em">15名</span>のお客様を見つかりました
+                            合計<span class="em">{{totalCount}}名</span>のお客様を見つかりました
                         </div>
                         <el-table
                             :data="employees"
                             style="width: 100%">
                             <el-table-column
-                                prop="employeeNo"
+                                prop="employeeId"
                                 label="社員番号"
                                 width="120">
                             </el-table-column>
@@ -117,7 +114,7 @@
                                 label="メールアドレス">
                             </el-table-column>
                             <el-table-column
-                                prop="birthday"
+                                prop="birthdayVal"
                                 width="200"
                                 label="誕生日">
                             </el-table-column>
@@ -131,14 +128,22 @@
                                 label=""
                                 width="120">
                                 <template slot-scope="scope">
-                                    <el-button type="text" size="small">参加案件リスト</el-button>
+                                    <el-button 
+                                    type="text" 
+                                    @click="goDetail(scope.$index, scope.row)"
+                                    size="small">参加案件リスト</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
                     </section>
                     <!-- ページ -->
                     <section class="page-container">
-                        <el-pagination layout="prev, pager, next" :total="50">
+                        <el-pagination 
+                            layout="prev, pager, next" 
+                            :page-size="10"
+                            :current-page="search.pageNum"
+                            @current-change="onCurrentPageChange"
+                            :total="totalCount">
                         </el-pagination>
                     </section>
                 </el-main>
@@ -162,106 +167,134 @@
         data() {
             return {
                 // ログインしたユーザー情報
-                user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    username: "管理者", // ユーザー名
-                    noticeCount: 2, // 通知数
-                },
+                user: {},
                 employees: [],
                 search: {
-                    caseCount: 1,
+                    pageSize: 10,
+                    caseCount: 0,
                 },
+                pageNum: 1,
+                totalCount: 0,
             };
         },
         mounted() {
-            this.init();
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 3) {
+                    goLogin(1);
+                } else {
+                    this.user = user;
+                    this.searchEmployees();
+                }
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 3) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.user.name = "管理者";
+                            sessionStorage.setItem("userinfo", JSON.stringify(this.user));
+                            this.searchEmployees();
+                        }
+                    })
+            }
         },
         methods: {
             goManageCustomer,
-            init() {
-                const employees = [{
-                    employeeNo: "100001",          // 社員番号
-                    name: "鈴木　七海",     // 氏名
-                    caseCount: 2,          // 案件数
-                    tel: 08012345678,      // 電話番号
-                    email: "suzuki001@gmail.com",   // メールアドレス
-                    birthday: "2000年1月1日",  // 誕生日
-                    skill: "VBA,java",     // スキル
-                }, {
-                    employeeNo: "100002",          // 社員番号
-                    name: "鈴木　七海",     // 氏名
-                    caseCount: 2,          // 案件数
-                    tel: 08012345678,      // 電話番号
-                    email: "suzuki001@gmail.com",   // メールアドレス
-                    birthday: "2000年1月1日",  // 誕生日
-                    skill: "VBA,java",     // スキル
-                }, {
-                    employeeNo: "100003",          // 社員番号
-                    name: "鈴木　七海",     // 氏名
-                    caseCount: 2,          // 案件数
-                    tel: 08012345678,      // 電話番号
-                    email: "suzuki001@gmail.com",   // メールアドレス
-                    birthday: "2000年1月1日",  // 誕生日
-                    skill: "VBA,java",     // スキル
-                }, {
-                    employeeNo: "100004",          // 社員番号
-                    name: "鈴木　七海",     // 氏名
-                    caseCount: 2,          // 案件数
-                    tel: 08012345678,      // 電話番号
-                    email: "suzuki001@gmail.com",   // メールアドレス
-                    birthday: "2000年1月1日",  // 誕生日
-                    skill: "VBA,java",     // スキル
-                }, {
-                    employeeNo: "100005",          // 社員番号
-                    name: "鈴木　七海",     // 氏名
-                    caseCount: 2,          // 案件数
-                    tel: 08012345678,      // 電話番号
-                    email: "suzuki001@gmail.com",   // メールアドレス
-                    birthday: "2000年1月1日",  // 誕生日
-                    skill: "VBA,java",     // スキル
-                }, {
-                    employeeNo: "100006",          // 社員番号
-                    name: "鈴木　七海",     // 氏名
-                    caseCount: 2,          // 案件数
-                    tel: 08012345678,      // 電話番号
-                    email: "suzuki001@gmail.com",   // メールアドレス
-                    birthday: "2000年1月1日",  // 誕生日
-                    skill: "VBA,java",     // スキル
-                }, {
-                    employeeNo: "100007",          // 社員番号
-                    name: "鈴木　七海",     // 氏名
-                    caseCount: 2,          // 案件数
-                    tel: 08012345678,      // 電話番号
-                    email: "suzuki001@gmail.com",   // メールアドレス
-                    birthday: "2000年1月1日",  // 誕生日
-                    skill: "VBA,java",     // スキル
-                }, {
-                    employeeNo: "100008",          // 社員番号
-                    name: "鈴木　七海",     // 氏名
-                    caseCount: 2,          // 案件数
-                    tel: 08012345678,      // 電話番号
-                    email: "suzuki001@gmail.com",   // メールアドレス
-                    birthday: "2000年1月1日",  // 誕生日
-                    skill: "VBA,java",     // スキル
-                }, {
-                    employeeNo: "100009",          // 社員番号
-                    name: "鈴木　七海",     // 氏名
-                    caseCount: 2,          // 案件数
-                    tel: 08012345678,      // 電話番号
-                    email: "suzuki001@gmail.com",   // メールアドレス
-                    birthday: "2000年1月1日",  // 誕生日
-                    skill: "VBA,java",     // スキル
-                }, {
-                    employeeNo: "100010",          // 社員番号
-                    name: "鈴木　七海",     // 氏名
-                    caseCount: 2,          // 案件数
-                    tel: 08012345678,      // 電話番号
-                    email: "suzuki001@gmail.com",   // メールアドレス
-                    birthday: "2000年1月1日",  // 誕生日
-                    skill: "VBA,java",     // スキル
-                }];
-                this.employees = employees;
-            }
+            searchEmployees() {
+                const {
+                    search = {},
+                } = this;
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "POST",
+                    url: "/logged/manager/employees",
+                    data: {
+                        ...this.search,
+                        fromNum: (this.pageNum - 1) * 10,
+                    },
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data = {},
+                        } = {} } = res;
+                        const {
+                            list = [],
+                            totalCount,
+                        } = data;
+                        this.totalCount = totalCount;
+                        this.employees = list.map((emp = {}) => {
+                            const { birthday } = emp;
+                            const birthdayVal = dateFormat(birthday);
+                            emp.birthdayVal = birthdayVal;
+                            return emp;
+                        });
+                    });
+            },
+            onCurrentPageChange(p) {
+                this.pageNum = p;
+                this.searchEmployees();
+            },
+            searchReset() {
+                this.search = {
+                    pageSize: 10,
+                    caseCount: 0,
+                };
+                this.pageNum = 1;
+                this.searchEmployees();
+            },
+            goDetail(idx, data = {}) {
+                const { employeeId } = data;
+                goManageEmployeeDetail(employeeId);
+            },
+            logout() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/logout",
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            msg = "",
+                        } = {} } = res;
+                        this.$message.success(msg);
+                        sessionStorage.removeItem("userinfo");
+                        setTimeout(() => goLogin(1), 1000);
+                    });
+            },
         },
     });
 </script>

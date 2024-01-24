@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.onestoit.mapper.NotificationCustomerMapper">
+	<!-- 通知の追加 -->
+	<insert id="addOne">
+		insert into onestoit_notification_customer (
+			customer_id,
+			create_date,
+			type,
+			case_id,
+			case_name,
+			readed
+		) values (
+			#{customerId},
+			#{createDate},
+			#{type},
+			#{caseId},
+			#{caseName},
+			#{readed}
+		)
+	</insert>
+	
+	<!-- 通知を読んだ -->
+	<update id="toReaded">
+		update onestoit_notification_customer set readed = 1 where id = #{id};
+	</update>
+	
+	<!-- 顧客の通知を検索 -->
+	<select id="findByCustomerId">
+		select * from onestoit_notification_customer 
+			where customer_id = #{customerId} 
+			order by create_date desc;
+	</select>
+	
+	<!-- 未読通知数 -->
+	<select id="notReadCount">
+		select COUNT(*) from onestoit_notification_customer where customer_id = #{customerId} and readed = 0;
+	</select>
+</mapper>

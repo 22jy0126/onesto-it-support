@@ -45,9 +45,14 @@
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="2" class="el-menu-vertical-demo">
-                    <el-menu-item index="1">新規案件登録</el-menu-item>
+                    <el-menu-item index="1" @click="goCustomerCaseEdit">新規案件登録</el-menu-item>
                     <el-menu-item index="2" @click="goCustomerCaseView">私の案件</el-menu-item>
-                    <el-menu-item index="3">通知</el-menu-item>
+                    <el-menu-item index="4" @click="goCustomerNotification">
+                        <el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
+                            <div>通知</div>
+                        </el-badge>
+                        <div v-if="noticeCount == 0">通知</div>
+                    </el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -87,7 +92,7 @@
                                     </div>
                                 </div>
                                 <div class="info-item info-item-last">
-                                    <div class="label">報酬：{{jobCase.bonusMoney}}万円<span class="required"></span>
+                                    <div class="label">報酬(税別)：{{jobCase.bonusMoney}}万円<span class="required"></span>
                                         <span>（{{jobCase.bonusMoneyNegotiable ? "相談可能" : "相談不可"}}）</span>
                                     </div>
                                 </div>
@@ -121,10 +126,10 @@
                             </div>
                             <div v-if="(+jobCase.status) == 2" class="save-btns">
                                 <el-button @click="onMilestoneCheck" type="primary">マイルストーンをチェック</el-button>
-                                <el-button type="success">案件終了</el-button>
+                                <el-button type="success" @click="onCaseFinish">案件終了</el-button>
                             </div>
                             <div v-if="(+jobCase.status) == 1" class="save-btns">
-                                <el-button type="danger">案件削除</el-button>
+                                <el-button type="danger" @click="caseDel">案件削除</el-button>
                             </div>
                     </section>
                     
@@ -147,12 +152,9 @@
         data() {
             return {
                 // ログインしたユーザー情報
-                user: {
-                    // avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    // username: "鈴木　奈々", // ユーザー名
-                    // noticeCount: 2, // 通知数
-                },
+                user: {},
                 jobCase: {},
+                noticeCount: 0,
             };
         },
         mounted() {
@@ -164,6 +166,7 @@
                     goLogin();
                 } else {
                     this.user = user;
+                    this.getNoticeCount(user.customerId);
                 }
             } else {
                 const loading = this.$loading({
@@ -187,6 +190,7 @@
                             goLogin();
                         } else {
                             this.user = user;
+                            this.getNoticeCount(user.customerId);
                             this.jobCase.customerId = user.customerId;
                             sessionStorage.setItem("userinfo", JSON.stringify(user));
                         }
@@ -215,11 +219,12 @@
                             code,
                             data: jobCase,
                         } = data;
-                        // jobCase = jobCase;
+
                         // 日付のフォーマット処理
                         const {
                             deadline,
                             status,
+                            milestoneStatus,
                         } = jobCase;
                         const deadlineVal = dateFormat(deadline);
                         jobCase.deadlineVal = deadlineVal;
@@ -240,6 +245,15 @@
                             jobCase.statusCls = "status status-4";
                         }
                         this.jobCase = jobCase;
+
+                        const tom = getURLParam("tom");
+                        if (tom == 1) {
+                            if (milestoneStatus == 1) {
+                                location.replace(`/milestoneprogressconfirm.html?caseId=${caseId}`);
+                            } else {
+                                location.replace(`/milestonedetailconfirm.html?caseId=${caseId}`);
+                            }
+                        }
                     });
                 
             } else {
@@ -254,12 +268,26 @@
                 jobCase.deadlineVal = deadlineVal;
                 this.jobCase = jobCase;
             }
-
-            
         },
         methods: {
+            goCustomerCaseEdit,
             goCustomerCaseView,
             goMilestoneDetailConfirm,
+            goCustomerNotification,
+            getNoticeCount(customerId) {
+                axios({
+                    method: "GET",
+                    url: `/logged/cust/notice/${customerId}`,
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        const { data: {
+                            code,
+                            data: noticeCount,
+                        } = {} } = res;
+                        this.noticeCount = noticeCount;
+                    });
+            },
             onBackPage() {
                 window.history.back();
             },
@@ -300,29 +328,6 @@
             onDraftSave() {
                 this.caseSave(0, "下書きを保存しました！", "只今案件の保存ができません、後でもう一度お試しください！");
             },
-            logout() {
-                const loading = this.$loading({
-                    lock: true,
-                    text: 'Loading',
-                    spinner: 'el-icon-loading',
-                    background: 'rgba(0, 0, 0, 0.1)'
-                });
-                axios({
-                    method: "GET",
-                    url: "/logout",
-                    withCredentials: true,
-                })
-                    .then((res = {}) => {
-                        loading.close();
-                        const { data: {
-                            code,
-                            msg = "",
-                        } = {} } = res;
-                        this.$message.success(msg);
-                        sessionStorage.removeItem("userinfo");
-                        setTimeout(() => goLogin(1), 1000);
-                    });
-            },
             onMilestoneCheck() {
                 const { caseId, milestoneStatus } = this.jobCase;
                 if (milestoneStatus == 1) {
@@ -330,6 +335,57 @@
                 } else {
                     goMilestoneDetailConfirm(caseId);
                 }
+            },
+            onCaseFinish() {
+                this.$confirm('案件終了後作業の状態に戻れません、よろしいですか?', '確認', {
+                    confirmButtonText: '案件終了する',
+                    cancelButtonText: "検討する",
+                    type: 'warning',
+                    center: false,
+                })
+                    .then(() => {
+                        const loading = this.$loading({
+                            lock: true,
+                            text: 'Loading',
+                            spinner: 'el-icon-loading',
+                            background: 'rgba(0, 0, 0, 0.1)'
+                        });
+                        axios({
+                            method: "POST",
+                            url: "/logged/case/cust/finish",
+                            data: {...this.jobCase, status: 3},
+                            withCredentials: true,
+                        })
+                            .then(() => {
+                                loading.close();
+                                this.$message.success("案件作業終了しました！");
+                                this.getNoticeCount(this.user.customerId);
+                                this.jobCase.status = 3;
+                                this.jobCase.applyStatus = 4;
+                                this.jobCase.applyStatusText = "案件作業終了";
+                                this.jobCase.statusCls = "status status-4";
+                            });
+                    });
+            },
+            caseDel() {
+                this.$confirm('削除した案件は戻れません、よろしいですか?', '確認', {
+                    confirmButtonText: '削除する',
+                    cancelButtonText: "検討する",
+                    type: 'warning',
+                    center: false,
+                })
+                    .then(() => {
+                        const { caseId }  = this.jobCase;
+                        axios({
+                            method: "GET",
+                            url: `/logged/case/cust/finish/${caseId}`,
+                            withCredentials: true,
+                        })
+                            .then(() =>{
+                                this.$message.success("案件が削除されました！");
+                                setTimeout(() => { goCustomerCaseView() }, 1000);
+                            });
+                    });
             },
             logout() {
                 const loading = this.$loading({

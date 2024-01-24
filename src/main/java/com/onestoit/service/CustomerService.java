@@ -4,6 +4,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.onestoit.controller.Result;
 import com.onestoit.model.Customer;
+import com.onestoit.model.CustomerCaseCount;
+import com.onestoit.model.PaginationCustReq;
 import com.onestoit.model.User;
 
 @Transactional
@@ -28,4 +30,19 @@ public interface CustomerService {
 	 * @return
 	 */
 	Result login(User u);
+	
+	/**
+	 * 顧客検索
+	 * @param c
+	 * @return
+	 */
+	Result findCustomer(CustomerCaseCount c);
+	
+	/**
+	 * 顧客のページングクエリー
+	 * @param c
+	 * @return
+	 */
+	Result findCustomerByPage(PaginationCustReq c);
+	
 }

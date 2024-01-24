@@ -6,15 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- TODO: ページの名にチェンジする -->
-    <title>求人応募履歴閲覧</title>
+    <title>顧客案件リスト</title>
     <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
     <!-- vue と elementUIの依存css -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 
     <!-- システム共用のスタイルはこのファイルに追加する -->
     <link href="./css/common.css" rel="stylesheet" />
-    <link href="./css/employeeApplyHistory.css" rel="stylesheet"/>
-
+    <link rel="stylesheet" href="./css/jobCase.css">
+    <link rel="stylesheet" href="./css/customerCaseView.css">
     <!-- vue と elementUIの依存javascript -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
@@ -36,32 +36,28 @@
         </header>
 
         <!-- メインの部分 -->
-        <el-container class="common-mian job-case-main">
+        <el-container class="common-mian manage-main">
             <!-- サイドメニュー -->
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
-                <el-menu default-active="3" class="el-menu-vertical-demo">
-                    <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
-                    <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
-                    <el-menu-item index="3">応募履歴</el-menu-item>
-                    <el-menu-item index="4" @click="goEmployeeNotification">
-                        <el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
-                            <div>通知</div>
-                        </el-badge>
-                        <div v-if="noticeCount == 0">通知</div>
-                    </el-menu-item>
+                <el-menu default-active="2" class="el-menu-vertical-demo">
+                    <el-menu-item index="1" @click="goManageCustomer">お客様管理</el-menu-item>
+                    <el-menu-item index="2" @click="goManageEmployee">社員管理</el-menu-item>
                 </el-menu>
             </el-aside>
 
             <el-container>
                 <el-main>
-                    <!-- TODO: 内容はここに書く -->
-                    <section class="employee-Apply-History">
-                        <div class="common-caption">
-                            <i class="el-icon-s-data icon"></i>
-                            <span class="em">求人応募履歴</span>
+                    <section>
+                        <div class="goback" @click="goback">
+                            <i class="el-icon-back"></i>
+                            戻る
                         </div>
-                        <div class="job-case-item" v-for="job in applyList">
+                        <div class="common-caption">
+                            <i class="el-icon-files icon"></i>
+                            参加案件リスト
+                        </div>
+                        <div class="job-case-item" v-for="job in jobList">
                             <div class="case-name-line">
                                 <div class="title">
                                     <div class="case-name">{{job.caseName}}</div>
@@ -77,7 +73,7 @@
                             <div class="case-sub">
                                 <div class="case-sub-money">
                                     <span class="label">報酬:&nbsp;&nbsp;&nbsp;</span>
-                                    <span>{{job.bonusMoney.toLocaleString()}}万円</span>
+                                    <span>{{+parseFloat(job.bonusMoney*0.9).toFixed(1).toLocaleString()}}万円</span>
                                     <span>{{job.bonusMoneyNegotiable ? "(相談可能)" : ""}}</span>
                                 </div>
                             </div>
@@ -89,12 +85,11 @@
                                 <span class="label">説明:&nbsp;&nbsp;&nbsp;</span>
                                 <span>{{job.description}}</span>
                             </div>
-                            <!-- <div class="case-sub">
-                                状況:
-                            </div> -->
-                            <div class="go-detail"
-                                @click="goCaseDetail(job.caseId)"
-                            >
+                            <div class="case-sub">
+                                <span class="label">案件開始日付:&nbsp;&nbsp;&nbsp;</span>
+                                <span>{{job.bindDateVal}}</span>
+                            </div>
+                            <div class="go-detail" @click="goManageCaseDetail(job.caseId, '2')">
                                 詳細>>
                             </div>
                         </div>
@@ -103,12 +98,11 @@
             </el-container>
         </el-container>
     </el-container>
-
 </body>
 
 </html>
-<script src="./js/utils.js"></script>
 <script src="./js/pageJump.js"></script>
+<script src="./js/utils.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -121,32 +115,19 @@
             return {
                 // ログインしたユーザー情報
                 user: {},
-                noticeCount: 0,
-                // 求人票のデータ
-                applyList: [],
+                jobList: [],
             };
         },
         mounted() {
-            // ユーザー情報をゲット
             const userStr = sessionStorage.getItem("userinfo") || "";
+            const employeeId = getURLParam("employeeId");
             if (userStr != "") {
                 const user = JSON.parse(userStr);
-                if (user.type != 2) {
+                if (user.type != 3) {
                     goLogin(1);
                 } else {
                     this.user = user;
-                    axios({
-                        method: "GET",
-                        url: `/logged/emp/notice/${user.employeeId}`,
-                        withCredentials: true,
-                    })
-                        .then((res = {}) => {
-                            const { data: {
-                                code,
-                                data: noticeCount,
-                            } = {} } = res;
-                            this.noticeCount = noticeCount;
-                        });
+                    this.getCaseList(employeeId);
                 }
             } else {
                 const loading = this.$loading({
@@ -166,81 +147,73 @@
                             code,
                             data: user = {},
                         } = {} } = res;
-                        if (code != 80011 || user.type != 2) {
+                        if (code != 80011 || user.type != 3) {
                             goLogin();
                         } else {
                             this.user = user;
-                            this.jobCase.customerId = user.customerId;
-                            sessionStorage.setItem("userinfo", JSON.stringify(user));
-                            axios({
-                                method: "GET",
-                                url: `/logged/emp/notice/${user.employeeId}`,
-                                withCredentials: true,
-                            })
-                                .then((res = {}) => {
-                                    const { data: {
-                                        code,
-                                        data: noticeCount,
-                                    } = {} } = res;
-                                    this.noticeCount = noticeCount;
-                                });
+                            this.user.name = "管理者";
+                            sessionStorage.setItem("userinfo", JSON.stringify(this.user));
+                            this.getCaseList(employeeId);
                         }
                     })
             }
-
-            const loading = this.$loading({
-                lock: true,
-                text: 'Loading',
-                spinner: 'el-icon-loading',
-                background: 'rgba(0, 0, 0, 0.1)'
-            });
-            axios({
-                method: "GET",
-                url: "/logged/case/getHistory",
-                withCredentials: true,
-            })
-                .then((res) => {
-                    loading.close();
-                    const { data: {
-                        code,
-                        data: applyList = [],
-                    } = {} } = res;
-                    this.applyList = applyList.map((job = {}) => {
-                        const { deadline, status, bind, ...others} = job;
-
-                        const deadlineVal = dateFormat(deadline);
-                        job.deadlineVal = deadlineVal;
-
-                        if (status == 1) {
-                            job.applyStatus = 1;
-                            job.applyStatusText = "応募中";
-                            job.statusCls = "status status-1";
-                        }
-                        if (status == 2 && !bind) {
-                            job.applyStatus = 2;
-                            job.applyStatusText = "応募終了";
-                            job.statusCls = "status status-2";
-                        }
-                        if (status == 2 && bind) {
-                            job.applyStatus = 3;
-                            job.applyStatusText = "案件作業中";
-                            job.statusCls = "status status-3";
-                        }
-                        if (status == 3 && bind) {
-                            job.applyStatus = 4;
-                            job.applyStatusText = "案件作業終了";
-                            job.statusCls = "status status-4";
-                        }
-                        return job;
-                    });
-                })
-
         },
         methods: {
-            goJobCases,
-            goEmployeeInfo,
-            goCaseDetail,
-            goEmployeeNotification,
+            goManageCustomer,
+            goManageEmployee,
+            goManageCaseDetail,
+            getCaseList(employeeId) {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: `/logged/case/manager/emp/cases/${employeeId}`,
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: jobList = {},
+                        } = {} } = res;
+                        this.jobList = jobList.map((job = {}) => {
+                            const { 
+                                bindDate,
+                                deadline, 
+                                status, 
+                                bind
+                             } = job;
+                            const deadlineVal = dateFormat(deadline);
+                            job.deadlineVal = deadlineVal;
+                            const bindDateVal = dateFormat(bindDate);
+                            job.bindDateVal = bindDateVal;
+
+                            if (status == 1) {
+                                job.applyStatus = 1;
+                                job.applyStatusText = "応募中";
+                                job.statusCls = "status status-1";
+                            }
+                            if (status == 2) {
+                                job.applyStatus = 3;
+                                job.applyStatusText = "案件作業中";
+                                job.statusCls = "status status-3";
+                            }
+                            if (status == 3) {
+                                job.applyStatus = 4;
+                                job.applyStatusText = "案件作業終了";
+                                job.statusCls = "status status-4";
+                            }
+                            return job;
+                        });
+                    })
+            },
+            goback() {
+                window.history.back();
+            },
             logout() {
                 const loading = this.$loading({
                     lock: true,
@@ -261,7 +234,7 @@
                         } = {} } = res;
                         this.$message.success(msg);
                         sessionStorage.removeItem("userinfo");
-                        setTimeout(() => goLogin(1), 1000);
+                        setTimeout(() => goLogin(), 1000);
                     });
             },
         },

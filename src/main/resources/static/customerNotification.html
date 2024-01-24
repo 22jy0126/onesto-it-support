@@ -20,7 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://unpkg.com/element-ui/lib/umd/locale/ja.js"></script>
-
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -31,7 +31,7 @@
                 ブリッジ
             </div>
             <div class="login-info">
-                {{user.username}}さん、こんにちは！
+                {{user.name}}さん、こんにちは！
                 <span class="logout" @click="logout">ログアウト</span>
             </div>
         </header>
@@ -41,11 +41,15 @@
             <!-- サイドメニュー -->
             <el-aside width="200px">
                 <!-- TODO: default-active は今いるのメニューです -->
-                <el-menu default-active="4" class="el-menu-vertical-demo">
-                    <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
-                    <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
-                    <el-menu-item index="3" @click="goEmployeeApplyHistory">応募履歴</el-menu-item>
-                    <el-menu-item index="4">通知</el-menu-item>
+                <el-menu default-active="3" class="el-menu-vertical-demo">
+                    <el-menu-item index="1" @click="goCustomerCaseEdit">新規案件登録</el-menu-item>
+                    <el-menu-item index="2" @click="goCustomerCaseView">私の案件</el-menu-item>
+                    <el-menu-item index="3">
+                        <el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
+                            <div>通知</div>
+                        </el-badge>
+                        <div v-if="noticeCount == 0">通知</div>
+                    </el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -57,7 +61,14 @@
                             <i class="el-icon-message-solid icon"></i>
                             <span class="em">通知一覧</span>
                         </div>
+                        <el-empty v-if="notices.length == 0" description="只今、通知がありません"></el-empty>
                         <div class="notice-case-item" v-for="notice in notices">
+                            <div v-if="notice.readed == 0" class="read-mark read-mark-0">
+                                未読
+                            </div>
+                            <div v-if="notice.readed == 1" class="read-mark read-mark-1">
+                                既読
+                            </div>
                             <div class="date">
                                 <span>{{notice.date}}</span>
                             </div>
@@ -66,7 +77,7 @@
                                 <div>メッセージ：{{notice.msg}}</div>
                             </div>
                             <div class="go-detail"
-                                @click="notice.goMethod(notice.caseId)"
+                                @click="goDetail(notice)"
                             >
                                 詳細>>
                             </div>
@@ -81,6 +92,7 @@
 
 </html>
 <script src="./js/pageJump.js"></script>
+<script src="./js/utils.js"></script>
 <script>
     // elementの日本語対応
     ELEMENT.locale(ELEMENT.lang.ja);
@@ -92,74 +104,128 @@
         data() {
             return {
                 // ログインしたユーザー情報
-                user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    username: "鈴木　奈々", // ユーザー名
-                    noticeCount: 2, // 通知数
-                },
+                user: {},
                 notices: [],
+                noticeCount: 0,
                 linkTypeMap: [{
                     /* 案件応募 */
-                    type: 1,
-                    goMethod: goCaseDetail,
+                    type: 2001,
+                    goMethod: goCustomerCaseView,
                     msg: "あなたが登録した案件に応募がありました、",
                 }, {
-                    /* 案件開始 */
-                    type: 2,
-                    goMethod: goMilestoneEdit,
-                    msg: "あなたが登録した案件が開始されました、",
-                }, {
                     /* マイルストーンの確認リクエスト */
-                    type: 3,
-                    goMethod: goMilestoneProgressUpdate,
+                    type: 2002,
+                    goMethod: goCustomerCaseDetail,
                     msg: "マイルストーンの確認リクエストが届いています、",
                 }, {
-                    /* マイルストーンの更新確認 */
-                    type: 4,
-                    goMethod: goMilestoneProgressUpdate,
-                    msg: "マイルストーンが更新されました、",
-                }, {
                     /* 案件の完了確認リクエスト */
-                    type: 5,
-                    goMethod: goMilestoneProgressUpdate,
-                    msg: "ク案件作業の完了確認リクエストが届いています、",
+                    type: 2003,
+                    goMethod: goCustomerCaseDetail,
+                    msg: "案件マイルストーン作業の完了確認リクエストが届いています、",
                 }, {
                     /* 案件完了確認 */
-                    type: 6,
-                    goMethod: goCaseDetail,
-                    msg: "お疲れさまでした！案件作業が完了しました、"
+                    type: 2004,
+                    goMethod: goCustomerCaseDetail,
+                    msg: "お疲れさまでした！案件作業が完了しました。案件の請求書は後日御宅に送り致します。"
                 }],
             };
         },
         mounted() {
-            const notices = [{
-                date: "2024年2月20日",                   // 送信日付
-                caseId: 1,                              // 案件Id
-                type: 1,                                // 通知タイプ
-                caseName: "学生管理システムの制作",         // 案件名
-            }, {
-                date: "2024年1月20日",                   // 送信日付
-                caseId: 1,                              // 案件Id
-                type: 2,                                // 通知タイプ
-                caseName: "学生管理システムの制作2",        // 案件名
-            }, {
-                date: "2024年1月23日",                   // 送信日付
-                caseId: 1,                              // 案件Id
-                type: 4,                                // 通知タイプ
-                caseName: "オンライン学習プラットフォームの開発",        // 案件名
-            }];
-            this.notices = notices.map((n = {}) => {
-                const { type } = n;
-                const nt = this.linkTypeMap.find(({ type: ty }) => ty == type);
-                n.goMethod = nt.goMethod;
-                n.msg = `${nt.msg}詳細を確認してください！`;
-                return n;
-            });
+            // ユーザー情報をゲット
+            const userStr = sessionStorage.getItem("userinfo") || "";
+            if (userStr != "") {
+                const user = JSON.parse(userStr);
+                if (user.type != 1) {
+                    goLogin();
+                } else {
+                    this.user = user;
+                    this.getNotices(user.customerId);
+                }
+            } else {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+                axios({
+                    method: "GET",
+                    url: "/login/info",
+                    withCredentials: true,
+                })
+                    .then((res) => {
+                        loading.close();
+                        const { data: {
+                            code,
+                            data: user = {},
+                        } = {} } = res;
+                        if (code != 80011 || user.type != 1) {
+                            goLogin();
+                        } else {
+                            this.user = user;
+                            this.getNotices(user.customerId);
+                            this.jobCase.customerId = user.customerId;
+                            sessionStorage.setItem("userinfo", JSON.stringify(user));
+                        }
+                    })
+            }
         },
         methods: {
-            goJobCases,
-            goEmployeeInfo,
-            goEmployeeApplyHistory,
+            goCustomerCaseEdit,
+            goCustomerCaseView,
+            getNotices(customerId) {
+                axios({
+                    method: "GET",
+                    url: `/logged/cust/notice/list/${customerId}`,
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        const { data: {
+                            code,
+                            data = [],
+                        } = {} } = res;
+                        let noticeCount = 0;
+                        const notices = [];
+                        const tmp = [];
+                        data.forEach((n = {}) => {
+                            const { readed, type, createDate } = n;
+                            const date = dateFormat(createDate);
+                            const nt = this.linkTypeMap.find(({ type: ty }) => ty == type);
+                            n.date = date;
+                            n.goMethod = nt.goMethod;
+                            n.msg = `${nt.msg}詳細を確認してください！`;
+                            if (readed == 0) {
+                                noticeCount++;
+                                notices.push(n);
+                            } else {
+                                tmp.push(n);
+                            }
+                        });
+                        this.noticeCount = noticeCount;
+                        notices.push(...tmp);
+                        this.notices = notices;
+                    });
+            },
+            goDetail(notice) {
+                const {
+                    goMethod,
+                    caseId,
+                    id,
+                    type,
+                } = notice;
+                axios({
+                    method: "GET",
+                    url: `/logged/cust/notice/readed/${id}`,
+                    withCredentials: true,
+                })
+                    .then(() => {
+                        const params = [caseId];
+                        if (type != 2004) {
+                            params.push(1);
+                        } 
+                        goMethod(...params);
+                    });
+            },
             logout() {
                 const loading = this.$loading({
                     lock: true,

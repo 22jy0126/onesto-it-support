@@ -46,7 +46,12 @@
                     <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
                     <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
                     <el-menu-item index="3" @click="goEmployeeApplyHistory">応募履歴</el-menu-item>
-                    <el-menu-item index="4">通知</el-menu-item>
+                    <el-menu-item index="4">
+                        <el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
+                            <div>通知</div>
+                        </el-badge>
+                        <div v-if="noticeCount == 0">通知</div>
+                    </el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -58,7 +63,14 @@
                             <i class="el-icon-message-solid icon"></i>
                             <span class="em">通知一覧</span>
                         </div>
+                        <el-empty v-if="notices.length == 0" description="只今、通知がありません"></el-empty>
                         <div class="notice-case-item" v-for="notice in notices">
+                            <div v-if="notice.readed == 0" class="read-mark read-mark-0">
+                                未読
+                            </div>
+                            <div v-if="notice.readed == 1" class="read-mark read-mark-1">
+                                既読
+                            </div>
                             <div class="date">
                                 <span>{{notice.date}}</span>
                             </div>
@@ -67,7 +79,7 @@
                                 <div>メッセージ：{{notice.msg}}</div>
                             </div>
                             <div class="go-detail"
-                                @click="notice.goMethod(notice.caseId)"
+                                @click="goDetail(notice)"
                             >
                                 詳細>>
                             </div>
@@ -94,47 +106,43 @@
         data() {
             return {
                 // ログインしたユーザー情報
-                user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    username: "鈴木　奈々", // ユーザー名
-                    noticeCount: 2, // 通知数
-                },
+                user: {},
                 notices: [],
+                noticeCount: 0,
                 linkTypeMap: [{
                     /* 案件開始 */
-                    type: 1,
+                    type: 1001,
                     goMethod: goCaseDetail,
                     msg: "おめでとうございます！あなたは応募した案件が開始されました、",
                 }, {
                     /* マイルストーンのチェック返信 */
-                    type: 2,
-                    goMethod: goMilestoneEdit,
+                    type: 1002,
+                    goMethod: goCaseDetail,
                     msg: "クライアントからマイルストーンの編集について返信があります、",
                 }, {
                     /* マイルストーンの編集確認完了 */
-                    type: 3,
-                    goMethod: goMilestoneProgressUpdate,
+                    type: 1003,
+                    goMethod: goCaseDetail,
                     msg: "クライアントからマイルストーンの編集に確認しました、",
                 }, {
                     /* マイルストーンの更新チェック返信 */
-                    type: 4,
-                    goMethod: goMilestoneProgressUpdate,
-                    msg: "クライアントからマイルストーンの更新について返信があります、",
+                    type: 1004,
+                    goMethod: goCaseDetail,
+                    msg: "クライアントからマイルストーンの進捗更新について返信があります、",
                 }, {
                     /* マイルストーンの更新確認完了 */
-                    type: 5,
-                    goMethod: goMilestoneProgressUpdate,
-                    msg: "クライアントからマイルストーンの更新に確認しました、",
+                    type: 1005,
+                    goMethod: goCaseDetail,
+                    msg: "クライアントからマイルストーンの進捗更新に確認しました、",
                 }, {
                     /* 案件完了確認 */
-                    type: 6,
+                    type: 1006,
                     goMethod: goCaseDetail,
                     msg: "お疲れ様でした！クライアントから案件作業完了が確認されました、"
                 }],
             };
         },
         mounted() {
-
             const userStr = sessionStorage.getItem("userinfo") || "";
             if (userStr != "") {
                 const user = JSON.parse(userStr);
@@ -142,6 +150,8 @@
                     goLogin(1);
                 } else {
                     this.user = user;
+                    const { employeeId } = user;
+                    this.getNotices(employeeId);
                 }
             } else {
                 const loading = this.$loading({
@@ -165,48 +175,72 @@
                             goLogin();
                         } else {
                             this.user = user;
-                            this.jobCase.customerId = user.customerId;
                             sessionStorage.setItem("userinfo", JSON.stringify(user));
+                            const { employeeId } = user;
+                            this.getNotices(employeeId);
                         }
                     })
             }
-
-            const loading = this.$loading({
-                lock: true,
-                text: 'Loading',
-                spinner: 'el-icon-loading',
-                background: 'rgba(0, 0, 0, 0.1)'
-            });
-            axios({
-                method: "GET",
-                url: "/logged/case/getHistory",
-                withCredentials: true,
-            })
-
-            const notices = [{
-                date: "2024年2月20日",                   // 送信日付
-                caseId: 1,                              // 案件Id
-                type: 1,                                // 通知タイプ
-                caseName: "学生管理システムの制作",         // 案件名
-            }, {
-                date: "2024年1月20日",                   // 送信日付
-                caseId: 1,                              // 案件Id
-                type: 2,                                // 通知タイプ
-                caseName: "学生管理システムの制作2",        // 案件名
-            }];
-            this.notices = notices.map((n = {}) => {
-                const { type } = n;
-                const nt = this.linkTypeMap.find(({ type: ty }) => ty == type);
-                n.goMethod = nt.goMethod;
-                n.msg = `${nt.msg}詳細を確認してください！`;
-                return n;
-            });
         },
         methods: {
             goJobCases,
             goEmployeeInfo,
             goCaseDetail,
             goEmployeeApplyHistory,
+            getNotices(employeeId) {
+                axios({
+                    method: "GET",
+                    url: `/logged/emp/notice/list/${employeeId}`,
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        const { data: {
+                            code,
+                            data = [],
+                        } = {} } = res;
+                        let noticeCount = 0;
+                        const notices = [];
+                        const tmp = [];
+                        data.forEach((n = {}) => {
+                            const { readed, type, createDate } = n;
+                            const date = dateFormat(createDate);
+                            const nt = this.linkTypeMap.find(({ type: ty }) => ty == type);
+                            n.date = date;
+                            n.goMethod = nt.goMethod;
+                            n.msg = `${nt.msg}詳細を確認してください！`;
+                            if (readed == 0) {
+                                noticeCount++;
+                                notices.push(n);
+                            } else {
+                                tmp.push(n);
+                            }
+                        });
+                        this.noticeCount = noticeCount;
+                        notices.push(...tmp);
+                        this.notices = notices;
+                    });
+            },
+            goDetail(notice) {
+                const {
+                    goMethod,
+                    caseId,
+                    id,
+                } = notice;
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                })
+                axios({
+                    method: "GET",
+                    url: `/logged/emp/notice/readed/${id}`,
+                    withCredentials: true,
+                })
+                    .then(() => {
+                        goMethod(caseId, 1);
+                    });
+            },
             logout() {
                 const loading = this.$loading({
                     lock: true,

@@ -43,7 +43,12 @@
                 <el-menu default-active="2" class="el-menu-vertical-demo">
                     <el-menu-item index="1" @click="goCustomerCaseEdit">新規案件登録</el-menu-item>
                     <el-menu-item index="2" @click="goCustomerCaseView">私の案件</el-menu-item>
-                    <el-menu-item index="3">通知</el-menu-item>
+                    <el-menu-item index="3" @click="goCustomerNotification">
+                        <el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
+                            <div>通知</div>
+                        </el-badge>
+                        <div v-if="noticeCount == 0">通知</div>
+                    </el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -52,7 +57,7 @@
                     <div class="milestone-detail-container">
                         <div class="goback" @click="goback">
                             <i class="el-icon-back"></i>
-                            案件詳細に戻る
+                            戻る
                         </div>
                         <div class="caption">
                             <i class="el-icon-s-order"></i>
@@ -151,6 +156,7 @@
             return {
                 // ログインしたユーザー情報
                 user: {},
+                noticeCount: 0,
                 jobCase: {},
                 milestones: [],
             };
@@ -164,6 +170,7 @@
                     goLogin();
                 } else {
                     this.user = user;
+                    this.getNoticeCount(user.customerId);
                 }
             } else {
                 const loading = this.$loading({
@@ -187,6 +194,7 @@
                             goLogin();
                         } else {
                             this.user = user;
+                            this.getNoticeCount(user.customerId);
                             this.jobCase.customerId = user.customerId;
                             sessionStorage.setItem("userinfo", JSON.stringify(user));
                         }
@@ -242,6 +250,21 @@
             },
             goCustomerCaseEdit,
             goCustomerCaseView,
+            goCustomerNotification,
+            getNoticeCount(customerId) {
+                axios({
+                    method: "GET",
+                    url: `/logged/cust/notice/${customerId}`,
+                    withCredentials: true,
+                })
+                    .then((res = {}) => {
+                        const { data: {
+                            code,
+                            data: noticeCount,
+                        } = {} } = res;
+                        this.noticeCount = noticeCount;
+                    });
+            },
             goback() {
                 window.history.back();
             },
@@ -262,8 +285,8 @@
                 const {
                     milestones = [],
                 } = this;
-                const data = milestones[index];
-                data.status = 2;
+                const milestone = milestones[index];
+                milestone.status = 2;
                 const loading = this.$loading({
                     lock: true,
                     text: 'Loading',
@@ -272,8 +295,11 @@
                 });
                 axios({
                     method: "POST",
-                    url: "/logged/milestone/updateOne",
-                    data,
+                    url: "/logged/milestone/cust/proc/res",
+                    data: {
+                        ...this.jobCase,
+                        milestone,
+                    },
                     withCredentials: true,
                 })
                     .then(() => {
@@ -303,10 +329,10 @@
                         const {
                             milestones = [],
                         } = this;
-                        const data = milestones[index];
-                        data.status = 4;
-                        data.isComment = false;
-                        data.comment = "";
+                        const milestone = milestones[index];
+                        milestone.status = 4;
+                        milestone.isComment = false;
+                        milestone.comment = "";
                         const loading = this.$loading({
                             lock: true,
                             text: 'Loading',
@@ -315,8 +341,11 @@
                         });
                         axios({
                             method: "POST",
-                            url: "/logged/milestone/updateOne",
-                            data,
+                            url: "/logged/milestone/cust/proc/confirmed",
+                            data: {
+                                ...this.jobCase,
+                                milestone,
+                            },
                             withCredentials: true,
                         })
                             .then(() => {

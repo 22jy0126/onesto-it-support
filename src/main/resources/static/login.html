@@ -162,7 +162,7 @@
                 this.errors[itemName] = false;
             },
             onLogin() {
-                const {
+                let {
                     username = "",
                     password = "",
                     type,
@@ -179,13 +179,8 @@
                 if (!flag) {
                     return;
                 }
-
-                if (type == 3) {
-                    debugger;
-                    goManageCustomer();
-                    return;
-                }
-
+                username = username.trim();
+                password = password.trim();
                 const loading = this.$loading({
                     lock: true,
                     text: 'Loading',
@@ -204,6 +199,7 @@
                             code,
                             msg,
                         } = {} } = res;
+                        loading.close();
                         if (code == 90050) {
                             this.$message.error(msg);
                         } else {
@@ -215,13 +211,12 @@
                                 if (type == 2) {
                                     goJobCases();
                                 }
+                                if (type == 3) {
+                                    goManageCustomer();
+                                }
                             }, 1000);
                         }
-                    })
-
-                //TODO: サーバーに送る
-                
-                
+                    });
             }
         },
     });

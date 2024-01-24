@@ -10,7 +10,7 @@ public class CaseWithCurrCust {
 	/*
 	 * 応募者リスト
 	 */
-	private ArrayList<EmployeeBase> apylist;
+	private ArrayList<CaseWithEmp> apylist;
 	
 	public CaseBase getCb() {
 		return cb;
@@ -18,10 +18,10 @@ public class CaseWithCurrCust {
 	public void setCb(CaseBase cb) {
 		this.cb = cb;
 	}
-	public ArrayList<EmployeeBase> getApylist() {
+	public ArrayList<CaseWithEmp> getApylist() {
 		return apylist;
 	}
-	public void setApylist(ArrayList<EmployeeBase> apylist) {
+	public void setApylist(ArrayList<CaseWithEmp> apylist) {
 		this.apylist = apylist;
 	}
 }

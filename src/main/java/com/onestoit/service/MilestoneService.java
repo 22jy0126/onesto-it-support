@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.onestoit.controller.Result;
+import com.onestoit.model.CaseBaseMilestones;
+import com.onestoit.model.CaseBaseProc;
 import com.onestoit.model.Milestone;
 
 @Transactional
@@ -28,7 +30,14 @@ public interface MilestoneService {
 	 * @param milestones
 	 * @return
 	 */
-	Result editConfirmed(ArrayList<Milestone> milestones);
+	Result editConfirmed(CaseBaseMilestones cbm);
+	
+	/**
+	 * マイルストーンリストの作成について返信する
+	 * @param cbm
+	 * @return
+	 */
+	Result editRes(CaseBaseMilestones cbm);
 	
 	/**
 	 * 一つのマイルストーンの更新
@@ -36,4 +45,32 @@ public interface MilestoneService {
 	 * @return
 	 */
 	Result updateOne(Milestone m);
+	
+	/**
+	 * 社員が案件のマイルストーンリストを編集完了
+	 * @param milestones
+	 * @return
+	 */
+	Result empEditFinish(CaseBaseMilestones cbm);
+	
+	/**
+	 * 社員が案件のマイルストーン進捗更新
+	 * @param cbm
+	 * @return
+	 */
+	Result empProcUpdate(CaseBaseProc cbp);
+	
+	/**
+	 * 顧客が案件のマイルストーン進捗返信
+	 * @param cbm
+	 * @return
+	 */
+	Result custProcRes(CaseBaseProc cbp);
+	
+	/**
+	 * 顧客が案件のマイルストーン進捗確認
+	 * @param cbm
+	 * @return
+	 */
+	Result custProcConfirmed(CaseBaseProc cbp);
 }

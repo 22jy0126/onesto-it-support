@@ -43,8 +43,13 @@
                 <!-- TODO: default-active は今いるのメニューです -->
                 <el-menu default-active="2" class="el-menu-vertical-demo">
                     <el-menu-item index="1" @click="goCustomerCaseEdit">新規案件登録</el-menu-item>
-                    <el-menu-item index="2">私の案件</el-menu-item>
-                    <el-menu-item index="3">通知</el-menu-item>
+                    <el-menu-item index="2" @click="goCustomerCaseView">私の案件</el-menu-item>
+					<el-menu-item index="3" @click="goCustomerNotification">
+						<el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
+							<div>通知</div>
+						</el-badge>
+						<div v-if="noticeCount == 0">通知</div>
+					</el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -84,14 +89,16 @@
 										<td>
 											<i class="el-icon-phone icon"></i>
 											<span class="pro-label">TEL</span>
-											{{employeeInfo.tel}}
+											************
+											<!-- {{employeeInfo.tel}} -->
 										</td>
 									</tr>
 									<tr>
 										<td>
 											<i class="el-icon-message icon"></i>
 											<span class="pro-label">Email</span>
-											{{employeeInfo.email}}
+											************
+											<!-- {{employeeInfo.email}} -->
 										</td>
 									</tr>
 					
@@ -213,6 +220,7 @@
         data() {
             return {
                 user: {},
+				noticeCount: 0,
                 employeeInfo: {},
                 caseInfo: {
 					status: 1,
@@ -230,6 +238,7 @@
                     goLogin();
                 } else {
                     this.user = user;
+					this.getNoticeCount(user.customerId);
                 }
             } else {
                 const loading = this.$loading({
@@ -253,6 +262,7 @@
                             goLogin();
                         } else {
                             this.user = user;
+							this.getNoticeCount(user.customerId);
                             this.jobCase.customerId = user.customerId;
                             sessionStorage.setItem("userinfo", JSON.stringify(user));
                         }
@@ -345,10 +355,23 @@
 		},
 		methods: {
             goCustomerCaseEdit,
-			goJobCases,
-			goEmployeeApplyHistory,
+			goCustomerCaseView,
+			goCustomerNotification,
+			getNoticeCount(customerId) {
+				axios({
+					method: "GET",
+					url: `/logged/cust/notice/${customerId}`,
+					withCredentials: true,
+				})
+					.then((res = {}) => {
+						const { data: {
+							code,
+							data: noticeCount,
+						} = {} } = res;
+						this.noticeCount = noticeCount;
+					});
+			},
             goback() {
-                // window.history.back();
 				goCustomerCaseView();
             },
 			logout() {
@@ -371,7 +394,7 @@
 						} = {} } = res;
 						this.$message.success(msg);
 						sessionStorage.removeItem("userinfo");
-						setTimeout(() => goLogin(1), 1000);
+						setTimeout(() => goLogin(), 1000);
 					});
 			},
 			onBind() {
@@ -388,6 +411,7 @@
 					data: {
 						caseId: this.caseInfo.caseId,
 						bonusMoney: this.caseInfo.bonusMoney,
+						caseName: this.caseInfo.caseName,
 						status: 2,
 						ca: {
 							caseId: this.caseInfo.caseId,
@@ -409,13 +433,33 @@
 							this.$message.error(msg);
 						}
 					});
-
-
-				
 			},
 			openBindWindow() {
 				this.bindWindowOpen = true;
 			},
+			logout() {
+				const loading = this.$loading({
+					lock: true,
+					text: 'Loading',
+					spinner: 'el-icon-loading',
+					background: 'rgba(0, 0, 0, 0.1)'
+				});
+				axios({
+					method: "GET",
+					url: "/logout",
+					withCredentials: true,
+				})
+					.then((res = {}) => {
+						loading.close();
+						const { data: {
+							code,
+							msg = "",
+						} = {} } = res;
+						this.$message.success(msg);
+						sessionStorage.removeItem("userinfo");
+						setTimeout(() => goLogin(), 1000);
+					});
+			}
 		}
     });
 </script>

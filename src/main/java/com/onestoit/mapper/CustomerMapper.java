@@ -1,8 +1,12 @@
 package com.onestoit.mapper;
 
+import java.util.ArrayList;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.onestoit.model.Customer;
+import com.onestoit.model.CustomerCaseCount;
+import com.onestoit.model.PaginationCustReq;
 import com.onestoit.model.User;
 
 @Mapper
@@ -26,4 +30,25 @@ public interface CustomerMapper {
 	 * @return
 	 */
 	Customer login(User u);
+	
+	/**
+	 * 顧客検索
+	 * @param c
+	 * @return
+	 */
+	ArrayList<CustomerCaseCount> findCustomer(CustomerCaseCount c);
+	
+	/**
+	 * 顧客のページングクエリー
+	 * @param c
+	 * @return
+	 */
+	ArrayList<CustomerCaseCount> findCustomerByPage(PaginationCustReq c);
+	
+	/**
+	 * 顧客検索の合計数
+	 * @param c
+	 * @return
+	 */
+	int customerCount(CustomerCaseCount c);
 }

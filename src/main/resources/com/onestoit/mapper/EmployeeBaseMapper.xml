@@ -5,41 +5,103 @@
 <mapper namespace="com.onestoit.mapper.EmployeeBaseMapper">
 	<insert id="save">
 		INSERT INTO onestoit_employee_base (
-			employee_id,
-			username,
-			type,
-			name,
-			gender,
-			birthday,
-			password,
-			tel,
-			email,
-			skill
+		employee_id,
+		username,
+		type,
+		name,
+		gender,
+		birthday,
+		password,
+		tel,
+		email,
+		skill
 		) VALUES (
-			#{employeeId},
-			#{username},
-			#{type},
-			#{name},
-			#{gender},
-			#{birthday},
-			#{password},
-			#{tel},
-			#{email},
-			#{skill}
+		#{employeeId},
+		#{username},
+		#{type},
+		#{name},
+		#{gender},
+		#{birthday},
+		#{password},
+		#{tel},
+		#{email},
+		#{skill}
 		);
 	</insert>
-	
+
 	<select id="alreadyExists">
-		select count(*) from onestoit_employee_base where employee_id = #{employeeId}
+		select count(*) from onestoit_employee_base where
+		employee_id = #{employeeId}
 	</select>
-	
+
 	<!-- 社員ログイン -->
 	<select id="login">
-		select * from onestoit_employee_base where employee_id = #{username} and password = #{password};
+		select * from onestoit_employee_base where
+		employee_id = #{username} and password = #{password};
+	</select>
+
+	<!--社員Idで社員の基本情報をゲット -->
+	<select id="getById">
+		select * from onestoit_employee_base where
+		employee_id = #{employeeId};
+	</select>
+
+	<!-- 社員検索 -->
+	<select id="findEmployeeByPage">
+		select
+		OEB.employee_id,
+		OEB.username,
+		OEB.type,
+		OEB.name,
+		OEB.gender,
+		OEB.birthday,
+		OEB.tel,
+		OEB.email,
+		OEB.skill,
+		EA.caseCount
+		from onestoit_employee_base OEB left join (
+		select
+		count(case_id) as caseCount,
+		employee_id
+		from onestoit_case_apply
+		where bind = true
+		group by employee_id
+		) EA on OEB.employee_id = EA.employee_id
+		<where>
+			<if test="employeeId != null">
+				OEB.employee_id = #{employeeId}
+			</if>
+			<if test="name != null">
+				and OEB.name like CONCAT('%', #{name}, '%')
+			</if>
+			<if test="caseCount != null">
+				and caseCount >= #{caseCount}
+			</if>
+		</where>
+		limit #{fromNum}, #{pageSize};
 	</select>
 	
-	<!--社員Idで社員の基本情報をゲット-->
-	<select id="getById">
-		select * from onestoit_employee_base where employee_id = #{employeeId};
+	<!-- 社員検索の合計数 -->
+	<select id="employeeCount">
+		select count(OEB.employee_id)
+		from onestoit_employee_base OEB left join (
+		select
+		count(case_id) as caseCount,
+		employee_id
+		from onestoit_case_apply
+		where bind = true
+		group by employee_id
+		) EA on OEB.employee_id = EA.employee_id
+		<where>
+			<if test="employeeId != null">
+				OEB.employee_id = #{employeeId}
+			</if>
+			<if test="name != null">
+				and OEB.name like CONCAT('%', #{name}, '%')
+			</if>
+			<if test="caseCount != null">
+				and caseCount >= #{caseCount}
+			</if>
+		</where>
 	</select>
 </mapper>

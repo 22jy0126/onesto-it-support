@@ -44,7 +44,12 @@
                     <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
                     <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
                     <el-menu-item index="3" @click="goEmployeeApplyHistory">応募歴史</el-menu-item>
-                    <el-menu-item index="4" @click="goEmployeeNotification">通知</el-menu-item>
+                    <el-menu-item index="4" @click="goEmployeeNotification">
+                        <el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
+                            <div>通知</div>
+                        </el-badge>
+                        <div v-if="noticeCount == 0">通知</div>
+                    </el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -168,9 +173,9 @@
                         >
                             クライアントに送る
                         </el-button>
-                        <el-button type="info">
+                        <!-- <el-button type="info">
                             下書きとして保存
-                        </el-button>
+                        </el-button> -->
                     </div>
                 </el-main>
             </el-container>
@@ -193,11 +198,8 @@
         data() {
             return {
                 // ログインしたユーザー情報
-                user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    username: "鈴木　奈々", // ユーザー名
-                    noticeCount: 2, // 通知数
-                },
+                user: {},
+                noticeCount: 0,
                 jobCase: {
                     caseId: undefined,
                     // caseName: "学生管理システムの作成",
@@ -224,6 +226,18 @@
                     goLogin(1);
                 } else {
                     this.user = user;
+                    axios({
+                        method: "GET",
+                        url: `/logged/emp/notice/${user.employeeId}`,
+                        withCredentials: true,
+                    })
+                        .then((res = {}) => {
+                            const { data: {
+                                code,
+                                data: noticeCount,
+                            } = {} } = res;
+                            this.noticeCount = noticeCount;
+                        });
                 }
             } else {
                 const loading = this.$loading({
@@ -247,8 +261,19 @@
                             goLogin();
                         } else {
                             this.user = user;
-                            this.jobCase.customerId = user.customerId;
                             sessionStorage.setItem("userinfo", JSON.stringify(user));
+                            axios({
+                                method: "GET",
+                                url: `/logged/emp/notice/${user.employeeId}`,
+                                withCredentials: true,
+                            })
+                                .then((res = {}) => {
+                                    const { data: {
+                                        code,
+                                        data: noticeCount,
+                                    } = {} } = res;
+                                    this.noticeCount = noticeCount;
+                                });
                         }
                     })
             }
@@ -357,10 +382,10 @@
             },
             onFinish() {
                 const {
-                    milestones = [],
+                    milestones: _milestones = [],
                 } = this;
                 let flag = true;
-                milestones.forEach((item = {}) => {
+                _milestones.forEach((item = {}) => {
                     const { 
                         name = "",
                         description = "",
@@ -379,9 +404,9 @@
                     return;
                 }
 
-                const data = [...(this.milestones || [])];
-                data.push(...this.deletedMilestones);
-                data.forEach(m => {
+                const milestones = [...(_milestones || [])];
+                milestones.push(...this.deletedMilestones);
+                milestones.forEach(m => {
                     m.caseId = this.jobCase.caseId;
                     m.editStatus = 1;
                     m.status = 0;
@@ -394,8 +419,11 @@
                 });
                 axios({
                     method: "POST",
-                    url: `/logged/milestone/update`,
-                    data,
+                    url: `/logged/milestone/emp/edit/finish`,
+                    data: {
+                        ...this.jobCase,
+                        milestones,
+                    },
                     withCredentials: true,
                 })
                     .then((res = {}) => {

@@ -63,5 +63,4 @@ public class EmployeeBase extends User {
 	public void setSkill(String skill) {
 		this.skill = skill;
 	}
-	
 }

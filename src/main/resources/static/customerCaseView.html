@@ -45,7 +45,12 @@
 					<el-menu default-active="2" class="el-menu-vertical-demo">
 						<el-menu-item index="1" @click="goCustomerCaseEdit">新規案件登録</el-menu-item>
 						<el-menu-item index="2">私の案件</el-menu-item>
-						<el-menu-item index="3">通知</el-menu-item>
+						<el-menu-item index="4" @click="goCustomerNotification">
+							<el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
+								<div>通知</div>
+							</el-badge>
+							<div v-if="noticeCount == 0">通知</div>
+						</el-menu-item>
 					</el-menu>
                 </el-menu>
             </el-aside>
@@ -66,7 +71,6 @@
 										{{job.cb.applyStatusText}}
 									</div>
 								</div>
-								<!-- <div class="case-name">{{job.cb.caseName}}</div> -->
 								<div>
 									<span>業務期間:</span>
 									<span>{{job.cb.deadlineVal}}</span>
@@ -140,7 +144,43 @@
 					                <div class="no-applicants">現在の応募者はいません。</div>
 				            	</div>
 					        </div>
-	                        
+							<!-- 契約社員 -->
+							<div class="applicants-list" v-if="job.cb.status > 1">
+								<div class="common-caption">
+									<i class="el-icon-user icon"></i>
+									頼まれた社員
+								</div>
+								<div class="applicant-item">
+									<div class="applicant-info">
+										<el-row>
+											<el-col>
+												<el-card shadow="hover">
+													<div class="applicant-user">
+														<div>
+															<div class="name">
+																{{job.assigned.name}}
+															</div>
+															<div>
+																<span class="apy-label">性別:&nbsp;&nbsp;&nbsp;<span>{{job.assigned.gender == 0 ? "男性" :
+																		"女性"}}</span></span>
+																<span
+																	class="apy-label">生年月日:&nbsp;&nbsp;&nbsp;<span>{{job.assigned.birthdayVal}}</span></span>
+															</div>
+															<div>
+																<span class="apy-label">経験開発ツール:&nbsp;&nbsp;&nbsp;<span>{{job.assigned.skill == null ?
+																		"未記入" : job.assigned.skill}}</span></span>
+															</div>
+														</div>
+														<div class="go-detail" @click="goCustomerEmpInfo(job.assigned.employeeId, job.cb.caseId)">
+															詳細>>
+														</div>
+													</div>
+												</el-card>
+											</el-col>
+										</el-row>
+									</div>
+								</div>
+							</div>
 	                    </div>
 	                </section>
                     
@@ -165,11 +205,8 @@
         data() {
             return {
                 // ログインしたユーザー情報
-                user: {
-                    avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png", //アバター画像
-                    username: "鈴木　奈々", // ユーザー名
-                    noticeCount: 2, // 通知数
-                },
+                user: {},
+				noticeCount: 0,
                 // 登録した求人票のデータ
 				jobList: [],
             };
@@ -183,6 +220,7 @@
 					goLogin();
 				} else {
 					this.user = user;
+					this.getNoticeCount(user.customerId);
 				}
 			} else {
 				const loading = this.$loading({
@@ -206,6 +244,7 @@
 							goLogin();
 						} else {
 							this.user = user;
+							this.getNoticeCount(user.customerId);
 							this.jobCase.customerId = user.customerId;
 							sessionStorage.setItem("userinfo", JSON.stringify(user));
 						}
@@ -233,6 +272,7 @@
 					this.jobList = jobList.map((job = {}) => {
 						const cb = { ...job.cb };
 						const apylist = [...(job.apylist || [])];
+						let assigned = {};
 						const { deadline, status, bind } = cb;
 						const deadlineVal = dateFormat(deadline);
 						cb.deadlineVal = deadlineVal;
@@ -257,9 +297,17 @@
 							const { birthday } = emp;
 							const birthdayVal = dateFormat(birthday);
 							emp.birthdayVal = birthdayVal;
+
+							if (status > 1) {
+								const { bind } = emp;
+								if (bind) {
+									assigned = emp;
+								}
+							}
 						});
 
 						job.cb = cb;
+						job.assigned = assigned;
 						return job;
 					});
 					
@@ -269,6 +317,21 @@
 			goCustomerCaseEdit,
 			goCustomerEmpInfo,
 			goCustomerCaseDetail,
+			goCustomerNotification,
+			getNoticeCount(customerId) {
+				axios({
+					method: "GET",
+					url: `/logged/cust/notice/${customerId}`,
+					withCredentials: true,
+				})
+					.then((res = {}) => {
+						const { data: {
+							code,
+							data: noticeCount,
+						} = {} } = res;
+						this.noticeCount = noticeCount;
+					});
+			},
 			logout() {
 				const loading = this.$loading({
 					lock: true,
@@ -289,7 +352,7 @@
 						} = {} } = res;
 						this.$message.success(msg);
 						sessionStorage.removeItem("userinfo");
-						setTimeout(() => goLogin(1), 1000);
+						setTimeout(() => goLogin(), 1000);
 					});
 			},
 		}

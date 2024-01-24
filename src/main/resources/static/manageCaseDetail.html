@@ -41,17 +41,9 @@
         <el-container class="common-mian job-case-main">
             <!-- サイドメニュー -->
             <el-aside width="200px">
-                <!-- TODO: default-active は今いるのメニューです -->
-                <el-menu default-active="1" class="el-menu-vertical-demo">
-                    <el-menu-item index="1" @click="goJobCases">求人一覧</el-menu-item>
-                    <el-menu-item index="2" @click="goEmployeeInfo">個人履歴</el-menu-item>
-                    <el-menu-item index="3" @click="goEmployeeApplyHistory">応募履歴</el-menu-item>
-                    <el-menu-item index="4" @click="goEmployeeNotification">
-                        <el-badge v-if="noticeCount > 0" :value="noticeCount" class="notice-badge">
-                            <div>通知</div>
-                        </el-badge>
-                        <div v-if="noticeCount == 0">通知</div>
-                    </el-menu-item>
+                <el-menu :default-active="from" class="el-menu-vertical-demo">
+                    <el-menu-item index="1" @click="goManageCustomer">お客様管理</el-menu-item>
+                    <el-menu-item index="2" @click="goManageEmployee">社員管理</el-menu-item>
                 </el-menu>
             </el-aside>
 
@@ -96,7 +88,8 @@
                                 </div>
                             </div>
                             <div class="info-item info-item-last">
-                                <div class="label">報酬(税別)：{{+parseFloat(jobCase.bonusMoney*0.9).toFixed(1)}}万円<span class="required"></span>
+                                <div class="label">報酬(税別)：{{+parseFloat(jobCase.bonusMoney*0.9).toFixed(1)}}万円<span
+                                        class="required"></span>
                                     <span>（{{jobCase.bonusMoneyNegotiable ? "相談可能" : "相談不可"}}）</span>
                                 </div>
                             </div>
@@ -106,8 +99,7 @@
                                 <i class="el-icon-menu"></i>
                                 <div class="caption">機能の詳細</div>
                             </div>
-                            <div class="functions-item"
-                                v-for="(func, index) in jobCase.functions">
+                            <div class="functions-item" v-for="(func, index) in jobCase.functions">
                                 <div class="index">
                                     <i class="el-icon-caret-right"></i>
                                     機能{{index+1}}：
@@ -117,29 +109,6 @@
                                 </div>
                             </div>
                         </section>
-                        <section class="client-infos">
-							<div class="caption-wrapper">
-                                <i class="el-icon-user-solid"></i>
-                                <div class="caption">クライアントの情報</div>
-                            </div>
-                            <el-card class="box-card">
-								<div>
-									<span class="c-label">ユーザ名:&nbsp;&nbsp;&nbsp;<span>{{cust.username}}</span></span>
-									<span class="c-label">居住地:&nbsp;&nbsp;&nbsp;<span>{{cust.addr1}}</span></span>
-								</div>
-							</el-card>
-                        </section>
-                        <div class="save-btns">
-                            <el-button @click="onApply" v-bind:class="jobCase.applyStatus != 0 ? 'hidden' : ''" type="primary">
-                                応募する
-                            </el-button>
-                            <el-button @click="goMilestoneEdit(jobCase.caseId)" v-if="jobCase.status == 2 && jobCase.milestoneStatus == 0" type="primary">
-                                マイルストーン編集
-                            </el-button>
-                            <el-button @click="goMilestoneProgressUpdate(jobCase.caseId)" v-if="jobCase.status == 2 && jobCase.milestoneStatus == 1" type="primary">
-                                マイルストーン詳細
-                            </el-button>
-                        </div>
                     </section>
                 </el-main>
             </el-container>
@@ -165,6 +134,7 @@
                 noticeCount: 0,
                 jobCase: {},
                 cust: {},
+                from: "1",
             };
         },
         mounted() {
@@ -172,22 +142,10 @@
             const userStr = sessionStorage.getItem("userinfo") || "";
             if (userStr != "") {
                 const user = JSON.parse(userStr);
-                if (user.type != 2) {
-                    goLogin(1);
+                if (user.type != 3) {
+                    goLogin();
                 } else {
                     this.user = user;
-                    axios({
-                        method: "GET",
-                        url: `/logged/emp/notice/${user.employeeId}`,
-                        withCredentials: true,
-                    })
-                        .then((res = {}) => {
-                            const { data: {
-                                code,
-                                data: noticeCount,
-                            } = {} } = res;
-                            this.noticeCount = noticeCount;
-                        });
                 }
             } else {
                 const loading = this.$loading({
@@ -207,28 +165,17 @@
                             code,
                             data: user = {},
                         } = {} } = res;
-                        if (code != 80011 || user.type != 2) {
+                        if (code != 80011 || user.type != 3) {
                             goLogin();
                         } else {
                             this.user = user;
                             sessionStorage.setItem("userinfo", JSON.stringify(user));
-                            axios({
-                                method: "GET",
-                                url: `/logged/emp/notice/${user.employeeId}`,
-                                withCredentials: true,
-                            })
-                                .then((res = {}) => {
-                                    const { data: {
-                                        code,
-                                        data: noticeCount,
-                                    } = {} } = res;
-                                    this.noticeCount = noticeCount;
-                                });
                         }
                     })
             }
-
             const caseId = getURLParam("caseId");
+            const from = getURLParam("from");
+            this.from = from;
             const loading = this.$loading({
                 lock: true,
                 text: 'Loading',
@@ -237,21 +184,20 @@
             });
             axios({
                 method: "POST",
-                url: "/logged/case/getWithCurrEmp",
+                url: "/logged/case/get",
                 data: {
                     caseId,
                 },
                 withCredentials: true,
             })
                 .then((res = {}) => {
+                    const { data = {} } = res;
                     loading.close();
-                    const { data: { data = {} } = {}} = res;
                     const {
-                        c: jobCase = {},
-                        caseApply,
-                        cust,
+                        code,
+                        data: jobCase,
                     } = data;
-                    this.cust = cust;
+
                     // 日付のフォーマット処理
                     const {
                         deadline,
@@ -260,55 +206,28 @@
                     } = jobCase;
                     const deadlineVal = dateFormat(deadline);
                     jobCase.deadlineVal = deadlineVal;
-                    this.jobCase = jobCase;
 
-                    // 応募状況
-                    if (caseApply == null) {
-                        this.jobCase.applyStatus = 0;
-                        this.jobCase.statusCls = "hidden";
-                    } else {
-                        const { bind } = caseApply;
-                        if (status == 1) {
-                            this.jobCase.applyStatus = 1;
-                            this.jobCase.applyStatusText = "応募中";
-                            this.jobCase.statusCls = "status status-1";
-                        }
-                        if (status == 2 && !bind) {
-                            this.jobCase.applyStatus = 2;
-                            this.jobCase.applyStatusText = "応募終了";
-                            this.jobCase.statusCls = "status status-2";
-                        }
-                        if (status == 2 && bind) {
-                            this.jobCase.applyStatus = 3;
-                            this.jobCase.applyStatusText = "案件作業中";
-                            this.jobCase.statusCls = "status status-3";
-                        }
-                        if (status == 3 && bind) {
-                            this.jobCase.applyStatus = 4;
-                            this.jobCase.applyStatusText = "案件作業終了";
-                            this.jobCase.statusCls = "status status-4";
-                        }
-                        
-                        const tom = getURLParam("tom");
-                        if (tom == 1) {
-                            if (status == 2 && milestoneStatus ==0) {
-                                location.replace(`/milestoneedit.html?caseId=${caseId}`);
-                            }
-                            if (status == 2 && milestoneStatus == 1) {
-                                location.replace(`/milestoneprogressupdate.html?caseId=${caseId}`);
-                            }
-                        }
+                    if (status == 1) {
+                        jobCase.applyStatus = 1;
+                        jobCase.applyStatusText = "応募中";
+                        jobCase.statusCls = "status status-1";
                     }
+                    if (status == 2) {
+                        jobCase.applyStatus = 3;
+                        jobCase.applyStatusText = "案件作業中";
+                        jobCase.statusCls = "status status-3";
+                    }
+                    if (status == 3) {
+                        jobCase.applyStatus = 4;
+                        jobCase.applyStatusText = "案件作業終了";
+                        jobCase.statusCls = "status status-4";
+                    }
+                    this.jobCase = jobCase;
                 });
         },
         methods: {
-            goJobCases,
-            goEmployeeInfo,
-            goEmployeeApplyHistory,
-            goEmployeeNotification,
-            goJobCases,
-            goMilestoneEdit,
-            goMilestoneProgressUpdate,
+            goManageCustomer,
+            goManageEmployee,
             goBack() {
                 window.history.back();
             },

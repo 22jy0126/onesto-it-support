@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.onestoit.model.Customer;
 import com.onestoit.model.Employee;
 import com.onestoit.model.EmployeeBase;
+import com.onestoit.model.PaginationCustReq;
+import com.onestoit.model.PaginationEmpReq;
 import com.onestoit.model.User;
 import com.onestoit.model.WorkHistory;
 import com.onestoit.service.CustomerService;
 import com.onestoit.service.EmployeeService;
+import com.onestoit.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -29,6 +32,9 @@ public class UserController {
 	
 	@Autowired
 	CustomerService customerService;
+	
+	@Autowired
+	NotificationService notificationService;
 	
 	@PostMapping("/register/emp/save")
 	Result save(@RequestBody Employee e) {
@@ -57,7 +63,7 @@ public class UserController {
 		String uname = u.getUsername();
 		String pwdraw = u.getPassword();
 		if (userType == 3) {  // 管理者の処理
-			if (uname == "manager" && pwdraw == "888888") {
+			if ("manager".equals(uname) && "88888888".equals(pwdraw)) {
 				session.setAttribute("userinfo", u);
 				res = new Result(Code.LOGIN_OK, u);
 			} else {
@@ -131,5 +137,43 @@ public class UserController {
 		return employeeService.getEmployeeBaseById(employeeId);
 	}
 	
+	@GetMapping("/logged/emp/notice/{employeeId}")
+	Result getEmpNoticeCount(@PathVariable String employeeId) {
+		return notificationService.getEmpNotReadNoticeCount(employeeId);
+	}
 	
+	@GetMapping("/logged/emp/notice/list/{employeeId}")
+	Result getEmpNoticeList(@PathVariable String employeeId) {
+		return notificationService.getEmpNoticeList(employeeId);
+	}
+	
+	@GetMapping("/logged/emp/notice/readed/{id}")
+	Result setEmpNoticeReaded(@PathVariable Integer id) {
+		return notificationService.setEmpReaded(id);
+	}
+	
+	@GetMapping("/logged/cust/notice/{customerId}")
+	Result getCustNoticeCount(@PathVariable Integer customerId) {
+		return notificationService.getCustNotReadNoticeCount(customerId);
+	}
+	
+	@GetMapping("/logged/cust/notice/list/{customerId}")
+	Result getCustNoticeList(@PathVariable Integer customerId) {
+		return notificationService.getCustNoticeList(customerId);
+	}
+	
+	@GetMapping("/logged/cust/notice/readed/{id}")
+	Result setCustNoticeReaded(@PathVariable Integer id) {
+		return notificationService.setCustReaded(id);
+	}
+
+	@PostMapping("/logged/manager/customers")
+	Result managerCustomerSearch(@RequestBody PaginationCustReq c) {
+		return customerService.findCustomerByPage(c);
+	}
+	
+	@PostMapping("/logged/manager/employees")
+	Result managerEmployeeSearch(@RequestBody PaginationEmpReq emp) {
+		return employeeService.findEmployeeByPage(emp);
+	}
 }
