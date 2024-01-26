@@ -63,7 +63,7 @@
                             <i class="el-icon-message-solid icon"></i>
                             <span class="em">通知一覧</span>
                         </div>
-                        <el-empty v-if="notices.length == 0" description="只今、通知がありません"></el-empty>
+                        <el-empty v-if="notices.length == 0" description="現在、通知はありません"></el-empty>
                         <div class="notice-case-item" v-for="notice in notices">
                             <div v-if="notice.readed == 0" class="read-mark read-mark-0">
                                 未読
@@ -222,6 +222,7 @@
             },
             goDetail(notice) {
                 const {
+                    type,
                     goMethod,
                     caseId,
                     id,
@@ -238,7 +239,13 @@
                     withCredentials: true,
                 })
                     .then(() => {
-                        goMethod(caseId, 1);
+                        const params = [caseId];
+                        const mTypes = [1002, 1003, 1004, 1005];
+                        // debugger;
+                        if (mTypes.includes(type)) {
+                            params.push(1);
+                        }
+                        goMethod(...params);
                     });
             },
             logout() {

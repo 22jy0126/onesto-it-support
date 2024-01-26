@@ -535,7 +535,7 @@
                             type: 'success'
                         });
                     } else {
-                        this.$message.error("只今案件の保存ができません、後でもう一度お試しください！");
+                        this.$message.error("現在案件の保存ができません、後でもう一度お試しください！");
                     }
                 });
                 
@@ -574,9 +574,10 @@
                     }
                 });
                 if (!flag) {
-                    this.$message.error('未記入の必須項目があります。もう一度チェックしてください！');
+                    this.$message.error('記入不備があります、もう一度チェックしてください！');
                     return;
                 }
+                this.jobCase.status = 0;
                 localStorage.removeItem("tempJobCase");
                 const jobCaseStr = JSON.stringify(this.jobCase);
                 localStorage.setItem("tempJobCase", jobCaseStr);

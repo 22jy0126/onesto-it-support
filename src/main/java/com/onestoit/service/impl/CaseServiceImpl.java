@@ -162,6 +162,7 @@ public class CaseServiceImpl implements CaseService {
 			String caseName = can.getCaseName();
 			NotificationCust nc = new NotificationCust();
 			nc.setCaseId(can.getCaseId());
+			nc.setCaseName(caseName);
 			nc.setCustomerId(can.getCustomerId());
 			nc.setCreateDate(new Date());
 			nc.setType(NoticeType.CUST_CASE_NEW_APPLY);
@@ -236,6 +237,7 @@ public class CaseServiceImpl implements CaseService {
 	@Transactional
 	public Result caseToBind(CaseBind cb) {
 		CaseBase c = (CaseBase) cb;
+		c.setMilestoneStatus(0);
 		CaseApply ca = cb.getCa();
 		ca.setBindDate(new Date());
 		int res;

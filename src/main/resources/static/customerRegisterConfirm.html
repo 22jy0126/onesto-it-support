@@ -135,7 +135,7 @@
                         loading.close();
                         const { data: { code } = {} } = res;
                         if (code == 90010) {
-                            this.$message.error('只今、登録できません、少し後でもう一度お試してください');
+                            this.$message.error('現在、登録できません、少し後でもう一度お試してください');
                         } else {
                             this.$message.success('登録しました');
                             localStorage.removeItem("tempCustomerInfo");

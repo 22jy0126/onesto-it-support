@@ -148,7 +148,7 @@
 							<div class="applicants-list" v-if="job.cb.status > 1">
 								<div class="common-caption">
 									<i class="el-icon-user icon"></i>
-									頼まれた社員
+									契約した社員
 								</div>
 								<div class="applicant-item">
 									<div class="applicant-info">
@@ -171,7 +171,7 @@
 																		"未記入" : job.assigned.skill}}</span></span>
 															</div>
 														</div>
-														<div class="go-detail" @click="goCustomerEmpInfo(job.assigned.employeeId, job.cb.caseId)">
+														<div class="go-detail" @click="goCustomerEmpInfo(job.assigned.employeeId, job.cb.caseId, 1)">
 															詳細>>
 														</div>
 													</div>
@@ -183,7 +183,6 @@
 							</div>
 	                    </div>
 	                </section>
-                    
                 </el-main>
             </el-container>
         </el-container>

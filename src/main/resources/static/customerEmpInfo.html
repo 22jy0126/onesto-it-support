@@ -89,16 +89,14 @@
 										<td>
 											<i class="el-icon-phone icon"></i>
 											<span class="pro-label">TEL</span>
-											************
-											<!-- {{employeeInfo.tel}} -->
+											{{employeeInfo.tel}}
 										</td>
 									</tr>
 									<tr>
 										<td>
 											<i class="el-icon-message icon"></i>
 											<span class="pro-label">Email</span>
-											************
-											<!-- {{employeeInfo.email}} -->
+											{{employeeInfo.email}}
 										</td>
 									</tr>
 					
@@ -227,6 +225,7 @@
 				},
 				show: true,
 				bindWindowOpen: false,
+				binded: getURLParam("binded"),
             };
         },
 		mounted() {
@@ -294,8 +293,14 @@
 						const {
 							birthday,
 							gender,
+							tel,
+							email,
 							workHistorys = [],
 						} = employeeInfo;
+						if (this.binded != 1) {
+							employeeInfo.tel = "**********";
+							employeeInfo.email = "**********";
+						}
 						const birthdayVal = dateFormat(birthday);
 						employeeInfo.birthdayVal = birthdayVal;
 						let genderVal;
@@ -327,13 +332,6 @@
 
 						this.employeeInfo = employeeInfo;
 
-
-                        // this.$loading({
-                        //     lock: true,
-                        //     text: 'Loading',
-                        //     spinner: 'el-icon-loading',
-                        //     background: 'rgba(0, 0, 0, 0.1)'
-                        // });
                         axios({
                             method: "GET",
                             url: `/logged/case/getbase/${caseId}`,

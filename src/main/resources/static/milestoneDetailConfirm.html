@@ -67,7 +67,7 @@
                             マイルストーンの確認
                             <span class="wait-tips" v-if="(milestones[0] || {}).editStatus == 0">
                                 <i class="el-icon-warning"></i>
-                                社員が編集中です、しばらくお待ちください！
+                                現在社員が編集中です、しばらくお待ちください！
                             </span>
                         </div>
                         <section class="milestone-wrapper" v-if="milestones.length > 0">
@@ -85,7 +85,7 @@
                                     <div class="opt-line">
                                         <span v-bind:class="milestoneItem.isComment ? 'hidden' : 'comment-add'" 
                                             @click="onCommentAdd(index)">
-                                            コメント追加
+                                            コメントを追加する
                                         </span>
                                         <div v-bind:class="!milestoneItem.isComment ? 'hidden' : 'comment-edit'">
                                             <el-input 
@@ -104,7 +104,7 @@
                                                     icon="el-icon-info" 
                                                     icon-color="red"
                                                     @confirm="onCommentCancel(index)"
-                                                    title="キャンセルしたコメントは戻らない、よろしいですか?">
+                                                    title="キャンセルしたコメントは戻りません、よろしいですか?">
                                                     <el-button 
                                                         slot="reference" 
                                                         class="opt-item-del">
@@ -120,7 +120,7 @@
                         <section class="milestones-empty" v-if="milestones.length == 0">
                             <div class="milestones-empty-inner">
                                 <img src="./img/computer_sagyouin_woman.png" alt="">
-                                <div class="text">社員は今編集中です、しばらくお待ちください！</div>
+                                <div class="text">現在社員は編集中です、しばらくお待ちください！</div>
                             </div>
                         </section>
                         <div class="btns-container" v-if="(milestones[0] || {}).editStatus == 1">

@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- TODO: ページの名にチェンジする -->
-    <title>お客様の案件登録情報確認</title>
+    <title>案件詳細</title>
     <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
     <!-- vue と elementUIの依存css -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
@@ -125,11 +125,11 @@
                                     type="info">下書きとして保存</el-button>
                             </div>
                             <div v-if="(+jobCase.status) == 2" class="save-btns">
-                                <el-button @click="onMilestoneCheck" type="primary">マイルストーンをチェック</el-button>
-                                <el-button type="success" @click="onCaseFinish">案件終了</el-button>
+                                <el-button @click="onMilestoneCheck" type="primary">マイルストーンをチェックする</el-button>
+                                <el-button type="success" @click="onCaseFinish">案件を終了する</el-button>
                             </div>
                             <div v-if="(+jobCase.status) == 1" class="save-btns">
-                                <el-button type="danger" @click="caseDel">案件削除</el-button>
+                                <el-button type="danger" @click="caseDel">案件を削除する</el-button>
                             </div>
                     </section>
                     
@@ -289,7 +289,8 @@
                     });
             },
             onBackPage() {
-                window.history.back();
+                // window.history.back();
+                goCustomerCaseEdit();
             },
             caseSave(status, succMsg, errMsg) {
                 this.jobCase.status = status;
@@ -323,10 +324,10 @@
                     });
             },
             onCaseCreate() {
-                this.caseSave(1, "新規案件を登録しました！", "只今案件の登録ができません、後でもう一度お試しください！");
+                this.caseSave(1, "新規案件を登録しました！", "現在案件の登録ができません、後でもう一度お試しください！");
             },
             onDraftSave() {
-                this.caseSave(0, "下書きを保存しました！", "只今案件の保存ができません、後でもう一度お試しください！");
+                this.caseSave(0, "下書きを保存しました！", "現在案件の保存ができません、後でもう一度お試しください！");
             },
             onMilestoneCheck() {
                 const { caseId, milestoneStatus } = this.jobCase;
@@ -337,8 +338,8 @@
                 }
             },
             onCaseFinish() {
-                this.$confirm('案件終了後作業の状態に戻れません、よろしいですか?', '確認', {
-                    confirmButtonText: '案件終了する',
+                this.$confirm('案件終了後前の状態に戻れません、よろしいですか?', '確認', {
+                    confirmButtonText: '案件を終了する',
                     cancelButtonText: "検討する",
                     type: 'warning',
                     center: false,
@@ -358,7 +359,7 @@
                         })
                             .then(() => {
                                 loading.close();
-                                this.$message.success("案件作業終了しました！");
+                                this.$message.success("案件が終了しました！");
                                 this.getNoticeCount(this.user.customerId);
                                 this.jobCase.status = 3;
                                 this.jobCase.applyStatus = 4;
@@ -368,7 +369,7 @@
                     });
             },
             caseDel() {
-                this.$confirm('削除した案件は戻れません、よろしいですか?', '確認', {
+                this.$confirm('削除した案件は戻りません、よろしいですか?', '確認', {
                     confirmButtonText: '削除する',
                     cancelButtonText: "検討する",
                     type: 'warning',

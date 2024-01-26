@@ -133,7 +133,7 @@
                             <el-button @click="onApply" v-bind:class="jobCase.applyStatus != 0 ? 'hidden' : ''" type="primary">
                                 応募する
                             </el-button>
-                            <el-button @click="goMilestoneEdit(jobCase.caseId)" v-if="jobCase.status == 2 && jobCase.milestoneStatus == 0" type="primary">
+                            <el-button @click="goMilestoneEdit(jobCase.caseId)" v-if="jobCase.status == 2 && jobCase.milestoneStatus != 1" type="primary">
                                 マイルストーン編集
                             </el-button>
                             <el-button @click="goMilestoneProgressUpdate(jobCase.caseId)" v-if="jobCase.status == 2 && jobCase.milestoneStatus == 1" type="primary">
@@ -336,7 +336,7 @@
                     });
             },
             onApply() {
-                this.$confirm(`応募すると${this.user.name}さんの個人履歴をクライアントに送ります、よろしいですか?`, '確認', {
+                this.$confirm(`応募すると${this.user.name}さんの職歴をクライアントに送ります、よろしいですか?`, '確認', {
                     confirmButtonText: '応募する',
                     cancelButtonText: "キャンセル",
                     type: 'warning',
@@ -368,11 +368,11 @@
                                 loading.close();
                                 const { data: {
                                     code,
-                                    msg = "新規案件応募できませんでした",
+                                    msg = "新規案件に応募できませんでした",
                                 } = {} } = res;
                                 if (code == 20011) {
                                     this.$confirm('クライアントが確認するまでしばらくお待ちください', '応募が完了しました', {
-                                        confirmButtonText: '分かりました',
+                                        confirmButtonText: '了解です',
                                         type: 'success',
                                         center: true,
                                         showCancelButton: false,

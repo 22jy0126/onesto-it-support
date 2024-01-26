@@ -84,8 +84,12 @@ const goCustomerCaseEdit = () => {
 };
 
 // お客様・案件応募者の詳細チェック
-const goCustomerEmpInfo = (employeeId, caseId) => {
-    goTo(`/customerempinfo.html?employeeId=${employeeId}&caseId=${caseId}`);
+const goCustomerEmpInfo = (employeeId, caseId, binded = "") => {
+    let url = `/customerempinfo.html?employeeId=${employeeId}&caseId=${caseId}`;
+    if (binded == 1) {
+        url = `${url}&binded=1`;
+    }
+    goTo(url);
 };
 
 // お客様・案件詳細

@@ -135,7 +135,7 @@
                     </div>
                     <div v-bind:class="errors.passwordFormat ? 'err-item' : 'opt-item-hidden'">
                         <i class="el-icon-warning error-icon"></i>
-                        パスワードのフォーマットは正しくない
+                        パスワードのフォーマットが正しくありません
                     </div>
                 </div>
                 <div class="edit-item-wrapper">
@@ -361,7 +361,6 @@
                         職務履歴を追加
                     </el-button>
                             
-                            
                 <div class="register-btn-line">
                     <el-button 
                         @click="onCreate"
@@ -575,7 +574,7 @@
                 this.employeeInfo.workHistorys = workHistorys;
 
                 if (flag == false) {
-                    this.$message.error('記入不備な項目があるので、もう一度チェックしてください！');
+                    this.$message.error('記入不備があります、もう一度チェックしてください！');
                     return;
                 }
 
