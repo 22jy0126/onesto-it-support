@@ -170,7 +170,10 @@
                 </el-main>
             </el-container>
         </el-container>
-        <el-dialog title="案件契約確認" :visible="this.bindWindowOpen">
+        <el-dialog 
+			title="案件契約確認" 
+			@close="bindCancel"
+			:visible="this.bindWindowOpen">
 			<div class="confirm-caption">
 				{{employeeInfo.name}}さんと「{{caseInfo.caseName}}」案件を契約して、よろしいですか。
 			</div>
@@ -197,6 +200,7 @@
 					type="primary">
 					契約決定
 				</el-button>
+				<el-button @click="bindCancel">キャンセル</el-button>
 			</div>
         </el-dialog>
     </el-container>
@@ -372,6 +376,9 @@
             goback() {
 				goCustomerCaseView();
             },
+			bindCancel() {
+				this.bindWindowOpen = false;
+			},
 			logout() {
 				const loading = this.$loading({
 					lock: true,
