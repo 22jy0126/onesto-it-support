@@ -133,10 +133,10 @@
                             <el-button @click="onApply" v-bind:class="jobCase.applyStatus != 0 ? 'hidden' : ''" type="primary">
                                 応募する
                             </el-button>
-                            <el-button @click="goMilestoneEdit(jobCase.caseId)" v-if="jobCase.status == 2 && jobCase.milestoneStatus != 1" type="primary">
+                            <el-button @click="goMilestoneEdit(jobCase.caseId)" v-if="jobCase.bindWithMe && jobCase.status == 2 && jobCase.milestoneStatus != 1" type="primary">
                                 マイルストーン編集
                             </el-button>
-                            <el-button @click="goMilestoneProgressUpdate(jobCase.caseId)" v-if="jobCase.status == 2 && jobCase.milestoneStatus == 1" type="primary">
+                            <el-button @click="goMilestoneProgressUpdate(jobCase.caseId)" v-if="jobCase.bindWithMe && jobCase.status == 2 && jobCase.milestoneStatus == 1" type="primary">
                                 マイルストーン詳細
                             </el-button>
                         </div>
@@ -274,6 +274,9 @@
                         this.jobCase.statusCls = "hidden";
                     } else {
                         const { bind } = caseApply;
+                        if (bind == false) {
+                            this.jobCase.bindWithMe = false;
+                        }
                         if (status == 1) {
                             this.jobCase.applyStatus = 1;
                             this.jobCase.applyStatusText = "応募中";
