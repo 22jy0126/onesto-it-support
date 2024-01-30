@@ -290,7 +290,7 @@
 							        </tr>
                                     <tr>
                                         <th class="title">
-                                            開発期間<span class="required">（必須）</span>
+                                            業務期間<span class="required">（必須）</span>
                                         </th>
                                         <td>
                                             <el-input-number 
@@ -300,7 +300,7 @@
                                             </el-input-number> 日
                                             <div v-bind:class="workItem.workPeriodErr ? 'err-item err-item-history' : 'opt-item-hidden'">
                                                 <i class="el-icon-warning error-icon"></i>
-                                                開発期間を入力してください
+                                                業務期間を入力してください
                                             </div>
                                         </td>
                                     </tr>
@@ -600,7 +600,7 @@
                     workNameErr: false,
                     workStart: "",          //開発開始時期
                     workStartErr: false,
-                    workPeriod: "",         //開発期間
+                    workPeriod: "",         //業務期間
                     workPeriodErr: false,
                     workCharge: "",         //担当内容
                     workChargeErr: false,

@@ -225,9 +225,14 @@
                             deadline,
                             status,
                             milestoneStatus,
+                            developTools = "",
                         } = jobCase;
                         const deadlineVal = dateFormat(deadline);
                         jobCase.deadlineVal = deadlineVal;
+
+                        if (developTools == null || developTools == "") {
+                            jobCase.developTools = "指定なし";
+                        }
 
                         if (status == 1) {
                             jobCase.applyStatus = 1;

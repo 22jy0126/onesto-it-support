@@ -152,42 +152,7 @@
                 user: {},
                 noticeCount: 0,
                 // 求人票のデータ
-                jobList: [{
-                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                    bonusMoney: 5,                    //　報酬
-                    bonusMoneyNegotiable: true,             //　報酬相談可能
-                    developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日"                // 業務期間
-                }, {
-                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                    bonusMoney: 5,                    //　報酬
-                    bonusMoneyNegotiable: true,             //　報酬相談可能
-                    developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日"                // 業務期間
-                }, {
-                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                    bonusMoney: 5,                    //　報酬
-                    bonusMoneyNegotiable: true,             //　報酬相談可能
-                    developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日"                // 業務期間
-                }, {
-                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                    bonusMoney: 5,                    //　報酬
-                    bonusMoneyNegotiable: true,             //　報酬相談可能
-                    developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日"                // 業務期間
-                }, {
-                    caseName: "学生管理システムの制作",         // 求人プロジェクト名
-                    bonusMoney: 5,                    //　報酬
-                    bonusMoneyNegotiable: true,             //　報酬相談可能
-                    developTools: "C言語で開発・GoogleChatでコミュニケーション・Wordで資料を作成",  // 希望開発ツール
-                    description: "学生の個人情報を管理して、保護者との連絡.............",   // 求人の説明
-                    deadline: "2024年2月20日"                // 業務期間
-                }],
+                jobList: [],
                 // 求人票の検索
                 search: {
                     pageSize: 10,
@@ -271,14 +236,18 @@
                     spinner: 'el-icon-loading',
                     background: 'rgba(0, 0, 0, 0.1)'
                 });
+                const searchData = {
+                    ...this.search,
+                    fromNum: (this.pageNum - 1) * 10,
+                    status: 1,
+                };
+                if (searchData.bonusMoney) {
+                    searchData.bonusMoney = searchData.bonusMoney/0.9;
+                }
                 axios({
                     method: "POST",
                     url: "/logged/case/getByPage",
-                    data: {
-                        ...this.search,
-                        fromNum: (this.pageNum - 1) * 10,
-                        status: 1,
-                    },
+                    data: searchData,
                     withCredentials: true,
                 })
                     .then((res = {}) => {
@@ -294,9 +263,13 @@
                             } = data;
                             this.totalCount = totalCount;
                             list.forEach((item = {}) => {
-                                const { deadline } = item;
+                                const { deadline, developTools = "" } = item;
                                 const deadlineVal = dateFormat(deadline);
                                 item.deadlineVal = deadlineVal;
+
+                                if (developTools == null || developTools == "") {
+                                    item.developTools = "指定なし";
+                                }
                             });
                             this.jobList = list;
                         }
