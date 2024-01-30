@@ -228,13 +228,17 @@
                     spinner: 'el-icon-loading',
                     background: 'rgba(0, 0, 0, 0.1)'
                 });
+                const searchData = {
+                    ...this.search,
+                    fromNum: (this.pageNum - 1) * 10,
+                };
+                if (searchData.employeeId == "") {
+                    searchData.employeeId = undefined;
+                }
                 axios({
                     method: "POST",
                     url: "/logged/manager/employees",
-                    data: {
-                        ...this.search,
-                        fromNum: (this.pageNum - 1) * 10,
-                    },
+                    data: searchData,
                     withCredentials: true,
                 })
                     .then((res = {}) => {
