@@ -83,7 +83,7 @@
                                         {{milestoneItem.description}}
                                     </div>
                                     <div class="opt-line">
-                                        <span v-bind:class="milestoneItem.isComment ? 'hidden' : 'comment-add'" 
+                                        <span v-bind:class="(milestoneItem.isComment || milestoneItem.editStatus == 0) ? 'hidden' : 'comment-add'" 
                                             @click="onCommentAdd(index)">
                                             コメントを追加する
                                         </span>
