@@ -74,6 +74,9 @@
 			<if test="caseName != null">
 				and case_name like CONCAT('%', #{caseName}, '%')
 			</if>
+			<if test="developTools != null">
+				and LOWER(develop_tools) like CONCAT('%', LOWER(#{developTools}), '%')
+			</if>
 			<if test="bonusMoney != null">
 				and bonus_money >= #{bonusMoney}
 			</if>
@@ -97,6 +100,9 @@
 			</if>
 			<if test="caseName != null">
 				and case_name like CONCAT('%', #{caseName}, '%')
+			</if>
+			<if test="developTools != null">
+				and LOWER(develop_tools) like CONCAT('%', LOWER(#{developTools}), '%')
 			</if>
 			<if test="bonusMoney != null">
 				and bonus_money >= #{bonusMoney}

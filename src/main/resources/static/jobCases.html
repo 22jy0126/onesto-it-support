@@ -69,6 +69,16 @@
                         </div>
                         <div class="search-item">
                             <div class="search-label">
+                                開発ツール
+                            </div>
+                            <el-input
+                                    clearable
+                                    placeholder="開発ツールを入力して検索"
+                                    v-model="search.developTools">
+                            </el-input>
+                        </div>
+                        <div class="search-item">
+                            <div class="search-label">
                                 報酬
                             </div>
                             <el-input-number v-model="search.bonusMoney" :min="0.1" :max="99999">
@@ -76,7 +86,7 @@
                             <div class="mark">万円以上</div>
                         </div>
                         <div class="search-item">
-                            <el-button type="primary" @click="searchCases">検索</el-button>
+                            <el-button type="primary" @click="searchCases(1)">検索</el-button>
                             <el-button type="info" @click="searchReset">リセット</el-button>
                         </div>
                     </div>
@@ -229,13 +239,16 @@
             goEmployeeApplyHistory,
             goCaseDetail,
             goEmployeeNotification,
-            searchCases() {
+            searchCases(pageInit) {
                 const loading = this.$loading({
                     lock: true,
                     text: 'Loading',
                     spinner: 'el-icon-loading',
                     background: 'rgba(0, 0, 0, 0.1)'
                 });
+                if (pageInit == 1) {
+                    this.pageNum = 1;
+                }
                 const searchData = {
                     ...this.search,
                     fromNum: (this.pageNum - 1) * 10,

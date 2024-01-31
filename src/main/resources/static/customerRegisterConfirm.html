@@ -78,7 +78,7 @@
                         <el-button type="primary" @click="onRegister">確認して登録する</el-button>
                     </div>
                     <div>
-                        <el-button type="info">修正に戻る</el-button>
+                        <el-button type="info" @click="toEdit">修正に戻る</el-button>
                     </div>
                 </div>
             </div>
@@ -115,6 +115,9 @@
             this.customerInfo = customerInfo;
         },
         methods: {
+            toEdit() {
+                window.location.href = "customerRegister.html";
+            },
             onRegister() {
                 const loading = this.$loading({
                     lock: true,
