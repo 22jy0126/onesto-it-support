@@ -101,7 +101,7 @@ public class CaseServiceImpl implements CaseService {
 		Result res2 = saveFunctions(functions);
 		Integer resCode = (res1.getCode() == Code.SAVE_OK && res2.getCode() == Code.SAVE_OK) ? Code.SAVE_OK
 				: Code.SAVE_ERROR;
-		return new Result(resCode, res2.getData());
+		return new Result(resCode, caseId);
 	}
 
 	@Override

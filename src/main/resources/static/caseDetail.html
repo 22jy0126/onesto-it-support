@@ -276,7 +276,9 @@
                         const { bind } = caseApply;
                         if (bind == false) {
                             this.jobCase.bindWithMe = false;
-                        }
+                        } else {
+							this.jobCase.bindWithMe = true;
+						}
                         if (status == 1) {
                             this.jobCase.applyStatus = 1;
                             this.jobCase.applyStatusText = "応募中";

@@ -316,9 +316,10 @@
                         loading.close();
                         const { data: {
                             code,
-                            data,
+                            data: caseId,
                         } = {} } = res;
                         if (code == 20011) {
+                            this.jobCase.caseId = caseId;
                             this.$message.success(succMsg);
                             if (status == 1) {
                                 localStorage.removeItem("tempJobCase");
