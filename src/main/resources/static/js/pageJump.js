@@ -9,7 +9,7 @@ const goTo = (url) => {
 * */
 // 社員・求人一覧
 const goJobCases = () => {
-    goTo("/jobcases.html");
+    goTo("/jobCases.html");
 };
 
 // 社員、お客様、管理者・ログイン
@@ -20,72 +20,72 @@ const goLogin = (emp) => {
 
 // 社員・社員の登録
 const goEmployeeRegister = () => {
-    goTo("/employeeregister.html");
+    goTo("/employeeRegister.html");
 };
 
 // 社員・社員の登録確認
 const goEmployeeRegisterConfirm = () => {
-    goTo("/employeeregisterconfirm.html");
+    goTo("/employeeRegisterConfirm.html");
 };
 
 // 社員・社員の登録完了
 const goEmployeeRegisterComplete = () => {
-    goTo("/employeeregistercomplete.html");
+    goTo("/employeeRegisterComplete.html");
 };
 
 // 社員・社員の詳細
 const goEmployeeInfo = () => {
-    goTo(`/employeeinfo.html`);
+    goTo(`/employeeInfo.html`);
 };
 
 // 社員・社員の応募歴史
 const goEmployeeApplyHistory = () => {
-    goTo("/employeeapplyhistory.html");
+    goTo("/employeeApplyHistory.html");
 };
 
 // 社員・案件の詳細
 const goCaseDetail = (caseId, tom = "0") => {
-    goTo(`/casedetail.html?caseId=${caseId}&tom=${tom}`);
+    goTo(`/caseDetail.html?caseId=${caseId}&tom=${tom}`);
 };
 
 // 社員・案件のマイルストーン編集
 const goMilestoneEdit = (caseId) => {
-    goTo(`/milestoneedit.html?caseId=${caseId}`);
+    goTo(`/milestoneEdit.html?caseId=${caseId}`);
 };
 
 // 社員・案件のマイルストー進捗更新
 const goMilestoneProgressUpdate = (caseId) => {
-    goTo(`/milestoneprogressupdate.html?caseId=${caseId}`);
+    goTo(`/milestoneProgressUpdate.html?caseId=${caseId}`);
 };
 
 // 社員・通知
 const goEmployeeNotification = () => {
-    goTo("employeenotification.html");
+    goTo("employeeNotification.html");
 }
 
 // お客様・お客様の登録
 const goCustomerRegister = () => {
-    goTo("/customerregister.html");
+    goTo("/customerRegister.html");
 };
 
 // お客様・お客様の登録確認
 const goCustomerRegisterConfirm = () => {
-    goTo("/customerregisterconfirm.html");
+    goTo("/customerRegisterConfirm.html");
 };
 
 // お客様・お客様の登録完了
 const goCustomerRegisterComplete = () => {
-    goTo("/customerregistercomplete.html");
+    goTo("/customerRegisterComplete.html");
 };
 
 // お客様・新規案件登録
 const goCustomerCaseEdit = () => {
-    goTo("/customercaseedit.html");
+    goTo("/customerCaseEdit.html");
 };
 
 // お客様・案件応募者の詳細チェック
 const goCustomerEmpInfo = (employeeId, caseId, binded = "") => {
-    let url = `/customerempinfo.html?employeeId=${employeeId}&caseId=${caseId}`;
+    let url = `/customerEmpInfo.html?employeeId=${employeeId}&caseId=${caseId}`;
     if (binded == 1) {
         url = `${url}&binded=1`;
     }
@@ -94,7 +94,7 @@ const goCustomerEmpInfo = (employeeId, caseId, binded = "") => {
 
 // お客様・案件詳細
 const goCustomerCaseDetail = (caseId = "", tom = "") => {
-    let url = "/customercasedetail.html";
+    let url = "/customerCaseDetail.html";
     if (caseId != "") {
         url = `${url}?caseId=${caseId}`;
     }
@@ -106,44 +106,44 @@ const goCustomerCaseDetail = (caseId = "", tom = "") => {
 
 // お客様・登録した案件リスト
 const goCustomerCaseView = () => {
-    goTo("/customercaseview.html");
+    goTo("/customerCaseView.html");
 };
 
 // お客様・案件のマイルストーン確認
 const goMilestoneDetailConfirm = (caseId = "") => {
-    goTo(`/milestonedetailconfirm.html?caseId=${caseId}`);
+    goTo(`/milestoneDetailConfirm.html?caseId=${caseId}`);
 };
 
 // お客様・案件のマイルストーン進捗確認
 const goMilestoneProgressConfirm = (caseId = "") => {
-    goTo(`/milestoneprogressconfirm.html?caseId=${caseId}`);
+    goTo(`/milestoneProgressConfirm.html?caseId=${caseId}`);
 };
 
 // お客様・通知
 const goCustomerNotification = () => {
-    goTo(`/customernotification.html`);
+    goTo(`/customerNotification.html`);
 };
 
 // 管理者・顧客管理
 const goManageCustomer = () => {
-    goTo("/managecustomer.html");
+    goTo("/manageCustomer.html");
 };
 
 // 管理者・社員管理
 const goManageEmployee = () => {
-    goTo("/manageemployee.html");
+    goTo("/manageEmployee.html");
 };
 
 // 管理者・顧客案件リスト
 const goManageCustomerDetail = (customerId) => {
-    goTo(`/managecustomerdetail.html?customerId=${customerId}`);
+    goTo(`/manageCustomerDetail.html?customerId=${customerId}`);
 };
 
 // 管理者・社員案件リスト
 const goManageEmployeeDetail = (employeeId) => {
-    goTo(`/manageemployeedetail.html?employeeId=${employeeId}`);
+    goTo(`/manageEmployeeDetail.html?employeeId=${employeeId}`);
 };
 
 const goManageCaseDetail = (caseId, from) => {
-    goTo(`/managecasedetail.html?caseId=${caseId}&from=${from}`);
+    goTo(`/manageCaseDetail.html?caseId=${caseId}&from=${from}`);
 }
